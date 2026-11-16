@@ -1,4 +1,5 @@
-﻿import { Particles, Bits, Lights, P, PF, B, Rng, fit, band, clamp, smooth, ease, TAU, WHITE, hex, flare, createFrame, Painter, rgb, mix } from "../../core/index.js";
+﻿import { Particles, Lights, P, Rng, fit, band, clamp, smooth, ease, TAU, WHITE, hex, flare, createFrame, Painter, rgb, mix } from "../../core/index.js";
+import { createGroundBlast } from "./_blast.js";
 import { GOLD, STONE, SIZE, ORIGIN, INK, stroke, contain, rune, drain, DURATION, HIT } from "./_lib.js";
 
 export const meta = {
@@ -13,9 +14,11 @@ export function create(o) {
   const orange = mix(C[3], hex("#c75c24"), 0.65), red = mix(C[1], hex("#631b18"), 0.7);
   const X0 = -ORIGIN[0], X1 = SIZE[0] - ORIGIN[0] - 1, TOP = -ORIGIN[1], Y1 = SIZE[1] - ORIGIN[1] - 1;
   const ps = new Particles({ rng: R, ground: () => 1, sparks: [WHITE, C[6], C[4], C[2]] });
-  const bits = new Bits({ ground: () => -2 }), lights = new Lights(), cracks = [], events = [];
+  const lights = new Lights(), cracks = [];
   const fadeAt = meta.duration - 0.12;
-  let t = 0, eventIndex = 0, aftershock = false;
+  const blast = createGroundBlast({ seed: o.seed, scale: 1, hot: C, dirt: STONE, haze: "#4a4552",
+    halfWidth: 230, duration: fadeAt, bounds: [X0 + 3, TOP + 3, X1 - 3, Y1 - 3] });
+  let t = 0, aftershock = false;
 
   // Short, fine far faults and broad near faults are projected onto the ground.
   // The two lateral trunks reach the actual canvas edges, rather than an old box.
@@ -70,26 +73,9 @@ export function create(o) {
     return { x: Math.cos(a) * 67, y: Math.sin(a) * 12, at: 0.085 + i * 0.018, hit: false };
   });
   for (let i = 0; i < 16; i++) {
-    const c = mains[i % 6], q = c.pts[3 + i % 9], heavy = i < 10;
-    events.push({ at: 0.025 + i * 0.008, rock: { kind: B.CHUNK, x: q[0], y: Math.min(-3, q[1] - 5),
-      vx: Math.sign(q[0]) * R.range(12, heavy ? 45 : 100), vy: -R.range(heavy ? 60 : 170, heavy ? 135 : 260),
-      s: heavy ? R.range(6, 11.5) : R.range(4, 7), a: R.range(-0.3, 0.3), va: R.range(-7, 7),
-      ramp: STONE, g: 0.85, drag: 0.9, bounce: 0.25, life: R.range(2.1, 2.7), pvy: 0 } });
-  }
-  for (const v of vents) events.push({ at: v.at, vent: v });
-  events.sort((a, b) => a.at - b.at);
-  for (let i = 0; i < 48; i++) {
     const a = R.range(-Math.PI, 0), speed = R.range(110, 380);
     ps.spawn(P.SPARK, R.range(-8, 8), -3, Math.cos(a) * speed, Math.sin(a) * speed,
       R.range(0.25, 0.7), WHITE, 1, R.range(0, 0.06));
-  }
-  for (let i = 0; i < 28; i++) ps.spawn(P.GRIT, R.range(-23, 23), -3, R.range(-170, 170),
-    -R.range(90, 270), R.range(0.7, 1.5), R.pick(S.slice(1)), R.chance(0.3) ? 2 : 1);
-  // A few broad translucent lobes form a wall; sparks supply fine detail cheaply.
-  for (let i = 0; i < 8; i++) {
-    const x = (i - 3.5) * 31, side = Math.sign(x);
-    ps.spawn(P.SMOKE, x, -R.range(8, 13), side * R.range(28, 60),
-      -R.range(12, 26), R.range(2.1, 2.65), dust, R.range(9, 12), 0.06 + Math.abs(x) / 1000, PF.BIG);
   }
   lights.add(0, -52, 138, C[5], 0.95, 0.58);
   lights.add(0, -12, 64, WHITE, 1.25, 0.13);
@@ -153,15 +139,7 @@ export function create(o) {
         if (i % 16 === 0) p.glow(x, y, 7, C[5], k * 0.28);
         prev = [x, y];
       }
-      for (const side of [-1, 1]) {
-        const x = side * r * 0.8;
-        if (x < X0 + 25 || x > X1 - 25) continue;
-        p.each(x - 22, -5, x + 22, 3, (lx, ly, sx, sy) => {
-          const d = ((lx - x) / 22) ** 2 + ((ly + 1) / 4) ** 2;
-          if (d < 1) p.blendPx(sx, sy, dust, (1 - d) ** 2 * k * 0.48);
-        });
-        p.line(x - side * 17, -4, x + side * 12, -3, C[5], k * 0.6);
-      }
+
     }
     if (t >= 0.3 && t < 0.61) {
       const u = (t - 0.3) / 0.31;
@@ -187,17 +165,7 @@ export function create(o) {
   return {
     update(dt) {
       t += dt;
-      while (eventIndex < events.length && t >= events[eventIndex].at) {
-        const e = events[eventIndex++];
-        if (e.rock) bits.add(e.rock);
-        else {
-          const { x, y } = e.vent;
-          for (let i = 0; i < 6; i++) ps.spawn(P.SPARK, x, y - 2, R.range(-34, 34), -R.range(100, 240), R.range(0.25, 0.55));
-          ps.spawn(P.SMOKE, x, y - 3, R.range(-10, 10), -R.range(34, 65), R.range(0.7, 1.2), dust, R.range(3, 5));
-          bits.add({ kind: B.CHUNK, x, y: y - 5, vx: R.range(-28, 28), vy: -R.range(100, 190), s: R.range(3, 5),
-            a: R.range(0, TAU), va: R.range(-9, 9), ramp: STONE, bounce: 0.28, drag: 1, life: 1.5 });
-        }
-      }
+      blast.update(dt);
       for (const n of nails) if (!n.hit && t >= n.at) {
         n.hit = true;
         for (let i = 0; i < 4; i++) ps.spawn(P.SPARK, n.x, n.y - 1, R.range(-55, 55), -R.range(45, 100), R.range(0.18, 0.34));
@@ -207,30 +175,23 @@ export function create(o) {
         aftershock = true;
         lights.add(0, -10, 76, C[4], 0.4, 0.23);
         for (const v of vents) {
-          ps.spawn(P.DUST, v.x, v.y - 2, R.range(-14, 14), -R.range(18, 34), 1.05, dust, 4.5);
           for (let i = 0; i < 3; i++) ps.spawn(P.SPARK, v.x, v.y, R.range(-35, 35), -R.range(60, 110), 0.4);
         }
-        for (const b of bits.list) if (b.rest || b.vy > 0) { b.rest = false; b.vy -= 36; b.va += R.sign() * 2; }
       }
-      for (const b of bits.list) b.pvy = b.vy;
-      bits.update(dt);
-      for (const b of bits.list) if (b.pvy > 85 && b.vy <= 0) {
-        ps.spawn(P.DUST, b.x, -3, R.range(-18, 18), -10, 0.45, dust, 2 + b.s * 0.16);
-      }
-      ps.update(dt); contain(ps, bits); lights.update(dt);
+      ps.update(dt); contain(ps); lights.update(dt);
     },
     drawBack(p) {
       if (t >= fadeAt) return;
       const ty = p.ty;
       if (t > 0.3 && t < 0.47) p.ty += Math.sin((t - 0.3) * 110) * 1.6 * (1 - (t - 0.3) / 0.17);
-      floor(p); seal(p, true); waves(p, true); ps.draw(p, "back");
+      floor(p); blast.drawBack(p); seal(p, true); waves(p, true); ps.draw(p, "back");
       p.ty = ty;
     },
     draw(p) {
       if (t >= fadeAt || impact(p)) return;
       const ty = p.ty;
       if (t > 0.3 && t < 0.47) p.ty += Math.sin((t - 0.3) * 110) * 1.6 * (1 - (t - 0.3) / 0.17);
-      waves(p, false); bits.draw(p); seal(p, false); ps.draw(p, "front");
+      waves(p, false); blast.draw(p); seal(p, false); ps.draw(p, "front");
       if (t < 0.32) {
         const k = 1 - smooth(0.085, 0.32, t), w = 32 * (1 - t / 0.35);
         p.beam(0, TOP + w / 2, 0, -w / 2, w, (u, v) => v < 0.24 ? WHITE : v < 0.62 ? C[6] : C[4], k);
