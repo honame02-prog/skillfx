@@ -2,9 +2,16 @@ import { hex, clamp, smooth, WHITE } from "../../core/index.js";
 
 export const GOLD = ["#171323", "#352536", "#694333", "#a57440", "#d8a750", "#f6ce78", "#ffe8ae", "#fff8dc"];
 export const STONE = ["#191622", "#342b3a", "#514353", "#81706d", "#c4ae8c"];
-export const RELEASE = 1.42, HIT = 1.86, DURATION = 4.8, TX = 175;
-export const SIZE = [420, 260], ORIGIN = [237, 220];
-export const BOX = [-233, -216, 179, 36];
+// Shared timeline (Opus, v2 script). All three parts and the move read these; only Opus edits them.
+//  0 .. EMERGE        black clouds roll in and coil into a vortex, the sky goes dark, thunder flickers
+//  EMERGE .. REVEALED the fingertip pierces the vortex core, the whole hand slowly comes down until fully seen
+//  REVEALED .. RELEASE "tu thien": everything locks — runes ignite, a heaven cage closes, colour drains, pressure
+//  RELEASE .. HIT     the slam: the hand drops from HOVER_TIP to the floor almost instantly
+//  HIT .. DURATION    "giam dia": the floor seal clamps, rune nails pin the earth, the ground splits, aftermath
+export const EMERGE = 1.8, REVEALED = 3.6, RELEASE = 4.1, HIT = 4.28, DURATION = 7.6, TX = 250;
+export const HOVER_TIP = -150, CLOUD_BASE = -300;
+export const SIZE = [520, 420], ORIGIN = [310, 380];
+export const BOX = [-306, -376, 206, 36];
 export const INK = hex("#090a13");
 export const envelope = (t, start, full, fade, end) => smooth(start, full, t) * (1 - smooth(fade, end, t));
 
