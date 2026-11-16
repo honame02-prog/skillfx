@@ -9,7 +9,7 @@ export const meta = {
   name: 'Phat No Hoa Lien',
   desc: 'Two hands fuse alien flames into a lotus, lift it, then hurl it into a distant target; its broken balance releases a petal shock and a towering crown of fire.',
   tags: ['ultimate', 'move', 'lotus', 'fire', 'spell', 'projectile', 'explosion', 'one-shot'],
-  size: [480, 280], origin: [88, 242], duration: +(ARRIVE + burst.meta.duration).toFixed(3),
+  size: [480, 380], origin: [88, 342], duration: +(ARRIVE + burst.meta.duration).toFixed(3),
   loop: false, fps: 30, bg: 'ground', actor: 2,
   options: { flames: FLAMES, seed: 17 },
 };
