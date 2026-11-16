@@ -1,6 +1,7 @@
 // The categories, in gallery order, with a line for each.
 
 export const categories = [
+  { id: "ultimate", name: "ultimate", blurb: "huge signature skills: sky-splitting, earth-shattering" },
   { id: "moves", name: "moves", blurb: "whole attacks, wind-up to recovery, chained from the effects below" },
   { id: "fire", name: "fire", blurb: "torches, breath, pillars, walls of flame" },
   { id: "explosions", name: "explosions", blurb: "blasts, smoke, fireworks, mushroom clouds" },
