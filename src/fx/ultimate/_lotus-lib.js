@@ -21,37 +21,63 @@ const NL = noiseFor(LOOP);
 const WIDTH = Array.from({ length: 257 }, (_, i) => Math.pow(Math.sin(Math.PI * i / 256), 0.62) * (1 - 0.3 * i / 256));
 const CURVE = Array.from({ length: 257 }, (_, i) => Math.sin(Math.PI * i / 256));
 
-// A curved, pointed petal: dark folded underside, saturated body, thin hot lip and a lit vein.
-// Shared by the intact flower and the falling fragments, so debris retains its identity.
+// A petal-shaped volume of fire: cooling root, translucent ragged edges and turbulent light.
+// Shared by the intact flower and falling fragments; there is no solid rim or folded facet.
 export function petal(p, x, y, dx, dy, w, C, t, seed, alpha = 1, crack = 0, lick = true) {
+  t = ((t % LOOP) + LOOP) % LOOP;
   const len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len, nx = -uy, ny = ux;
+  if (len < 0.01) return;
+  const N = (rate, s = 0, off = 0) => NL(t, rate, s, off);
   const bend = Math.sin(seed * 3.71) * w * 0.19;
-  const margin = w + 2;
-  p.shade(Math.min(x, x + dx) - margin, Math.min(y, y + dy) - margin,
-    Math.max(x, x + dx) + margin, Math.max(y, y + dy) + margin, (px, py, out) => {
+  const flow = Array.from({ length: 65 }, (_, i) => [
+    N(3.75, seed, -i * 0.11), N(5, seed + 9, -i * 0.14), N(2.5, seed + 19, -i * 0.09),
+  ]);
+  const margin = w + 3;
+  p.each(Math.min(x, x + dx) - margin, Math.min(y, y + dy) - margin,
+    Math.max(x, x + dx) + margin, Math.max(y, y + dy) + margin, (px, py, sx, sy) => {
       const ax = px - x, ay = py - y, u = (ax * ux + ay * uy) / len;
       if (u <= 0 || u >= 1) return;
-      const ui = Math.round(u * 256), half = w * WIDTH[ui];
-      const v = ax * nx + ay * ny - bend * CURVE[ui], d = Math.abs(v), edge = half - d;
-      if (edge < 0) return;
-      const ridge = Math.abs(v + half * 0.22);
-      out.a = alpha;
-      out.c = edge < 0.85 ? C[v < 0 ? 5 : 2] : ridge < 0.7 && u > 0.2 ? C[5]
-        : v > half * 0.4 ? C[1] : d > half * 0.65 ? C[3] : C[u > 0.57 ? 3 : 2];
-      if (crack > 0 && u > 0.16 && u < 0.9 && Math.abs(v - Math.sin(u * 24 + seed) * half * 0.32) < crack * 0.8) {
-        out.c = WHITE; out.k = 0.4 * crack; out.l = C[5];
-      }
+      const ui = Math.round(u * 256), f = flow[Math.round(u * 64)];
+      const v = ax * nx + ay * ny - bend * CURVE[ui] - f[2] * u * 1.2;
+      const upper = v * ny < 0, rough = (upper ? 2 : 0.8) * smooth(0.25, 0.85, u);
+      const half = w * WIDTH[ui] + (v < 0 ? f[0] : f[1]) * rough;
+      const edge = half - Math.abs(v);
+      if (edge <= 0 || half <= 0) return;
+      const volume = smooth(0, Math.max(1.8, half * 0.7), edge);
+      const heat = smooth(0.08, 0.4, u) * (0.65 + 0.35 * f[2]);
+      const curl = Math.max(0, 1 - Math.abs(v / half + f[0] * 0.4));
+      const a = alpha * volume * (0.5 + 0.22 * heat) * (0.8 + f[1] * 0.2);
+      p.blendPx(sx, sy, C[u < 0.18 ? 0 : heat > 0.65 ? 3 : 2], a);
+      p.add(sx, sy, C[4], alpha * volume * heat * curl * (0.36 + crack * 0.15));
     });
   if (lick) {
-    const N = (rate, s = 0, off = 0) => NL(t, rate, s, off);
-    const L = 4 + 5 * (0.5 + 0.5 * N(5, seed));
-    flameBlade(p, x + dx * 0.89, y + dy * 0.89, ux * 0.25, -1,
-      L, Math.max(0.65, w * 0.15), N(4, seed + 3) * 2, N, seed, hotFirst(C), LAYERS);
+    const H = hotFirst(C), side = ny > 0 ? -1 : 1;
+    for (let j = 0; j < 2; j++) {
+      const u = 0.72 + j * 0.22, ui = Math.round(u * 256);
+      const off = bend * CURVE[ui] + side * w * WIDTH[ui] * 0.65;
+      const tx = x + dx * u + nx * off, ty = y + dy * u + ny * off;
+      const L = (3 + 5 * (0.5 + 0.5 * N(4, seed + j * 13))) * Math.min(1, w / 6);
+      const fade = p.fade; p.fade *= alpha;
+      flameBlade(p, tx, ty, ux * 0.18, -1, L, Math.max(0.55, w * 0.12),
+        N(5, seed + j + 3) * 1.6, N, seed + j * 13, H, [[1, 1, 4], [0.5, 0.65, 3]], 0.5, 1.2);
+      p.fade = fade;
+      p.glow(tx, ty - L * 0.35, L, C[4], 0.08 * alpha);
+    }
+    // P.FIRE / P.EMBER rise and cooling, sampled analytically to preserve the loop.
+    cycle(t, LOOP, 5, seed + 300, R => R.range(0.22, 0.55), (age, life, R) => {
+      const q = age / life, u = R.range(0.78, 1), k = Math.sin(q * Math.PI) * alpha;
+      const tx = x + dx * u + R.range(-1.5, 1.5) + R.range(-4, 4) * age;
+      const ty = y + dy * u - (14 * age + 16 * age * age);
+      p.disc(tx, ty, (1 - q) * 1.2, C[q < 0.4 ? 4 : 2], d => k * (1 - d) * 0.75);
+      p.light(tx, ty, C[5], k * 0.5);
+      p.glow(tx, ty, 3, C[4], k * 0.22);
+    });
   }
-  p.glow(x + dx * 0.65, y + dy * 0.65, w * 1.8, C[4], 0.1 * alpha);
+  p.glow(x + dx * 0.65, y + dy * 0.65, w * 1.8, C[4], 0.09 * alpha);
 }
 
 export function lotus(p, t, ramps, { x = 0, y = -28, size = 1, instability = 0, halo = true, seed = 1 } = {}) {
+  t = ((t % LOOP) + LOOP) % LOOP;
   const ph = t / LOOP * TAU, breath = 1 + Math.sin(ph * 2) * 0.025;
   const s = size * breath, rot = 0.11 * Math.sin(ph), bob = Math.sin(ph) * s;
   const jit = instability * Math.sin(t * 113) * 1.2;
@@ -79,15 +105,17 @@ export function lotus(p, t, ramps, { x = 0, y = -28, size = 1, instability = 0, 
   const pulse = 0.85 + 0.15 * Math.sin(ph * 2);
   for (let i = 0; i < 5; i++) {
     const dx = (i - 2) * 1.8 * s, h = (5 - Math.abs(i - 2)) * s;
-    p.line(x + dx, y - 2 * s, x + dx * 0.7, y - h - 4 * s, ramps[i % ramps.length][5]);
-    p.dot(x + dx * 0.7, y - h - 4 * s, WHITE);
+    p.line(x + dx, y - 2 * s, x + dx * 0.7, y - h - 4 * s, ramps[i % ramps.length][4], 0.5);
+    p.light(x + dx * 0.7, y - h - 4 * s, WHITE, pulse * 0.65);
   }
-  sparkle(p, x, y - 5 * s, 5 * s, WHITE, ramps[0][4], 0.3 * pulse);
-  p.glow(x, y - 5 * s, 13 * s, WHITE, 0.26 * pulse);
-  p.glow(x, y - 8 * s, 49 * s, ramps[0][3], 0.18 * pulse);
+  p.disc(x, y - 5 * s, 1.5 * s, WHITE, d => (1 - d) * pulse);
+  sparkle(p, x, y - 5 * s, 4 * s, WHITE, ramps[0][4], 0.23 * pulse);
+  p.glow(x, y - 5 * s, 10 * s, WHITE, 0.34 * pulse);
+  p.glow(x, y - 8 * s, 42 * s, ramps[0][3], 0.1 * pulse);
 }
 
 export function wheel(p, t, ramps, x, y, radius) {
+  t = ((t % LOOP) + LOOP) % LOOP;
   p.ring(x, y, radius, 1, ramps[0][3], 0.18);
   p.ring(x, y, radius - 3, 0.6, ramps[1][3], 0.12);
   // Twelve turning broken spokes, with a complete revolution at the loop seam.
@@ -106,6 +134,7 @@ export function wheel(p, t, ramps, x, y, radius) {
 
 // Seamless analytic EMBER motion: the same rise, wander, cooling and hot head as P.EMBER.
 export function orbitEmbers(p, t, ramps, seed, x = 0, y = -30, size = 1) {
+  t = ((t % LOOP) + LOOP) % LOOP;
   cycle(t, LOOP, 42, seed, R => R.range(0.5, 1.3), (age, life, R) => {
     const q = age / life, a = R.range(0, TAU) + q * 1.4, r = R.range(25, 43) * size;
     const px = x + Math.cos(a) * r, py = y + Math.sin(a) * r * 0.5 - q * 14 * size;

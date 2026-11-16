@@ -2,7 +2,7 @@ import { FLAMES, LOOP, flames, lotus, orbitEmbers } from './_lotus-lib.js';
 
 export const meta = {
   name: 'Hoa Lien',
-  desc: 'Three tiers of pointed fire petals breathe around a white stamen; separate alien flames lick their rims beneath a quiet turning dharma wheel.',
+  desc: 'Translucent lotus flames curl and shed rising embers in four distinct colors, with dark roots, luminous hearts and a small white stamen beneath a quiet dharma wheel.',
   tags: ['ultimate', 'lotus', 'fire', 'multicolor', 'loop'],
   size: [148, 136], origin: [74, 112], duration: LOOP, loop: true, fps: 30, bg: 'ground',
   options: { flames: FLAMES, seed: 17 },
