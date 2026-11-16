@@ -28,12 +28,17 @@ const HOLD_END = HIT + 0.8, MELT_SPAN = 1.5, QUIET = RELEASE - 0.15;
 const birth = (row) => HOLD_END + (HAND_H - 1 - row) / HAND_H * MELT_SPAN;
 const pulseStarts = [1.91, 2.54, 3.05, 3.46, 3.77];
 const cageBars = Array.from({ length: 10 }, (_, i) => {
-  const a = (i + 0.5) / 10 * TAU, x = Math.cos(a) * 116, y = Math.sin(a) * 22;
-  return { x, y, back: Math.sin(a) < 0, delay: (i % 5) * 0.018,
-    glyphs: Array.from({ length: 12 }, (_, j) => {
-      const pts = rune(x, CLOUD_BASE + 19 + j * 24, 0.68, i + j);
-      return pts.filter((_, n) => n % 2 === 0 || n === pts.length - 1);
-    }) };
+  const a = (i + 0.25) / 10 * TAU, x = Math.cos(a) * 128, y = Math.sin(a) * 22;
+  const tx = Math.cos(a) * 12, ty = CLOUD_BASE - 62 + Math.sin(a) * 4;
+  return { x, y, tx, ty, back: Math.sin(a) < 0, delay: ((i * 7) % 10) / 9 * 0.15,
+    glyphs: Array.from({ length: 9 }, (_, j) => {
+      const u = 0.1 + j * 0.098, gx = lerp(tx, x, u), gy = lerp(ty, y, u);
+      const pts = rune(gx, gy, 0.64 + u * 0.18, i + j);
+      return { x: gx, y: gy, halo: j % 3 === 0, pts: pts.filter((_, n) => n % 2 === 0 || n === pts.length - 1) };
+    }),
+    shards: Array.from({ length: 9 }, (_, j) => ({ u: 0.12 + j * 0.098,
+      vx: Math.sin(i * 13 + j * 7) * 27, vy: 30 + ((i + j * 3) % 7) * 9,
+      life: 0.32 + ((i * 3 + j) % 6) * 0.035, spin: i + j * 1.7 })) };
 });
 const far = (a) => Math.sin(a) < 0, near = (a) => Math.sin(a) >= 0;
 
@@ -99,37 +104,74 @@ export function create(o) {
   }
 
   function cage(p, back) {
-    if (t < REVEALED || t >= HOLD_END + 1.5) return;
-    const k = 1 - smooth(HOLD_END + 0.05, HOLD_END + 1.5, t), keep = back ? far : near;
-    const plunge = 12 * ease.inQuart(clamp((t - RELEASE) / (HIT - RELEASE)));
-    const lock = smooth(REVEALED, QUIET, t), depth = back ? 0.5 : 0.82;
+    const shatter = HIT + 0.15;
+    if (t < REVEALED || t >= HIT + 0.7) return;
+    const plunge = 150 * ease.inQuart(clamp((t - RELEASE) / (HIT - RELEASE)));
+    const depth = back ? 0.52 : 0.88;
     for (const q of cageBars) {
       if (q.back !== back) continue;
-      const u = ease.outCubic(clamp((t - REVEALED - q.delay) / 0.23));
-      const top = CLOUD_BASE + plunge, bottom = lerp(CLOUD_BASE, q.y + plunge, u);
-      p.line(q.x - 2, top, q.x - 2, bottom, C[3], k * depth * 0.7);
-      p.line(q.x, top, q.x, bottom, C[7], k * depth);
-      // A narrow light-buffer halo avoids shading ten tall rectangular glow bounds.
-      for (let yy = Math.ceil(top + 6); yy <= bottom; yy++) {
-        p.light(q.x - 1, yy, C[6], k * depth * 0.075);
-        p.light(q.x + 1, yy, C[6], k * depth * 0.075);
+      if (t >= shatter) {
+        const age = t - shatter;
+        for (const s of q.shards) {
+          if (age >= s.life) continue;
+          // The buried ends stay underground; only exposed rune splinters fall.
+          const sy = lerp(q.ty, q.y, s.u) + 150;
+          if (sy > q.y - 3) continue;
+          const x = lerp(q.tx, q.x, s.u) + s.vx * age;
+          const y = sy + s.vy * age + 180 * age * age;
+          const k = depth * (1 - smooth(0.12, s.life, age)) * (1 - smooth(q.y - 8, q.y + 3, y));
+          if (k < 0.004) continue;
+          const angle = s.spin + age * 12, dx = Math.cos(angle) * 2, dy = Math.sin(angle) * 3;
+          p.line(x - dx, y - dy, x + dx, y + dy, C[8], k);
+          p.light(x, y, C[6], k * 0.6);
+          p.glow(x, y, 3, C[6], k * 0.2);
+        }
+        continue;
       }
-      for (let j = 0; j < q.glyphs.length; j++) {
-        const yy = CLOUD_BASE + 19 + j * 24;
-        if (yy + plunge > bottom - 5) break;
-        const pts = q.glyphs[j], a = k * depth * (0.6 + lock * 0.4);
-        for (let n = 1; n < pts.length; n++) p.line(pts[n - 1][0], pts[n - 1][1] + plunge, pts[n][0], pts[n][1] + plunge, C[8], a);
-        p.glow(q.x, yy + plunge, 3, C[5], a * 0.18);
+      const local = t - REVEALED - q.delay;
+      if (local <= 0) continue;
+      const u = ease.inQuad(clamp(local / 0.14)), top = q.ty + plunge;
+      const bottom = Math.min(q.y + 2, lerp(q.ty, q.y, u) + plunge);
+      const endX = lerp(q.tx, q.x, (bottom - plunge - q.ty) / (q.y - q.ty));
+      p.line(q.tx, top, endX, bottom, C[9], depth);
+      // Sample the halo along the converging one-pixel core, without a wide beam.
+      for (let yy = Math.ceil(top); yy <= bottom; yy += 2) {
+        const x = lerp(q.tx, q.x, (yy - plunge - q.ty) / (q.y - q.ty));
+        p.light(x - 1, yy, C[6], depth * 0.2);
+        p.light(x + 1, yy, C[6], depth * 0.2);
       }
-      if (u > 0.95) stroke(p, rune(q.x, q.y + plunge - 2, 0.8, q.delay * 100), C[8], k * depth, C[6], 4);
+      for (const g of q.glyphs) {
+        if (g.y + plunge > bottom - 5) break;
+        for (let n = 1; n < g.pts.length; n++) p.line(g.pts[n - 1][0], g.pts[n - 1][1] + plunge, g.pts[n][0], g.pts[n][1] + plunge, C[8], depth);
+        p.light(g.x, g.y + plunge, C[6], depth * 0.3);
+        if (g.halo) p.glow(g.x, g.y + plunge, 3, C[6], depth * 0.19);
+      }
+      const landAge = local - 0.14;
+      if (landAge >= 0 && landAge < 0.21) {
+        const v = landAge / 0.21, k = (1 - v) * depth;
+        p.line(q.x - 4 * (1 - v), q.y, q.x + 4 * (1 - v), q.y, C[9], k);
+        p.line(q.x, q.y - 5 * (1 - v), q.x, q.y + 2, C[8], k);
+        p.glow(q.x, q.y - 1, 8, C[6], k * 0.5);
+        for (const side of [-1, 1]) p.ellipse(q.x + side * (2 + v * 8), q.y - Math.sin(v * Math.PI) * 3,
+          2 + v * 4, 1 + v * 1.7, dust, (d) => (1 - d) * k * 0.36);
+      }
     }
-    for (const y of [CLOUD_BASE + plunge, -72 + plunge, plunge]) {
-      band(p, 0, y, 116, 0.19, 0.5, k * lock * depth, ringRamp, keep);
-    }
-    // The roof arches meet above the hand; perspective and layer split keep the prison readable.
-    if (lock > 0) for (const q of cageBars) {
-      if (q.back !== back) continue;
-      stroke(p, [[q.x, CLOUD_BASE + plunge], [q.x * 0.65, CLOUD_BASE - 35 + plunge], [0, CLOUD_BASE - 59 + plunge]], C[6], k * lock * depth * 0.7, C[5], 3);
+    if (t >= shatter) return;
+    // A few sagging, broken rune ties; never a complete horizontal hoop.
+    for (const i of [0, 2, 3, 5, 7, 8]) {
+      const q = cageBars[i], next = cageBars[(i + 1) % 10];
+      if (q.back !== back || next.back !== back) continue;
+      const k = smooth(REVEALED + Math.max(q.delay, next.delay) + 0.14, REVEALED + 0.35, t) * depth * 0.35;
+      if (k <= 0) continue;
+      const u = 0.56 + (i % 3) * 0.14, v = u + (i % 2 ? -0.035 : 0.025);
+      const x0 = lerp(q.tx, q.x, u), y0 = lerp(q.ty, q.y, u) + plunge;
+      const x1 = lerp(next.tx, next.x, v), y1 = lerp(next.ty, next.y, v) + plunge;
+      if (Math.max(y0, y1) > Math.min(q.y, next.y) - 5) continue;
+      for (let j = 0; j < 7; j++) {
+        const a = j / 7, b = (j + 0.68) / 7;
+        p.line(lerp(x0, x1, a), lerp(y0, y1, a) + Math.sin(a * Math.PI) * 5,
+          lerp(x0, x1, b), lerp(y0, y1, b) + Math.sin(b * Math.PI) * 5, C[7], k);
+      }
     }
   }
 
