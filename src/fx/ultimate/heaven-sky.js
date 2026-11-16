@@ -1,94 +1,166 @@
-import { Rng, fit, smooth, clamp, TAU, WHITE, hex, bolt, createFrame, Painter } from "../../core/index.js";
-import { GOLD, SIZE, ORIGIN, INK, HIT, envelope, stroke } from "./_lib.js";
+﻿import { Rng, fit, smooth, clamp, TAU, WHITE, hex, mix, bolt, createFrame, Painter } from "../../core/index.js";
+import { GOLD, SIZE, ORIGIN, BOX, INK, EMERGE, REVEALED, RELEASE, HIT, DURATION, CLOUD_BASE, rune, stroke } from "./_lib.js";
 
 export const meta = {
-  name: "Heaven's fingerprint", desc: "Ink clouds coil around a celestial fingerprint; star-filled fractures split the sky and gold lightning answers the falling finger.",
-  tags: ["ultimate", "sky", "fingerprint", "lightning", "one-shot"], size: SIZE, origin: ORIGIN,
-  duration: 3.8, fps: 30, loop: false, bg: "ground", options: { palette: GOLD, seed: 17 },
+  name: "Imprisoned heaven", desc: "Ink storms spiral inward, part around a golden wrist, then freeze with suspended lightning. The impact tears the clouds apart and daylight returns.",
+  tags: ["ultimate", "sky", "storm", "vortex", "lightning", "one-shot"], size: SIZE, origin: ORIGIN,
+  duration: DURATION, fps: 30, loop: false, bg: "ground", options: { palette: GOLD, seed: 17 },
 };
 
+// Cache true translucent discs with uneven scalloped undersides; never dithered smoke.
+function puff(size, layer) {
+  const w = Math.ceil(size * 3.5), h = Math.ceil(size * 2.5), f = createFrame(w, h), p = new Painter(f);
+  p.place(w / 2, h / 2);
+  const dark = hex(layer === 0 ? "#0c0d15" : "#171820"), rim = hex(layer === 0 ? "#292c35" : layer === 1 ? "#43454e" : "#63636b");
+  p.disc(0, -size * 0.12, size, dark, (d) => 0.58 * (1 - d) ** 0.65);
+  for (const [dx, dy, s] of [[-0.64, 0.1, 0.68], [0.56, 0.05, 0.76], [0.05, 0.36, 0.7]]) {
+    p.disc(dx * size, dy * size, size * s, rim, (d) => 0.24 * (1 - d) ** 1.2);
+    p.disc(dx * size, (dy - 0.18) * size, size * s * 0.87, dark, (d) => 0.49 * (1 - d) ** 0.55);
+  }
+  const pixels = [];
+  f.color.forEach((c, i) => {
+    if ((c >>> 24) > 10) pixels.push(i % w - Math.floor(w / 2), Math.floor(i / w) - Math.floor(h / 2), c, (c >>> 24) / 255, mix(c, hex("#191919"), 0.78));
+  });
+  return new Float64Array(pixels);
+}
+
 export function create(o) {
-  const C = fit(o.palette, 8), R = new Rng(o.seed);
-  const clouds = Array.from({ length: 20 }, (_, i) => ({ a: i / 20 * TAU, r: R.range(80, 132), s: R.range(11, 19), ph: R.range(0, TAU), w: R.range(0.16, 0.28) }));
-  // Painter-built translucent puffs are static volumes; only their orbits and opacity change.
-  // Cache their pixels once rather than resampling two soft discs on every tick.
-  for (const q of clouds) {
-    const f = createFrame(44, 44), cp = new Painter(f);
-    cp.disc(22, 22, q.s, hex("#161520"), (d) => 0.5 * (1 - d * 0.65));
-    cp.disc(22 - q.s * 0.18, 22 - q.s * 0.23, q.s * 0.55, hex("#49404b"), 0.2);
-    q.pixels = [];
-    f.color.forEach((c, i) => { if (c) q.pixels.push([i % 44 - 22, Math.floor(i / 44) - 22, c, (c >>> 24) / 255]); });
+  const C = fit(o.palette, 8), R = new Rng(o.seed), [x0, y0, x1, y1] = BOX;
+  const stamps = Array.from({ length: 3 }, (_, layer) => [puff(8 + layer, layer), puff(12 + layer, layer)]);
+  const clouds = [];
+  for (let layer = 0; layer < 3; layer++) for (let arm = 0; arm < 2; arm++) for (let i = 0; i < 12; i++) {
+    const u = (i + R.range(0.1, 0.9)) / 12;
+    clouds.push({ layer, arm, u, ph: R.range(-0.14, 0.14), s: R.int(0, 1), delay: R.range(0, 0.2), tear: R.range(0.7, 1.3) });
   }
-  // One continuous double whorl, with asymmetrical recurving ridges around it: a dermal print,
-  // deliberately distinct from the concentric ellipses of a summoning portal.
-  const ridges = [];
-  for (let side = 0; side < 2; side++) {
-    const pts = [];
-    for (let i = 0; i <= 430; i++) {
-      const a = i / 430 * TAU * 7.4 + side * Math.PI, r = 2 + i / 430 * 55;
-      const x = Math.cos(a) * r + Math.sin(a * 0.5) * 4;
-      pts.push([x * 0.77, -145 + Math.sin(a) * r * 0.9 + 0.003 * x * x]);
-    }
-    ridges.push(pts);
+  // A soft ink wash and a tightening side vignette, feathered inside the shared canvas.
+  const veilSamples = [];
+  for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+    const edge = smooth(0.46, 1.04, Math.hypot((x + 50) / 262, (y + 190) / 224));
+    const sky = 1 - smooth(CLOUD_BASE + 45, -70, y), feather = Math.min(1, (x - x0) / 9, (x1 - x) / 9, (y - y0) / 9, (y1 - y) / 9);
+    if (feather > 0 && sky * 0.24 + edge * 0.55 > 0.015) veilSamples.push(x, y, sky * feather, edge * feather);
   }
-  for (let j = 0; j < 7; j++) {
-    const pts = [], r = 60 + j * 4;
-    for (let i = 0; i <= 150; i++) {
-      const a = -2.83 + i / 150 * 5.58;
-      pts.push([Math.sin(a) * r * 0.77 * (1 + 0.1 * Math.cos(a * 3)), -145 + Math.cos(a) * r * 0.78 + Math.sin(a * 2) * 4]);
-    }
-    ridges.push(pts);
-  }
-  const cracks = Array.from({ length: 9 }, (_, i) => {
-    const a = i / 9 * TAU, x = Math.cos(a) * 65, y = -143 + Math.sin(a) * 47;
-    const end = [clamp(x * 2.4, -205, 156), clamp(-143 + Math.sin(a) * 133, -207, -28)];
-    const safe = ([xx, yy]) => [clamp(xx, -211, 164), clamp(yy, -207, -25)];
-    const pts = bolt(R, x, y, ...end, { jag: 0.3, depth: 4 }).map(safe);
-    const mid = pts[8], fork = bolt(R, ...mid, clamp(mid[0] + Math.sin(a) * 42, -209, 165), clamp(mid[1] - Math.cos(a) * 40, -207, -25), { jag: 0.26, depth: 3 }).map(safe);
-    return { pts, fork, start: R.range(0.72, 1.3), stars: Array.from({ length: 10 }, () => R.next()) };
+  const veil = new Float32Array(veilSamples);
+  const bolts = [-1, 1].map((side) => {
+    const path = bolt(R, side * 104, CLOUD_BASE + 18, side * 160, CLOUD_BASE + 121, { jag: 0.28, depth: 4 });
+    const mid = path[7], fork = bolt(R, ...mid, mid[0] - side * 33, mid[1] + 35, { jag: 0.35, depth: 3 });
+    return { path, fork };
+  });
+  const runes = Array.from({ length: 12 }, (_, i) => {
+    const a = i / 12 * TAU;
+    return rune(Math.cos(a) * 65, CLOUD_BASE + Math.sin(a) * 32, 0.75, i % 3);
   });
   let t = 0;
-  return {
-    update(dt) { t += dt; },
-    drawBack(p) {
-      const k = envelope(t, 0, 0.65, 1.95, 2.3);
-      if (k <= 0) return;
-      // Translucent weather, never a solid black full-screen card.
-      for (const q of clouds) {
-      const a = q.a + t * q.w, rr = q.r - 6 * Math.sin(t * 0.8 + q.ph), x = Math.cos(a) * rr - 15, y = -143 + Math.sin(a) * rr * 0.42;
-        for (const [dx, dy, c, a] of q.pixels) p.blend(x + dx, y + dy, c, a * k);
+  const wash = new Uint32Array(SIZE[0] * SIZE[1]);
+  let washTick = -1;
+  function updateWash() {
+    // Rasterize the slowly changing, seed-independent wash once per display frame.
+    // The usual empty back buffer then needs only native row copies, not 200k blends.
+    const tick = Math.floor(t * meta.fps + 1e-6);
+    if (tick === washTick) return;
+    washTick = tick;
+    const tt = tick / meta.fps, gather = smooth(0, EMERGE, tt);
+    const dark = smooth(0, EMERGE + 0.35, Math.min(tt, REVEALED)) * (1 - smooth(HIT + 0.15, DURATION - 0.2, tt));
+    for (let i = 0; i < veil.length; i += 4) {
+      const a = dark * (veil[i + 2] * 0.23 + veil[i + 3] * (0.18 + gather * 0.38));
+      wash[(veil[i + 1] + ORIGIN[1]) * SIZE[0] + veil[i] + ORIGIN[0]] = a > 0.004 ? (INK & 0xffffff) | ((a * 255) << 24) : 0;
+    }
+  }
+
+  function weather(p) {
+    if (t <= 0 || t >= DURATION - 0.12) return;
+    const locked = t >= REVEALED && t < RELEASE, silent = t >= RELEASE - 0.15 && t < RELEASE;
+    // Hold precisely the reveal pose through imprisonment; no hidden time-dependent wobble.
+    const clock = t >= REVEALED && t < HIT ? REVEALED : t >= HIT ? REVEALED + (t - HIT) * 0.28 : t;
+    const gather = smooth(0, EMERGE, Math.min(t, EMERGE)), opening = smooth(EMERGE, REVEALED, t);
+    const aftermath = Math.max(0, t - HIT), clear = 1 - smooth(HIT + 0.15, DURATION - 0.2, t);
+    const dark = smooth(0, EMERGE + 0.35, Math.min(t, REVEALED)) * clear;
+    const straight = p.sn === 0 && p.cs === 1, sx0 = p.cellX(0, 0), sy0 = p.cellY(0, 0);
+    const left = sx0 - ORIGIN[0] - p.ox, top = sy0 - ORIGIN[1] - p.oy;
+    let empty = straight && p.fx === 1 && p.fade === 1 && left >= 0 && top >= 0 && left + SIZE[0] <= p.w && top + SIZE[1] <= p.h;
+    if (empty) for (let i = 0; i < p.C.length; i++) if (p.C[i]) { empty = false; break; }
+    if (empty) for (let y = 0; y < SIZE[1]; y++) p.C.set(wash.subarray(y * SIZE[0], (y + 1) * SIZE[0]), (top + y) * p.w + left);
+    else for (let i = 0; i < veil.length; i += 4) {
+      const x = veil[i], y = veil[i + 1], a = dark * (veil[i + 2] * 0.23 + veil[i + 3] * (0.18 + gather * 0.38));
+      if (a <= 0.004) continue;
+      if (straight) {
+        const sx = sx0 + x * p.fx, sy = sy0 + y, index = (sy - p.oy) * p.w + sx - p.ox;
+        if (sx < p.ox || sx >= p.ox + p.w || sy < p.oy || sy >= p.oy + p.h) continue;
+        // Empty back-buffer pixels can receive the cached translucent wash directly.
+        if (!p.C[index] && p.fade === 1) p.C[index] = (INK & 0xffffff) | ((a * 255) << 24);
+        else p.blendPx(sx, sy, INK, a);
+      } else p.blend(x, y, INK, a);
+    }
+
+    // Accelerating double beat. The freeze retains the bolts, never the thunder flash.
+    const phase = t * 0.95 + t * t * 0.59, beat = phase % 1;
+    const pulse = Math.exp(-(((beat - 0.04) / 0.046) ** 2)) + 0.52 * Math.exp(-(((beat - 0.19) / 0.04) ** 2));
+    const flash = !locked && !silent && t < RELEASE ? pulse * smooth(0.2, 0.65, t) : 0;
+    const core = opening * clear;
+    if (core > 0) {
+      p.glow(0, CLOUD_BASE + 7, 40, C[4], core * (0.32 + flash * 0.2));
+      p.glow(0, CLOUD_BASE + 8, 18, C[6], core * 0.36);
+    }
+
+    for (const q of clouds) {
+      const enter = smooth(q.delay, EMERGE - 0.12, Math.min(t, EMERGE));
+      const a = q.arm * Math.PI + q.u * TAU * 0.76 + clock * (0.18 + q.layer * 0.16) * (1 - q.u * 0.35) + q.ph;
+      const radius = 18 + q.u * (166 + q.layer * 7) + opening * (1 - q.u) * 50;
+      const cx = Math.cos(a) * radius, cy = CLOUD_BASE + Math.sin(a) * radius * 0.31;
+      let x = (q.arm ? 182 : -280) * (1 - enter) + cx * enter;
+      let y = (CLOUD_BASE - 42 + q.u * 14) * (1 - enter) + cy * enter;
+      // The wrist pushes the inner banks aside, leaving low hanging curls on each side.
+      x += Math.sign(cx || 1) * opening * (1 - q.u) * 12;
+      y += opening * (1 - q.u) * Math.max(0, Math.sin(a)) * 11;
+      const wave = aftermath * 410, distance = Math.hypot(x, (y - CLOUD_BASE) * 2);
+      const swept = t >= HIT ? smooth(distance - 24, distance + 24, wave) : 0;
+      const drift = swept * Math.log1p(aftermath * 4) * 36 * q.tear;
+      x += Math.cos(a) * drift;
+      y += Math.sin(a) * drift * 0.5 - swept * aftermath * 6;
+      const alpha = smooth(q.delay, q.delay + 0.35, t) * clear * (1 - swept * 0.84) * (0.83 + q.layer * 0.08);
+      if (alpha < 0.012) continue;
+      const pixels = stamps[q.layer][q.s];
+      const contained = x > x0 + 38 && x < x1 - 38 && y > y0 + 38 && y < y1 - 38;
+      const bx = p.cellX(x, y), by = p.cellY(x, y);
+      for (let i = 0; i < pixels.length; i += 5) {
+        const xx = x + pixels[i], yy = y + pixels[i + 1];
+        const boundary = contained ? 1 : clamp(Math.min(xx - x0, x1 - xx, yy - y0, y1 - yy) / 12);
+        if (boundary <= 0) continue;
+        const color = pixels[i + (locked ? 4 : 2)], opacity = pixels[i + 3] * alpha * boundary;
+        if (straight) p.blendPx(bx + pixels[i] * p.fx, by + pixels[i + 1], color, opacity);
+        else p.blend(xx, yy, color, opacity);
       }
-      const reveal = smooth(0.08, 0.85, t), fade = k * (1 - smooth(0.95, 1.65, t));
-      for (let j = 0; j < ridges.length; j++) {
-        const pts = ridges[j], n = Math.max(2, Math.floor(pts.length * reveal));
-        if (fade > 0.01) stroke(p, pts.slice(0, n), j < 2 ? C[6] : C[4], fade * 1.1, C[5], 3);
-        const u = Math.floor(((t * 0.45 + j * 0.13) % 1) * (n - 1));
-        if (pts[u]) p.glow(...pts[u], 8, C[6], fade * 0.45);
+      // Buried lightning illuminates the underside through the light buffer only.
+      if (flash > 0.06 && q.layer === 2 && q.u > 0.3 && q.u < 0.48)
+        p.glow(x, y + 9, 24, hex("#c1c4d1"), flash * 0.7 * alpha);
+    }
+
+    if (core > 0.005) {
+      const k = core * (locked || t >= RELEASE ? 0.33 : 0.21 + flash * 0.17);
+      // Broken rune orbit, never a dermal print or stacked concentric ellipses.
+      for (const pts of runes) p.polyline(pts, C[5], k);
+      for (let i = 0; i < 64; i++) {
+        const a = i / 64 * TAU;
+        if (i % 8 < 5) p.blend(Math.cos(a) * 65, CLOUD_BASE + Math.sin(a) * 32, C[4], k * 0.6);
       }
-      p.glow(0, -147, 57, C[4], fade * 0.18);
-      for (const q of cracks) {
-        const u = smooth(q.start, q.start + 0.28, t), heat = k * (0.5 + 0.5 * Math.max(0, Math.sin(t * 19 + q.start)));
-        for (const path of [q.pts, q.fork]) {
-          const n = Math.floor((path.length - 1) * u);
-          for (let i = 0; i < n; i++) {
-            const [x, y] = path[i], [xx, yy] = path[i + 1], w = (path === q.pts ? 4.5 : 1.8) * Math.sin((i + 1) / path.length * Math.PI);
-            const length = Math.hypot(xx - x, yy - y) || 1, nx = -(yy - y) / length, ny = (xx - x) / length;
-            p.beam(x, y, xx, yy, w * 2 + 1, INK, k);
-            p.line(x - nx * w, y - ny * w, xx - nx * w, yy - ny * w, C[5], heat);
-            p.line(x + nx * w, y + ny * w, xx + nx * w, yy + ny * w, C[3], k * 0.7);
-            if (i % 3 === 0) p.glow(x - w, y, 5, C[4], heat * 0.25);
-            if (i % 3 === 1 && w > 1.5) {
-              const star = q.stars[i % q.stars.length], sx = x + nx * (star - 0.5) * w, sy = y + ny * (star - 0.5) * w;
-              p.dot(sx, sy, star > 0.6 ? WHITE : hex("#9daed7"), k * 0.9);
-              if (star > 0.8) p.glow(sx, sy, 3, hex("#9daed7"), k * 0.28);
-            }
-          }
-        }
-        // Unstable golden lightning flashes in short, uneven beats over the void seams.
-        if (t > q.start + 0.2 && Math.sin(t * 29 + q.start * 31) > 0.9 && t < 2.35)
-          stroke(p, q.pts, WHITE, k, C[5], 7);
+    }
+    if (locked || flash > 0.36) {
+      for (let i = 0; i < bolts.length; i++) {
+        if (!locked && i === 1 && flash < 0.72) continue;
+        const k = locked ? 1 : Math.min(1, flash);
+        for (const path of [bolts[i].path, bolts[i].fork]) stroke(p, path, locked ? hex("#707175") : WHITE, k, locked ? hex("#55565a") : hex("#c5c6df"), locked ? 2 : 5);
       }
-    },
-    draw() {},
-  };
+    }
+    // One outward shock front. Each bank shreds when the same front reaches it.
+    if (t >= HIT && aftermath < 0.65) {
+      const r = aftermath * 410, k = 1 - smooth(0.12, 0.65, aftermath);
+      for (let i = 0; i < 144; i++) {
+        const a = i / 144 * TAU, x = Math.cos(a) * r, y = CLOUD_BASE + Math.sin(a) * r * 0.5;
+        if (x < x0 + 10 || x > x1 - 10 || y < y0 + 10 || y > y1 - 10) continue;
+        p.blend(x, y, C[6], k * 0.7);
+        if (i % 6 === 0) p.glow(x, y, 8, C[4], k * 0.2);
+      }
+    }
+  }
+
+  return { update(dt) { t += dt; updateWash(); }, drawBack: weather, draw() {} };
 }
