@@ -3,12 +3,13 @@ import { FLAMES, flames, lotus, orbitEmbers, drawColored } from './_lotus-lib.js
 import * as burst from './hoa-lien-burst.js';
 
 // One presentation frame lets the rupture become visible before the shared hit-stop freezes it.
-const THROW = 1.12, ARRIVE = 1.53, HIT = ARRIVE + burst.BREAK + 1 / 60, TX = 176;
+// Opus: the lotus is the star of an ultimate, so it charges longer and grows big above the head before the throw.
+const THROW = 1.75, ARRIVE = THROW + 0.41, HIT = ARRIVE + burst.BREAK + 1 / 60, TX = 176;
 export const meta = {
   name: 'Phat No Hoa Lien',
   desc: 'Two hands fuse alien flames into a lotus, lift it, then hurl it into a distant target; its broken balance releases a petal shock and a towering crown of fire.',
   tags: ['ultimate', 'move', 'lotus', 'fire', 'spell', 'projectile', 'explosion', 'one-shot'],
-  size: [480, 280], origin: [88, 242], duration: ARRIVE + burst.meta.duration,
+  size: [480, 280], origin: [88, 242], duration: +(ARRIVE + burst.meta.duration).toFixed(3),
   loop: false, fps: 30, bg: 'ground', actor: 2,
   options: { flames: FLAMES, seed: 17 },
 };
@@ -19,8 +20,8 @@ const BRACE = { ...READY, x: 4, turn: 0.9, crouch: 6, lean: -4, fx: -5, fy: -34,
 export const act = {
   target: { x: TX },
   poses: [
-    [-0.3, READY], [0, CUP], [0.45, { ...CUP, crouch: 5 }], [0.86, UP],
-    [1.04, { ...UP, lean: -2, x: -4 }], [THROW, CAST, 'snap'],
+    [-0.3, READY], [0, CUP], [0.6, { ...CUP, crouch: 5 }], [1.2, UP],
+    [1.45, { ...UP, crouch: -1 }], [1.66, { ...UP, lean: -3, x: -5 }], [THROW, CAST, 'snap'],
     [ARRIVE, { ...CAST, lean: 3 }], [HIT, BRACE, 'snap'],
     [HIT + 0.4, { ...BRACE, crouch: 4 }], [HIT + 1, { ...READY, x: 3 }],
     [HIT + 1.7, READY], [meta.duration, READY],
@@ -34,14 +35,16 @@ export const act = {
 };
 
 const hand = t => {
-  const up = smooth(0.45, 0.86, t);
+  const up = smooth(0.6, 1.2, t);
   return [-1, -27 - up * 17];
 };
+// How far the lotus floats above the hands once they are raised, so the big flower clears the head.
+const lift = t => smooth(0.7, 1.3, t) * 22;
 const charge = {
   meta: { duration: THROW, loop: false, options: {} },
   draw(p, t, o) {
     if (t >= THROW) return;
-    const C = flames(o), [x, y] = hand(t), open = smooth(0.08, 0.64, t);
+    const C = flames(o), [x, hy] = hand(t), y = hy - lift(t), open = smooth(0.1, 1.3, t);
     // One double helix per flame. Their shrinking paths lead from either hand to the same stamen.
     for (let j = 0; j < C.length; j++) {
       for (const side of [-1, 1]) {
@@ -54,9 +57,9 @@ const charge = {
         for (let i = 4; i < 24; i += 6) p.glow(pts[i][0], pts[i][1], 4, C[j][4], 0.16);
       }
     }
-    lotus(p, t, C, { x, y: y - 3, size: 0.12 + open * 0.48, halo: t > 0.4, seed: o.seed });
-    orbitEmbers(p, t, C, o.seed, x, y, 0.65);
-    p.glow(x, y, 22, WHITE, 0.1 * open);
+    lotus(p, t, C, { x, y: y - 3, size: 0.12 + open * 0.83, halo: t > 0.5, seed: o.seed });
+    orbitEmbers(p, t, C, o.seed, x, y, 0.65 + open * 0.5);
+    p.glow(x, y, 22 + open * 20, WHITE, 0.08 + 0.08 * open);
   },
 };
 const projectile = {
@@ -77,7 +80,7 @@ const projectile = {
       },
       draw(p) {
         for (let j = 0; j < C.length; j++) drawColored(ps[j], p, C[j]);
-        lotus(p, t, C, { y: 0, size: 0.48 - clamp(t / (ARRIVE - THROW)) * 0.18, halo: false, seed: o.seed });
+        lotus(p, t, C, { y: 0, size: 0.95 - clamp(t / (ARRIVE - THROW)) * 0.4, halo: false, seed: o.seed });
       },
     };
   },
@@ -89,7 +92,7 @@ export function create(o) {
     { fx: charge, t: 0, until: THROW, ...common },
     { fx: projectile, t: THROW, until: ARRIVE, ...common,
       x: t => 24 + (TX - 24) * clamp((t - THROW) / (ARRIVE - THROW)),
-      y: t => -32 + 10 * clamp((t - THROW) / (ARRIVE - THROW)) - 12 * Math.sin(clamp((t - THROW) / (ARRIVE - THROW)) * Math.PI) },
+      y: t => -66 + 44 * clamp((t - THROW) / (ARRIVE - THROW)) - 12 * Math.sin(clamp((t - THROW) / (ARRIVE - THROW)) * Math.PI) },
     { fx: burst, t: ARRIVE, x: TX, ...common },
   ])(o);
 }
