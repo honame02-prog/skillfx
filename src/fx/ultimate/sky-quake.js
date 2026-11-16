@@ -1,163 +1,248 @@
-import { Particles, Bits, Lights, P, PF, B, Rng, fit, band, bolt, clamp, smooth, ease, TAU, WHITE, hex, flare, createFrame, Painter, rgb, clearFrame } from "../../core/index.js";
-import { GOLD, STONE, SIZE, ORIGIN, INK, stroke, contain, drain } from "./_lib.js";
+﻿import { Particles, Bits, Lights, P, PF, B, Rng, fit, band, clamp, smooth, ease, TAU, WHITE, hex, flare, createFrame, Painter, rgb, mix } from "../../core/index.js";
+import { GOLD, STONE, SIZE, ORIGIN, INK, stroke, contain, rune, drain, DURATION, HIT } from "./_lib.js";
 
 export const meta = {
-  name: "Sky breaking quake", desc: "A negative impact frame, a sky-high eruption and two shock domes split the earth into molten branching faults, tumbling slabs and rolling dust.",
+  name: "Sky breaking quake",
+  desc: "An inverted impact pins the earth with a tightening rune seal; molten faults heave slabs, staggered geysers erupt and a second quake widens the sinking crater.",
   tags: ["ultimate", "quake", "impact", "cracks", "one-shot"], size: SIZE, origin: ORIGIN,
-  duration: 2.94, fps: 30, loop: false, bg: "ground", options: { palette: GOLD, seed: 31 },
+  duration: +(DURATION - HIT).toFixed(2), fps: 30, loop: false, bg: "ground", options: { palette: GOLD, seed: 31 },
 };
 
 export function create(o) {
-  const C = fit(o.palette, 8), R = new Rng(o.seed), lip = hex(STONE[3]), ps = new Particles({ rng: R, ground: () => 2, sparks: [WHITE, C[6], C[5], C[3]] });
-  const bits = new Bits({ ground: () => 1 }), lights = new Lights(), cracks = [];
-  // Perspective lies in z, so forks widen towards camera and flatten towards the horizon.
-  for (let j = 0; j < 13; j++) {
-    const a = j / 13 * TAU + R.range(-0.12, 0.12), L = R.range(160, 240);
-    const path = bolt(R, 0, 0, Math.cos(a) * L, Math.sin(a) * L, { jag: 0.21, depth: 5 });
-    const project = ([x, z]) => [x, z * (z < 0 ? 0.11 : 0.15)];
-    const pts = path.map(project).filter(([x, y]) => x > -221 && x < 167 && y > -27 && y < 31);
-    if (pts.length < 3) continue;
-    cracks.push({ pts, start: j * 0.006, fork: false });
-    for (const f of [0.38, 0.68]) {
-      const m = path[Math.floor((path.length - 1) * f)], aa = a + R.sign() * 0.65;
-      const fork = bolt(R, ...m, m[0] + Math.cos(aa) * L * 0.34, m[1] + Math.sin(aa) * L * 0.34, { jag: 0.24, depth: 3 }).map(project).filter(([x, y]) => x > -221 && x < 167 && y > -27 && y < 31);
-      if (fork.length > 1) cracks.push({ pts: fork, start: 0.07 + f * 0.08, fork: true });
+  const C = fit(o.palette, 8), R = new Rng(o.seed), S = STONE.map(hex), dust = hex("#958371");
+  const orange = mix(C[3], hex("#c75c24"), 0.65), red = mix(C[1], hex("#631b18"), 0.7);
+  const X0 = -ORIGIN[0], X1 = SIZE[0] - ORIGIN[0] - 1, TOP = -ORIGIN[1], Y1 = SIZE[1] - ORIGIN[1] - 1;
+  const ps = new Particles({ rng: R, ground: () => 1, sparks: [WHITE, C[6], C[4], C[2]] });
+  const bits = new Bits({ ground: () => -2 }), lights = new Lights(), cracks = [], events = [];
+  const fadeAt = meta.duration - 0.12;
+  let t = 0, eventIndex = 0, aftershock = false;
+
+  // Short, fine far faults and broad near faults are projected onto the ground.
+  // The two lateral trunks reach the actual canvas edges, rather than an old box.
+  const targets = [[X0, 9], [X1, -5], [-186, 32], [-78, 35], [112, 33], [192, 20], [-152, -24], [-42, -31], [98, -27]];
+  function fault(x0, y0, x1, y1, depth, start = 0, reach = 1) {
+    const n = depth ? 7 : 17, dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy), pts = [];
+    for (let i = 0; i <= n; i++) {
+      const u = i / n, jitter = i && i < n ? R.range(-1, 1) * Math.sin(u * Math.PI) : 0;
+      pts.push([clamp(x0 + dx * u - dy / len * jitter * 12, X0, X1),
+        clamp(y0 + dy * u + dx / len * jitter * (y1 > 0 ? 6 : 2.5), -35, Y1 - 4)]);
+    }
+    const c = { pts, depth, start, reach };
+    cracks.push(c);
+    if (depth < 2) for (const u of (depth ? [0.56] : [0.36, 0.68])) {
+      const q = pts[Math.floor(u * n)], side = R.sign(), k = depth ? 0.24 : 0.36;
+      fault(...q, q[0] + dx * k + side * 14, q[1] + dy * k + side * (y1 > 0 ? 8 : 4),
+        depth + 1, start + reach * u, reach * (1 - u) * 0.7);
+    }
+    return c;
+  }
+  const mains = targets.map(([x, y]) => fault(0, 0, x, y, 0));
+
+  // Bake geometry ONCE, including shoulders exposed by the aftershock. Channels
+  // encode material, propagation distance and perspective, not final colors.
+  // Each draw only replays sparse pixels, with no bolt/beam rasterization.
+  const faultFrame = createFrame(...SIZE), fp = new Painter(faultFrame).place(...ORIGIN);
+  for (const c of [...cracks].sort((a, b) => b.depth - a.depth)) {
+    for (let i = 1; i < c.pts.length; i++) {
+      const [x, y] = c.pts[i - 1], [xx, yy] = c.pts[i], u = i / (c.pts.length - 1);
+      const q = clamp(c.start + c.reach * u), near = y >= 0;
+      const w = (c.depth ? 2.6 / c.depth : 6.2) * (1 - u * 0.52) * (near ? 1.12 : 0.56);
+      const code = (role) => rgb(role, Math.round(q * 255), near ? 255 : 135);
+      fp.beam(x, y, xx, yy, w + 2.2, code(1));
+      fp.beam(x, y, xx, yy, w, code(2));
+      fp.line(x, y - w * 0.5, xx, yy - w * 0.5, code(3));
+      fp.beam(x, y, xx, yy, near && !c.depth ? 1.6 : 0.9, code(4));
     }
   }
-  const vents = cracks.filter((c) => !c.fork).map((c) => c.pts[Math.floor(c.pts.length * 0.67)]);
-  // Rasterize only the static fault geometry through the existing Painter. Per-pixel role/index
-  // retains the fast propagation and cooling without shading hundreds of overlapping capsules every frame.
-  const faultFrame = createFrame(...SIZE), fp = new Painter(faultFrame).place(...ORIGIN), faults = [];
-  for (const c of cracks) {
-    clearFrame(faultFrame);
-    for (let i = 0; i < c.pts.length - 1; i++) {
-      const [x, y] = c.pts[i], [xx, yy] = c.pts[i + 1], q = i / c.pts.length;
-      const w = (c.fork ? 1.1 : 3.6) * (1 - q * 0.55) * (y > 0 ? 1.25 : 0.75);
-      fp.beam(x, y, xx, yy, w * 2 + 1, rgb(1, i, 0));
-      fp.line(x, y - w, xx, yy - w, rgb(2, i, 0));
-      fp.line(x, y, xx, yy, rgb(3, i, 0));
-    }
-    const pixels = [];
-    faultFrame.color.forEach((v, i) => {
-      if (!v) return;
-      const q = ((v >>> 8) & 255) / (c.pts.length - 1);
-      pixels.push({ x: i % SIZE[0] - ORIGIN[0], y: Math.floor(i / SIZE[0]) - ORIGIN[1], role: v & 255, q,
-        at: c.start + 0.25 * (1 - Math.cbrt(1 - q)) });
-    });
-    faults.push(pixels);
+  const faultPixels = [];
+  faultFrame.color.forEach((v, i) => {
+    if (!v) return;
+    faultPixels.push({ x: i % SIZE[0] - ORIGIN[0], y: Math.floor(i / SIZE[0]) - ORIGIN[1],
+      role: v & 255, at: ((v >>> 8) & 255) / 255 * 0.19, far: ((v >>> 16) & 255) < 200 });
+  });
+  const vents = mains.slice(0, 7).map((c, i) => {
+    const [x, y] = c.pts[6 + i % 4];
+    return { x, y, at: 0.12 + i * 0.043 };
+  });
+  const glyphs = Array.from({ length: 16 }, (_, i) => ({ a: i / 16 * TAU, pts: rune(0, 0, 1.5, i) }));
+  const nails = Array.from({ length: 8 }, (_, i) => {
+    const a = (i + 0.35) / 8 * TAU;
+    return { x: Math.cos(a) * 67, y: Math.sin(a) * 12, at: 0.085 + i * 0.018, hit: false };
+  });
+  for (let i = 0; i < 16; i++) {
+    const c = mains[i % 6], q = c.pts[3 + i % 9], heavy = i < 10;
+    events.push({ at: 0.025 + i * 0.008, rock: { kind: B.CHUNK, x: q[0], y: Math.min(-3, q[1] - 5),
+      vx: Math.sign(q[0]) * R.range(12, heavy ? 45 : 100), vy: -R.range(heavy ? 60 : 170, heavy ? 135 : 260),
+      s: heavy ? R.range(6, 11.5) : R.range(4, 7), a: R.range(-0.3, 0.3), va: R.range(-7, 7),
+      ramp: STONE, g: 0.85, drag: 0.9, bounce: 0.25, life: R.range(2.1, 2.7), pvy: 0 } });
   }
-  const merged = new Map();
-  for (const pixels of faults) for (const q of pixels) {
-    const key = (q.y + ORIGIN[1]) * SIZE[0] + q.x + ORIGIN[0], prev = merged.get(key);
-    if (!prev) merged.set(key, q);
-    else {
-      const at = Math.min(prev.at, q.at);
-      if (q.role >= prev.role) merged.set(key, { ...q, at });
-      else prev.at = at;
-    }
+  for (const v of vents) events.push({ at: v.at, vent: v });
+  events.sort((a, b) => a.at - b.at);
+  for (let i = 0; i < 48; i++) {
+    const a = R.range(-Math.PI, 0), speed = R.range(110, 380);
+    ps.spawn(P.SPARK, R.range(-8, 8), -3, Math.cos(a) * speed, Math.sin(a) * speed,
+      R.range(0.25, 0.7), WHITE, 1, R.range(0, 0.06));
   }
-  const faultPixels = [...merged.values()];
-  // Several sizes and timings: heavy peeled slabs, then smaller ballistic fragments.
-  for (let i = 0; i < 42; i++) {
-    const heavy = i < 10, side = R.sign();
-    bits.add({ kind: B.CHUNK, x: side * R.range(8, heavy ? 65 : 30), y: -1, vx: side * R.range(25, heavy ? 100 : 190), vy: -R.range(110, heavy ? 250 : 370),
-      a: R.range(0, TAU), va: R.range(-11, 11), s: heavy ? R.range(5, 10) : R.range(1.5, 4), ramp: STONE, g: 0.8, drag: 0.6, bounce: 0.33, life: R.range(1.6, 2.4), pvy: 0 });
+  for (let i = 0; i < 28; i++) ps.spawn(P.GRIT, R.range(-23, 23), -3, R.range(-170, 170),
+    -R.range(90, 270), R.range(0.7, 1.5), R.pick(S.slice(1)), R.chance(0.3) ? 2 : 1);
+  // A few broad translucent lobes form a wall; sparks supply fine detail cheaply.
+  for (let i = 0; i < 8; i++) {
+    const x = (i - 3.5) * 31, side = Math.sign(x);
+    ps.spawn(P.SMOKE, x, -R.range(8, 13), side * R.range(28, 60),
+      -R.range(12, 26), R.range(2.1, 2.65), dust, R.range(9, 12), 0.06 + Math.abs(x) / 1000, PF.BIG);
   }
-  for (let i = 0; i < 105; i++) {
-    const a = R.range(-Math.PI, 0), sp = R.range(90, 430);
-    ps.spawn(P.SPARK, R.range(-12, 12), -3, Math.cos(a) * sp, Math.sin(a) * sp, R.range(0.3, 1), WHITE, 1, R.range(0, 0.12));
-  }
-  for (let i = 0; i < 85; i++) ps.spawn(P.GRIT, R.range(-28, 28), -2, R.range(-160, 160), -R.range(80, 360), R.range(0.7, 1.8), hex(R.pick(STONE.slice(1))), R.chance(0.3) ? 2 : 1, R.range(0, 0.16));
-  for (let i = 0; i < 22; i++) {
-    const a = R.range(0, TAU), sp = R.range(130, 320);
-    ps.spawn(P.SMOKE, Math.cos(a) * 10, Math.sin(a) * 3 - 3, Math.cos(a) * sp, -R.range(4, 23), R.range(1.4, 2.4), hex("#87705f"), R.range(7, 12), R.range(0.05, 0.22), PF.BIG);
-  }
-  for (let i = 0; i < 8; i++) ps.spawn(P.SMOKE, R.range(-11, 11), -R.range(3, 22), R.range(-33, 33), -R.range(80, 190), R.range(1.3, 2.1), hex("#978476"), R.range(5, 9), R.range(0.03, 0.18), PF.BIG);
-  lights.add(0, -35, 88, C[5], 0.85, 0.65);
-  lights.add(0, -2, 52, WHITE, 1.1, 0.16);
-  let t = 0, ventIndex = 0, dustAcc = 0;
+  lights.add(0, -52, 138, C[5], 0.95, 0.58);
+  lights.add(0, -12, 64, WHITE, 1.25, 0.13);
 
   function floor(p) {
-    const fade = 1 - smooth(2.1, 2.88, t), heat = clamp(1 - t / 1.9);
+    const fade = 1 - smooth(2.15, fadeAt, t), heat = clamp(1 - t / 2.4);
     if (fade <= 0) return;
+    const sink = ease.outCubic(clamp(t / 0.4)), cy = 1 + 7 * sink, rx = 20 + 32 * sink;
+    p.ellipse(0, cy, rx, 3 + 7 * sink, (d) => d > 0.87 ? S[1] : INK, fade * 0.85);
+    const heatColor = (h) => h > 0.8 ? C[6] : h > 0.56 ? C[4] : h > 0.3 ? orange : red;
+    const nearColor = heatColor(heat), farColor = heatColor(heat - 0.13);
     for (const q of faultPixels) {
-      if (t < q.at) continue;
-      const h = heat * (1 - q.q * 0.3), col = h > 0.75 ? C[7] : h > 0.5 ? C[5] : h > 0.25 ? C[3] : C[1];
-      p.dot(q.x, q.y, q.role === 1 ? INK : q.role === 2 ? lip : col, fade);
+      if (t + 1e-7 < q.at || (q.role === 1 && t < 0.3)) continue;
+      p.dot(q.x, q.y, q.role < 3 ? INK : q.role === 3 ? S[2] : q.far ? farColor : nearColor, fade);
     }
-    for (const c of cracks) for (let i = 0; i < c.pts.length; i += 9) {
-      const q = i / c.pts.length;
-      if (q > ease.outCubic(clamp((t - c.start) / 0.25))) continue;
-      const [x, y] = c.pts[i];
-      if (heat > 0.1) p.glow(x, y, 9, C[4], heat * fade * 0.34);
+    band(p, 0, cy - 3, rx + 1, 0.19, 1.5, fade * 0.7, [INK, S[1], S[2], S[3]], () => true);
+    for (const v of vents) if (t > v.at && heat > 0.1) p.glow(v.x, v.y - 2, 10, C[4], heat * fade * 0.28);
+  }
+
+  function seal(p, back) {
+    const k = (1 - smooth(0.5, 1.05, t)) * (back ? 0.7 : 1);
+    if (k <= 0) return;
+    const r = 165 - 109 * ease.outCubic(clamp(t / 0.4)), keep = (a) => (Math.sin(a) < 0) === back;
+    band(p, 0, 0, r, 0.16, 2, k, C.slice(3), keep, t < 0.1);
+    band(p, 0, 0, r - 12, 0.16, 0.7, k * 0.55, C.slice(2, 6), keep);
+    for (const g of glyphs) {
+      if (!keep(g.a)) continue;
+      const ca = Math.cos(g.a), sa = Math.sin(g.a), rr = r - 6;
+      const pts = g.pts.map(([x, y]) => [ca * (rr + y) - sa * x, (sa * (rr + y) + ca * x) * 0.16]);
+      stroke(p, pts, C[6], k, C[4], 3);
     }
-    band(p, 0, 2, 25, 0.22, 2, fade, [INK, hex(STONE[2]), C[3], C[5]], () => true);
-    p.glowLine(-65, 2, 65, 2, 17, C[4], heat * 0.4);
+    for (const n of nails) {
+      if ((n.y < 0) !== back || t < n.at - 0.045) continue;
+      const fall = 1 - ease.inCubic(clamp((t - n.at + 0.045) / 0.045)), tip = n.y - 92 * fall, h = 26;
+      p.tri(n.x - 3, tip - h, n.x + 3, tip - h, n.x, tip + 3, C[2], k);
+      p.line(n.x - 2, tip - h, n.x, tip + 2, C[6], k);
+      p.line(n.x, tip - h + 2, n.x, tip - 2, WHITE, k);
+      for (let j = 0; j < 3; j++) p.line(n.x - 4, tip - h + 5 + j * 6, n.x + 3, tip - h + 3 + j * 6, C[5], k);
+      if (t > n.at) p.glow(n.x, n.y - 3, 16, C[5], k * 0.5);
+    }
   }
 
   function waves(p, back) {
     for (let j = 0; j < 2; j++) {
-      const u = (t - 0.05 - j * 0.14) / 0.65;
+      const u = (t - 0.025 - j * 0.115) / 0.65;
       if (u <= 0 || u >= 1) continue;
-      const r = 9 + 218 * ease.outCubic(u), k = (1 - u) ** 0.7;
-      band(p, 0, 1, Math.min(163, r), 0.15, 2.7 * (1 - u) + 0.7, k, C.slice(3), (a) => Math.sin(a) < 0 === back);
-      if (!back) {
-        const pts = [];
-        for (let i = 0; i <= 180; i++) {
-          const a = -Math.PI + i / 180 * Math.PI, x = Math.cos(a) * r, y = Math.sin(a) * r * (j ? 0.62 : 0.75);
-          if (x < -225 || x > 170 || y < -211) { if (pts.length > 1) stroke(p, pts, C[6], k, C[5], 5); pts.length = 0; continue; }
-          pts.push([x, y]);
+      const r = 12 + 440 * ease.outCubic(u), k = (1 - u) ** 0.7;
+      const keep = (a) => (Math.sin(a) < 0) === back && Math.cos(a) * r > X0 + 2 && Math.cos(a) * r < X1 - 2
+        && Math.sin(a) * r * 0.065 < Y1 - 3;
+      band(p, 0, 0, r, 0.065, 1.7, k, C.slice(3), keep);
+      if (back) continue;
+      // Sample the thin shell instead of scanning a dome-sized rectangle.
+      let prev = null;
+      for (let i = 0; i <= 160; i++) {
+        const a = -Math.PI + i / 160 * Math.PI, x = Math.cos(a) * r, y = Math.sin(a) * r * (j ? 0.74 : 0.84);
+        if (x < X0 + 2 || x > X1 - 2 || y < TOP + 3) { prev = null; continue; }
+        if (prev) {
+          p.line(...prev, x, y, u < 0.2 ? WHITE : C[6], k);
+          p.line(prev[0] * 0.994, prev[1] * 0.994, x * 0.994, y * 0.994, C[4], k * 0.65);
         }
-        stroke(p, pts, u < 0.18 ? WHITE : C[6], k, C[5], 5);
+        if (i % 16 === 0) p.glow(x, y, 7, C[5], k * 0.28);
+        prev = [x, y];
+      }
+      for (const side of [-1, 1]) {
+        const x = side * r * 0.8;
+        if (x < X0 + 25 || x > X1 - 25) continue;
+        p.each(x - 22, -5, x + 22, 3, (lx, ly, sx, sy) => {
+          const d = ((lx - x) / 22) ** 2 + ((ly + 1) / 4) ** 2;
+          if (d < 1) p.blendPx(sx, sy, dust, (1 - d) ** 2 * k * 0.48);
+        });
+        p.line(x - side * 17, -4, x + side * 12, -3, C[5], k * 0.6);
       }
     }
+    if (t >= 0.3 && t < 0.61) {
+      const u = (t - 0.3) / 0.31;
+      band(p, 0, 2, 28 + 138 * ease.outCubic(u), 0.12, 1.2, 0.6 * (1 - u), C.slice(3), (a) => (Math.sin(a) < 0) === back);
+    }
+  }
+
+  function impact(p) {
+    if (t >= 2 / 30 - 1e-7) return false;
+    const negative = t < 1 / 30 - 1e-7, bg = negative ? INK : WHITE, fg = negative ? WHITE : INK;
+    p.rect(X0, TOP, SIZE[0], SIZE[1], bg);
+    p.beam(0, TOP + 16, 0, -3, 32, fg);
+    p.ellipse(0, 0, 68, 14, fg);
+    for (let i = 0; i < 24; i++) {
+      const a = -Math.PI + i / 23 * Math.PI, r = 28 + i % 4 * 7, len = 54 + i % 5 * 17;
+      p.line(Math.cos(a) * r, -3 + Math.sin(a) * r, Math.cos(a) * (r + len), -3 + Math.sin(a) * (r + len), fg);
+    }
+    lights.draw(p);
+    drain(p);
+    return true;
   }
 
   return {
     update(dt) {
       t += dt;
-      if (t > 0.1 && ventIndex < vents.length && t > 0.1 + ventIndex * 0.027) {
-        const [x, y] = vents[ventIndex++];
-        for (let i = 0; i < 7; i++) {
-          ps.spawn(P.SPARK, x, y, R.range(-45, 45), -R.range(110, 230), R.range(0.25, 0.6));
-          if (i < 3) ps.spawn(P.DUST, x, y, R.range(-25, 25), -R.range(40, 90), R.range(0.45, 0.9), hex("#9b8066"), R.range(2, 4));
-          if (i < 2) bits.add({ kind: B.CHUNK, x, y: y - 2, vx: R.range(-40, 40), vy: -R.range(100, 210), s: R.range(2, 4), a: R.range(0, TAU), va: R.range(-10, 10), ramp: STONE, g: 0.8, drag: 0.8, bounce: 0.3, life: R.range(0.8, 1.6) });
+      while (eventIndex < events.length && t >= events[eventIndex].at) {
+        const e = events[eventIndex++];
+        if (e.rock) bits.add(e.rock);
+        else {
+          const { x, y } = e.vent;
+          for (let i = 0; i < 6; i++) ps.spawn(P.SPARK, x, y - 2, R.range(-34, 34), -R.range(100, 240), R.range(0.25, 0.55));
+          ps.spawn(P.SMOKE, x, y - 3, R.range(-10, 10), -R.range(34, 65), R.range(0.7, 1.2), dust, R.range(3, 5));
+          bits.add({ kind: B.CHUNK, x, y: y - 5, vx: R.range(-28, 28), vy: -R.range(100, 190), s: R.range(3, 5),
+            a: R.range(0, TAU), va: R.range(-9, 9), ramp: STONE, bounce: 0.28, drag: 1, life: 1.5 });
         }
       }
-      if (t < 0.6) for (dustAcc += dt * 65; dustAcc >= 1; dustAcc--) {
-        const side = R.sign(), x = side * (12 + 195 * ease.outCubic(t / 0.65));
-        ps.spawn(P.DUST, x, -R.range(1, 12), side * R.range(12, 40), -R.range(3, 18), R.range(0.5, 1.2), hex("#b49c80"), R.range(2.5, 5));
+      for (const n of nails) if (!n.hit && t >= n.at) {
+        n.hit = true;
+        for (let i = 0; i < 4; i++) ps.spawn(P.SPARK, n.x, n.y - 1, R.range(-55, 55), -R.range(45, 100), R.range(0.18, 0.34));
+        ps.spawn(P.DUST, n.x, n.y - 2, R.range(-10, 10), -14, 0.45, dust, 3);
+      }
+      if (!aftershock && t >= 0.3) {
+        aftershock = true;
+        lights.add(0, -10, 76, C[4], 0.4, 0.23);
+        for (const v of vents) {
+          ps.spawn(P.DUST, v.x, v.y - 2, R.range(-14, 14), -R.range(18, 34), 1.05, dust, 4.5);
+          for (let i = 0; i < 3; i++) ps.spawn(P.SPARK, v.x, v.y, R.range(-35, 35), -R.range(60, 110), 0.4);
+        }
+        for (const b of bits.list) if (b.rest || b.vy > 0) { b.rest = false; b.vy -= 36; b.va += R.sign() * 2; }
       }
       for (const b of bits.list) b.pvy = b.vy;
       bits.update(dt);
-      for (const b of bits.list) if (b.pvy > 100 && b.vy <= 0) {
-        for (let i = 0; i < 3; i++) ps.spawn(P.DUST, b.x, 0, R.range(-25, 25), -R.range(5, 15), R.range(0.3, 0.6), hex("#87766c"), 1 + b.s * 0.2);
+      for (const b of bits.list) if (b.pvy > 85 && b.vy <= 0) {
+        ps.spawn(P.DUST, b.x, -3, R.range(-18, 18), -10, 0.45, dust, 2 + b.s * 0.16);
       }
       ps.update(dt); contain(ps, bits); lights.update(dt);
     },
-    drawBack(p) { if (t >= meta.duration) return; floor(p); waves(p, true); ps.draw(p, "back"); },
+    drawBack(p) {
+      if (t >= fadeAt) return;
+      const ty = p.ty;
+      if (t > 0.3 && t < 0.47) p.ty += Math.sin((t - 0.3) * 110) * 1.6 * (1 - (t - 0.3) / 0.17);
+      floor(p); seal(p, true); waves(p, true); ps.draw(p, "back");
+      p.ty = ty;
+    },
     draw(p) {
-      if (t >= meta.duration) return;
-      waves(p, false); bits.draw(p); ps.draw(p, "front");
-      // A narrow white core shoots from earth all the way to the ruptured sky.
-      if (t < 0.48) {
-        const h = 211 * ease.outExpo(clamp(t / 0.085)), k = 1 - smooth(0.12, 0.48, t), w = 1 + 9 * (1 - t / 0.48);
-        p.beam(0, -h, 0, -1, w, (u, v) => v < 0.12 ? WHITE : v < 0.45 ? C[6] : C[4], k);
-        p.glowLine(0, -h + 6, 0, -4, 18, C[5], k * 0.65);
-        for (const side of [-1, 1]) p.line(side * (w + 5), -h + 8, side * (w + 5), -7, C[5], k * 0.5);
+      if (t >= fadeAt || impact(p)) return;
+      const ty = p.ty;
+      if (t > 0.3 && t < 0.47) p.ty += Math.sin((t - 0.3) * 110) * 1.6 * (1 - (t - 0.3) / 0.17);
+      waves(p, false); bits.draw(p); seal(p, false); ps.draw(p, "front");
+      if (t < 0.32) {
+        const k = 1 - smooth(0.085, 0.32, t), w = 32 * (1 - t / 0.35);
+        p.beam(0, TOP + w / 2, 0, -w / 2, w, (u, v) => v < 0.24 ? WHITE : v < 0.62 ? C[6] : C[4], k);
+        p.glowLine(0, TOP + 22, 0, -8, 20, C[5], k * 0.65);
       }
-      if (t < 0.18) flare(p, 0, -2, 64 * (1 - t / 0.18), 1 - t / 0.18, C);
+      if (t < 0.18) {
+        const k = 1 - t / 0.18;
+        flare(p, 0, -5, 76 * k, k, C);
+        if (t < 0.1) p.ellipse(0, -3, 35, 10, (d) => d < 0.55 ? WHITE : C[6]);
+      }
       lights.draw(p);
-      // Two graphic frames, opposite polarities; the light remains localized to the impact.
-      if (t < 2 / 30) {
-        if (t < 1 / 30) drain(p, true); else drain(p);
-        for (let i = 0; i < 26; i++) {
-          const a = i / 26 * TAU, r = 28 + (i % 4) * 12, L = 35 + (i % 5) * 13;
-          const x = Math.cos(a) * r, y = -4 + Math.sin(a) * r * 0.7, xx = Math.cos(a) * (r + L), yy = -4 + Math.sin(a) * (r + L) * 0.7;
-          if (xx < -226 || xx > 173 || yy > 31) continue;
-          p.line(x, y, xx, yy, t < 1 / 30 ? INK : WHITE);
-        }
-      }
+      p.ty = ty;
     },
   };
 }
