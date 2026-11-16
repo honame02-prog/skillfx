@@ -6,7 +6,7 @@ import { GOLD, EMERGE, REVEALED, RELEASE, HIT, DURATION, TX, SIZE } from "./_lib
 
 export const meta = {
   name: "Tu Thien Chi", desc: "A celestial fingerprint awakens; a colossal golden finger imprisons heaven and earth, then crushes the target into a world-splitting quake.",
-  tags: ["move", "ultimate", "finger", "heaven", "quake", "one-shot"], size: SIZE, origin: [60, 380],
+  tags: ["move", "ultimate", "finger", "heaven", "quake", "one-shot"], size: SIZE, origin: [40, 380],
   duration: DURATION, fps: 30, loop: false, bg: "ground", actor: 2, options: { palette: GOLD, seed: 17 },
 };
 

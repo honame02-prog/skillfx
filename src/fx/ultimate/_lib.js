@@ -10,8 +10,8 @@ export const STONE = ["#191622", "#342b3a", "#514353", "#81706d", "#c4ae8c"];
 //  HIT .. DURATION    "giam dia": the floor seal clamps, rune nails pin the earth, the ground splits, aftermath
 export const EMERGE = 1.8, REVEALED = 3.6, RELEASE = 4.1, HIT = 4.28, DURATION = 7.6, TX = 250;
 export const HOVER_TIP = -150, CLOUD_BASE = -300;
-export const SIZE = [520, 420], ORIGIN = [310, 380];
-export const BOX = [-306, -376, 206, 36];
+export const SIZE = [480, 420], ORIGIN = [290, 380];
+export const BOX = [-286, -376, 186, 36];
 export const INK = hex("#090a13");
 export const envelope = (t, start, full, fade, end) => smooth(start, full, t) * (1 - smooth(fade, end, t));
 
