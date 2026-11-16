@@ -1,11 +1,12 @@
 // Rolling cloud lobes, cooling fire, brands and their floor fires use Sprite Fusion's explosion techniques
 // (https://www.spritefusion.com/pixel-art-vfx/explosion), MIT License, Copyright (c) 2026 Hugo Duprez.
-import { Particles, Blazes, Lights, P, PF, Rng, fit, band, smooth, clamp, ease, TAU, WHITE, hex, flare } from '../../core/index.js';
-import { Plume, Column, lobe, draft, cull, fadeEdges, pool } from '../explosions/_lib.js';
-import { flameBlade, noiseFor, BIG_LAYERS } from '../fire/_lib.js';
+import { Particles, Blazes, Lights, P, PF, Rng, fit, band, smooth, clamp, ease, TAU, WHITE, hex, mix, flare } from '../../core/index.js';
+import { Plume, Column, draft, cull, fadeEdges, pool } from '../explosions/_lib.js';
+import { noiseFor, smokePuff } from '../fire/_lib.js';
 import { FLAMES, flames, lotus, petal } from './_lotus-lib.js';
 
-export const BREAK = 0.22;
+export const BREAK = 0.42;
+const QUIET = BREAK - 0.1;
 export const meta = {
   name: 'Hoa Lien Burst',
   desc: 'A cracking lotus ruptures into separate whorls of alien fire, a petal shock front, a rolling mushroom crown and a rain of burning petals and brands.',
@@ -13,11 +14,16 @@ export const meta = {
   size: [420, 260], origin: [210, 222], duration: 3.4, loop: false, fps: 30, bg: 'ground',
   options: { flames: FLAMES, seed: 17 },
 };
-const SM = ['#625869', '#514657', '#3d3247', '#2a2135', '#181321'].map(hex);
+const SM = ['#66636b', '#514e58', '#3d3944', '#2a2632', '#18151f'].map(hex);
+const LEAD = hex('#fff1bd');
 const noise = noiseFor(0);
+const WIDTH = Array.from({ length: 129 }, (_, i) => Math.pow(1 - i / 128, 0.85));
 
 export function create(o) {
   const C = flames(o), FR = C.map(r => fit(r, 9).reverse()), R = new Rng(o.seed);
+  const cooled = FR.map(r => Array.from({ length: 5 }, (_, k) => r.map((_, i) => r[Math.min(8, i + k)])));
+  const shockRamps = C.map(r => [mix(r[0], SM[4], 0.35), mix(r[2], SM[2], 0.45), mix(r[4], SM[0], 0.3), LEAD]);
+  const capSmoke = new Particles({ seed: o.seed });
   const lights = new Lights();
   const systems = C.map((r, i) => {
     let blazes;
@@ -27,10 +33,10 @@ export function create(o) {
     return { ps, blazes };
   });
   const plume = new Plume(R, { y: -34, rise: 100, tau: 0.48, drift: 2, tube: [12, 23], ring: [4, 45],
-    grow: 0.42, n: 46, size: [8, 13], swell: 0.25, spin: 5, spinTau: 0.9, heat: 1.45, cool: 0.72,
+    grow: 0.42, n: 36, size: [9, 14], swell: 0.25, spin: 5, spinTau: 0.9, heat: 1.45, cool: 0.72,
     under: 0.65, tilt: 0.16, squash: 0.62, fade: [1.2, 1.95], spread: 18, inner: true });
   plume.lobes.forEach((q, i) => { q.color = Math.floor(i * C.length / plume.lobes.length); q.f *= 0.12; });
-  const columns = C.map(() => new Column(R, { w: 3, foot: 10, speed: 200, size: [4, 7], n: 22, sway: 1.8 }));
+  const columns = C.map(() => new Column(R, { w: 3, foot: 10, speed: 200, size: [4, 7], n: 14, sway: 1.8 }));
   // The same ten petals leave the lotus radially, coast, then flutter down under gravity.
   const petals = Array.from({ length: 10 }, (_, i) => {
     const a = -Math.PI + 0.12 + i / 9 * (Math.PI - 0.24), v = R.range(125, 190);
@@ -47,7 +53,7 @@ export function create(o) {
   function explode() {
     lights.add(0, -58, 92, WHITE, 1.1, 0.12);
     C.forEach((r, j) => lights.add((j - (C.length - 1) / 2) * 20, -55, 70, r[3], 0.3, 0.65));
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 110; i++) {
       const j = i % C.length, { ps } = systems[j], a = R.range(-Math.PI - 0.08, 0.08), v = R.range(130, 440);
       ps.spawn(P.SPARK, 0, -22, Math.cos(a) * v, Math.sin(a) * v - 30, R.range(0.22, 0.62));
     }
@@ -57,7 +63,7 @@ export function create(o) {
       ps.spawn(P.FIRE, Math.cos(a) * d, -30 + Math.sin(a) * d, Math.cos(a) * v, Math.sin(a) * v - 25,
         R.range(0.3, 0.5), 0, R.range(7, 12), R.range(0, 0.06), PF.BIG | (i % 8 === 0 ? PF.SMOKES : 0));
     }
-    for (let i = 0; i < 56; i++) {
+    for (let i = 0; i < 40; i++) {
       const j = i % C.length, { ps } = systems[j], a = R.range(0, TAU), v = R.range(30, 115);
       ps.spawn(P.EMBER, Math.cos(a) * 20, -35 + Math.sin(a) * 20, Math.cos(a) * v, -R.range(30, 120),
         R.range(0.7, 1.7), C[j][3], R.chance(0.2) ? 2 : 1);
@@ -78,38 +84,57 @@ export function create(o) {
       const u = (t - BREAK - beat * 0.13) / (0.82 - beat * 0.08);
       if (u <= 0 || u >= 1) continue;
       const radius = (178 - beat * 16) * ease.outCubic(u), alpha = Math.pow(1 - u, 0.65);
-      const thick = 4 + 13 * (1 - u), ramp = C[beat % C.length];
-      band(p, 0, 1, radius, 0.16, thick, alpha, [ramp[0], ramp[2], ramp[4], ramp[5]], keep, u < 0.28);
-      // Thick pointed lips overlap the pressure band, with a white leading edge and a colored wake.
+      const thick = 1.5 + 5 * (1 - u), ramp = shockRamps[beat % C.length];
+      band(p, 0, 1, radius, 0.16, thick, alpha * 0.8, ramp, keep);
+      // One hue per front: pale hot tips trail into the same flame's smoky wake.
       for (let i = 0; i < 24; i++) {
-        const a = (i + beat * 0.5) * TAU / 24, cc = C[(i + beat) % C.length];
+        const a = (i + beat * 0.5) * TAU / 24;
         if (!keep(a)) continue;
-        for (let w = 7; w >= 0; w--) {
+        for (let w = 4; w >= 0; w--) {
           const pts = [-1, 0, 1].map(v => {
-            const g = a + v * TAU / 48, r = radius - w + (v ? -3 : 10) * (1 - u);
+            const g = a + v * TAU / 48, r = radius - w + (v ? -2 : 8) * (1 - u);
             return [Math.cos(g) * r, 1 + Math.sin(g) * r * 0.16];
           });
-          p.polyline(pts, w === 0 ? (u < 0.4 ? WHITE : cc[5]) : cc[w < 3 ? 4 : 2], alpha);
+          p.polyline(pts, ramp[w === 0 ? 3 : w < 3 ? 2 : 0], alpha * (w === 0 ? 0.85 : 0.55));
         }
       }
     }
   }
   // Draw simulated FIRE as ragged tongues, never as concentric round puffs.
+  function tongue(p, q, H, ux, uy, size, N) {
+    const nx = -uy, ny = ux, len = size * 2.4, width = size * 0.65;
+    const bend = N(7, q.seed) * size * 0.6;
+    // One thermal pass replaces six overlapping half-pixel layers per tongue.
+    for (let r = 0; r <= len; r += 0.8) {
+      const u = r / len, half = width * WIDTH[Math.round(u * 128)] * Math.min(1, (r + 1.5) / 3.5)
+        + N(9, q.seed, r * 0.45) * 0.75;
+      if (half < 0.3) continue;
+      const off = bend * u * u + N(4, q.seed + 7, r * 0.2) * u * 1.8;
+      const x = q.x + ux * r + nx * off, y = q.y + uy * r + ny * off;
+      for (let v = -half; v <= half; v++) {
+        const heat = (1 - Math.abs(v) / half) * (1 - u);
+        p.px(x + nx * v, y + ny * v, H[heat > 0.8 ? 0 : heat > 0.65 ? 1 : heat > 0.45 ? 3 : heat > 0.22 ? 4 : 6]);
+      }
+    }
+  }
   function drawFire(ps, p, j, layer) {
-    const all = ps.list, fire = [], rest = [];
-    for (const q of all) (q.k === P.FIRE ? fire : rest).push(q);
+    const all = ps.list, fire = [], smoke = [], rest = [];
+    for (const q of all) (q.k === P.FIRE ? fire : q.k === P.SMOKE ? smoke : rest).push(q);
     ps.list = rest; ps.draw(p, layer); ps.list = all;
+    // The same smoke model in direct screen spans avoids per-pixel angle calculations.
+    if (layer === 'back') for (const q of smoke) {
+      if (q.delay <= 0) smokePuff(p, q.x, q.y, q.life / q.max, q.size, q.col, !!(q.flag & PF.BIG));
+    }
     const N = (rate, seed = 0, off = 0) => noise(t, rate, seed, off);
     for (const q of fire) {
       if (q.delay > 0 || !!(q.flag & PF.BACK) !== (layer === 'back')) continue;
       const k = q.life / q.max, cooling = Math.floor((1 - k) * 4);
-      const H = FR[j].map((_, i) => FR[j][Math.min(8, i + cooling)]);
+      const H = cooled[j][cooling];
       const speed = Math.hypot(q.vx, q.vy) || 1, dx = q.vx / speed * 0.65, dy = Math.min(-0.3, q.vy / speed);
       const norm = Math.hypot(dx, dy), size = q.size * (0.55 + k * 0.45);
       const saved = p.fade; p.fade *= Math.min(1, k * 4);
-      flameBlade(p, q.x, q.y, dx / norm, dy / norm, size * 2.4, size * 0.65,
-        N(7, q.seed) * size * 0.6, N, q.seed, H, BIG_LAYERS, 0.75, 1.8);
-      p.glow(q.x, q.y - size * 0.5, size * 2.1, C[j][3], 0.07 * k);
+      tongue(p, q, H, dx / norm, dy / norm, size, N);
+      // Shared stream lights replace a radial light evaluation for every tongue.
       p.fade = saved;
     }
   }
@@ -123,20 +148,59 @@ export function create(o) {
       columns[j].draw(p, S.y + S.tube * 0.4, FR[j], SM, 1 - smooth(0.65, 1.25, age), E * 1.1);
       p.fade = saved;
     }
-    for (const e of plume.lobesAt(plume.t)) {
-      const j = e.q.color, underside = clamp((e.y - S.y + 9) / 22);
-      const fire = Math.min(0.28, clamp((e.heat - 0.25) / 0.9) * (0.35 + underside * 0.65));
-      const glow = E * (0.8 + underside * 0.65) * e.q.gv;
-      lobe(p, e.x, e.y, e.r, FR[j], SM, fire, glow, e.fade * alpha * 0.92, e.z, underside < 0.2 ? 1 : 0);
-      // The light buffer keeps the underside incandescent as the top turns to soot.
-      p.glow(e.x, e.y + e.r * 0.3, e.r * 1.9, C[j][3], E * alpha * (0.08 + underside * 0.16));
-      if (underside > 0.35 && e.z > -0.15 && age < 1.8) {
-        const N = (rate, seed = 0, off = 0) => noise(t, rate, seed, off);
-        const saved = p.fade; p.fade *= alpha * e.fade * 0.7;
-        flameBlade(p, e.x, e.y + e.r * 0.7, Math.sin(e.q.ph) * 0.3, -1,
-          e.r * (0.7 + E * 0.6), e.r * 0.35, N(6, e.q.th) * 4, N, e.q.th * 20, FR[j], BIG_LAYERS);
-        p.fade = saved;
-      }
+    // PF.BIG smoke follows the toroidal roll: out over the crown, inward beneath the rim.
+    const lobes = plume.lobesAt(plume.t);
+    capSmoke.list = lobes.map(e => ({ k: P.SMOKE, flag: PF.BIG, delay: 0, x: e.x, y: e.y,
+      vx: 0, vy: 0, life: 0.48 + e.q.j * 0.15, max: 1, size: e.r * 0.84,
+      col: SM[e.up > 0 ? 3 : 1], seed: e.q.th }));
+    const saved = p.fade; p.fade *= alpha * 0.72;
+    for (const q of capSmoke.list) smokePuff(p, q.x, q.y, q.life / q.max, q.size, q.col, !!(q.flag & PF.BIG));
+    p.fade = saved;
+    for (let i = 0; i < lobes.length; i++) {
+      const e = lobes[i];
+      if (e.z < -0.15 || e.up > 0.3) continue;
+      const underside = clamp((e.y - S.y + 5) / 16);
+      // Light only, below the smoke: no painted fire discs in the crown.
+      const tint = C[e.q.color][3], strength = E * alpha * e.fade * underside * 0.6;
+      p.each(e.x - e.r, e.y, e.x + e.r, e.y + e.r, (x, y, sx, sy) => {
+        const dx = (x - e.x) / e.r, dy = (y - e.y) / e.r, d = dx * dx + dy * dy;
+        if (d >= 1) return;
+        p.add(sx, sy, tint, strength * (1 - d) * smooth(0.05, 0.5, dy));
+      });
+      // Short broken inner curls describe the returning flow without outlining balls.
+      const curl = Array.from({ length: 8 }, (_, k) => {
+        const a = 0.1 + k / 7 * 2.8, r = e.r * (0.65 - k / 7 * 0.35);
+        return [e.x + Math.cos(a) * r, e.y + Math.sin(a) * r * 0.7];
+      });
+      p.polyline(curl, SM[4], alpha * e.fade * 0.18);
+    }
+  }
+  function pressure(p) {
+    const still = t >= QUIET, tt = Math.min(t, QUIET), u = tt / QUIET;
+    const saved = p.fade;
+    if (still) p.fade *= 0.48;
+    lotus(p, tt, C, { y: -22, size: 0.75 * (1 - u * 0.38), instability: still ? 0 : u * 1.8,
+      halo: false, seed: o.seed });
+    p.fade = saved;
+    if (still) return; // A held, dim silhouette for exactly 0.1 s before rupture.
+    for (let j = 0; j < C.length; j++) {
+      const a = j * TAU / C.length + tt * (j & 1 ? -12 : 12), reach = 9 + 9 * u;
+      const x = Math.cos(a) * reach, y = -30 + Math.sin(a) * reach * 0.55;
+      petal(p, x, y, -x * 0.9, -30 - y - 5, 2 + u * 2, C[j], tt, j + o.seed,
+        u * 0.8, u, false);
+      const crack = [[x * 0.75, y], [x * 0.4 + Math.sin(j * 7 + tt * 60) * 2, -31], [0, -29]];
+      p.polyline(crack, C[j][4], u * 0.8);
+      p.polyline(crack.slice(1), LEAD, smooth(0.35, 1, u));
+    }
+    // Paired dark/light ripples make compressed air readable against the scene.
+    for (let i = 0; i < 3; i++) {
+      const q = (u * 1.4 + i / 3) % 1, r = 17 + (1 - q) * 32;
+      const pts = Array.from({ length: 49 }, (_, k) => {
+        const a = k / 48 * TAU, warp = Math.sin(a * 5 + tt * 35) * u;
+        return [Math.cos(a) * (r + warp), -29 + Math.sin(a) * r * 0.46];
+      });
+      p.polyline(pts, SM[4], Math.sin(q * Math.PI) * u * 0.5);
+      p.polyline(pts.map(([x, y]) => [x, y - 1]), SM[0], Math.sin(q * Math.PI) * u * 0.25);
     }
   }
   return {
@@ -152,7 +216,7 @@ export function create(o) {
           const j = i % C.length, a = i * TAU / streamAcc.length + age * 3.8;
           const radius = 8 + 35 * (1 - Math.exp(-age * 7));
           const x = Math.cos(a) * radius, y = -42 - age * 45 + Math.sin(a) * radius * 0.65;
-          for (streamAcc[i] += dt * 26; streamAcc[i] >= 1; streamAcc[i]--) {
+          for (streamAcc[i] += dt * 18; streamAcc[i] >= 1; streamAcc[i]--) {
             systems[j].ps.spawn(P.FIRE, x + R.range(-3, 3), y + R.range(-3, 3),
               -Math.sin(a) * 75 + Math.cos(a) * 25, Math.cos(a) * 45 - 55,
               R.range(0.24, 0.42), 0, R.range(6, 11), 0, PF.BIG | (R.chance(0.07) ? PF.SMOKES : 0));
@@ -203,13 +267,13 @@ export function create(o) {
       if (t >= 3.32) return;
       const saved = p.fade; p.fade *= 1 - smooth(2.85, 3.32, t);
       if (t < BREAK) {
-        lotus(p, t, C, { y: -22, size: 0.75 * (1 - t / BREAK * 0.17), instability: t / BREAK, seed: o.seed });
+        pressure(p);
         p.fade = saved; return;
       }
       const age = t - BREAK;
       if (age < 0.067) {
-        p.glow(0, -55, 92, WHITE, 1.5 * (1 - age / 0.08));
-        lotus(p, t, C.map(() => Array(7).fill(WHITE)), { y: -24, size: 1.5, halo: false });
+        // The flash already has a timed light; avoid redrawing an oversized white lotus.
+        p.ellipse(0, -40, 28, 22, WHITE, 1 - age / 0.08);
         flare(p, 0, -35, 90, 1 - age / 0.08, [C[0][2], C[0][4], C[0][5], WHITE]);
       }
       for (let j = 0; j < C.length; j++) drawFire(systems[j].ps, p, j, 'front');
