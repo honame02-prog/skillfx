@@ -73,12 +73,12 @@ export function createGroundBlast(o = {}) {
     vx: (i - 3.5) * R.range(25, 36) * s, speed: R.range(565, 685) * s,
     phase: R.range(0, TAU),
   }));
-  const wave = Array.from({ length: 42 }, (_, i) => {
-    const a = (i + 0.15) / 42 * TAU;
+  const wave = Array.from({ length: 30 }, (_, i) => {
+    const a = (i + 0.15) / 30 * TAU;
     return { ca: Math.cos(a), sa: Math.sin(a), size: i % 3, phase: R.range(0, TAU) };
   });
-  const mist = Array.from({ length: 16 }, (_, i) => ({
-    x: (i - 7.5) * reach / 9, y: -R.range(14, 51) * s,
+  const mist = Array.from({ length: 10 }, (_, i) => ({
+    x: (i - 4.5) * reach / 5.5, y: -R.range(14, 51) * s,
     phase: R.range(0, TAU), drift: R.range(6, 14) * s, at: R.range(0.5, 0.8), back: i % 3 !== 0,
   }));
   const launches = Array.from({ length: 34 }, (_, i) => {
@@ -92,7 +92,7 @@ export function createGroundBlast(o = {}) {
       life: Math.max(0.1, Math.min(duration - 0.3, R.range(2.55, 3.02))),
     } };
   }).sort((a, b) => a.at - b.at);
-  for (let i = 0; i < 165; i++) ps.spawn(P.GRIT, R.range(-22, 22) * s, -4 * s,
+  for (let i = 0; i < 110; i++) ps.spawn(P.GRIT, R.range(-22, 22) * s, -4 * s,
     R.range(-205, 205) * s, -R.range(220, 670) * s, R.range(1.1, 1.9), R.pick(D.slice(1)), i % 4 === 0 ? 2 * s : s, R.range(0.025, 0.24));
   for (let i = 0; i < 28; i++) ps.spawn(P.SPARK, R.range(-18, 18) * s, -3 * s,
     R.range(-240, 240) * s, -R.range(80, 350) * s, R.range(0.18, 0.5), H[5], s);
@@ -128,7 +128,7 @@ export function createGroundBlast(o = {}) {
       const j = jets[i], age = t - j.at, fade = smooth(0, 0.06, age) * (1 - smooth(0.56, 1.24, age));
       if (fade <= 0) continue;
       // Successive soil rolls follow the head; the foot tears loose as gravity wins.
-      for (let k = 7; k >= 0; k--) {
+      for (let k = 5; k >= 0; k--) {
         const a = Math.max(0, age - k * 0.062), h = Math.max(0, j.speed * a - 550 * s * a * a);
         const x = j.x + j.vx * a + Math.sin(j.phase + k * 1.7 + t * 4) * 4 * s;
         const y = -6 * s - h;
