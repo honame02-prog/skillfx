@@ -34,8 +34,9 @@ function coneDust(p, t) {
   const crownW = 8 + H * (0.62 + 0.45 * slump), radius = crownW / 6;
   for (let i = 0; i < tops.length; i++) {
     const dx = x0 + i - TX - drift, cell = Math.round(dx / (radius * 1.65));
-    const u = (dx - cell * radius * 1.65) / radius;
-    tops[i] = H - radius + radius * Math.sqrt(Math.max(0, 1 - u * u)); capX[i] = u;
+    const r = radius * (0.65 + 0.7 * hsh(cell + 40, 3)), lift = (hsh(cell + 40, 5) - 0.5) * radius * 1.1 + 1.5 * Math.sin(a * 2.3 + cell * 1.7);   // uneven lobes
+    const u = (dx - cell * radius * 1.65 - (hsh(cell + 40, 7) - 0.5) * radius * 0.5) / r;
+    tops[i] = H - radius + lift + r * Math.sqrt(Math.max(0, 1 - u * u)); capX[i] = Math.max(-1, Math.min(1, u));
   }
   const N = grid(x0, y0, x1, 0, 4, (x, y) => {
     const h = -y, dx = x - TX - drift * h / H;
@@ -45,10 +46,12 @@ function coneDust(p, t) {
   p.shade(x0, y0, x1, 0, (x, y, o) => {
     const row = Math.max(0, Math.min(rows - 1, Math.round(y - y0))), v = height[row];
     const dx = x - center[row], e = Math.abs(dx) * invW[row];
-    if (e > 1.05) return;
+    if (e > 1.25) return;
+    const n = N(x, y);
+    if (e > 0.88 + n * 0.3) return;   // ragged sides
     const col = Math.max(0, Math.min(tops.length - 1, Math.floor(x - x0))), top = tops[col] + y;
     if (top < 0) return;
-    const n = N(x, y), density = (1 - e * e * 0.4) * (0.65 + n * 0.6) - thin * 1.28;
+    const density = (1 - e * e * 0.4) * (0.65 + n * 0.6) - thin * 1.28;
     if (density < 0.23) return;
     let shade = 0.65 + n * 2.6 + e * 0.65 - dx * invW[row] * 0.55;
     if (top < radius * 1.5) shade += (1 - top / (radius * 1.5)) * (0.9 - capX[col] * 0.55);

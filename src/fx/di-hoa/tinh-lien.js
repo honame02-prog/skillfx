@@ -8,7 +8,7 @@ import { blast } from './_tinhlien-blast.js';
 
 export const meta = {
   name: 'Tinh Lien Yeu Hoa',
-  desc: 'Clouds part for a beast eye whose gaze is a pale sunbeam on a flickering flame-lotus; the gaze focuses, the lotus explodes into a towering cone of dust with a ghost lotus burning inside.',
+  desc: 'A beast eye parts the clouds and its pale sunbeam gaze burns a white flame-lotus on the target, which explodes into a towering cone of dust with a ghost lotus inside.',
   tags: ['di-hoa', 'fire', 'eye', 'light', 'explosion', 'one-shot'],
   size: [360, 260], origin: [60, 235], duration: END, loop: false, fps: 30, bg: 'ground', actor: 2,
   options: { seed: 5 },

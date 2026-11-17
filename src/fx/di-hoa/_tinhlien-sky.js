@@ -24,7 +24,7 @@ function cloudFrame(tq) {
     const x = CX0 + i, y = CY0 + j, dx = (x - EC[0]) / hx, dy = (y - EC[1]) / hy, r2 = dx * dx + dy * dy, n = N(x, y), lower = (-128 - y) / 60;
     const dens = (n * 1.1 + Math.min(1, lower) * 0.5 - 0.35) * smooth(1, (1.35 + 0.3 * n) ** 2, r2);
     if (dens <= cut) continue;
-    const rim = op > 0.05 && r2 < 2.05 + flash * 0.35 && n > 0.65 - flash * 0.05;
+    const rim = op > 0.05 && r2 < 1.7 + flash * 0.35 && n > 0.74 - flash * 0.06;
     // Solid lit crests and dark undersides, never alpha stipple.
     buf[j * CW + i] = rim ? IRIS[flash > 0.3 ? 2 : n > 0.75 ? 1 : 0] : CLOUD[dens > 0.66 ? 2 : dens > 0.39 ? 1 : 0];
   }
