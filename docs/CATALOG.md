@@ -1,6 +1,6 @@
 # Catalog
 
-256 effects in 23 categories. Every one is a file in
+257 effects in 23 categories. Every one is a file in
 `src/fx/<category>/<name>.js`; render any of them with `node tools/render.mjs <id> --gif`.
 
 ## ultimate
@@ -28,6 +28,7 @@ five alien flames, each its own skill; together the Phat No Hoa Lien.
 | Cot Linh Draft | `di-hoa/cot-linh-draft` | one-shot 4.4s | 360×260 | Motion draft: a cold white fire pours from a down-turned palm, rolls along the ground, climbs the target, freezes into flame-shaped ice, then shatters. |
 | Thanh Lien Dia Tam Hoa | `di-hoa/thanh-lien` | one-shot 4.7s | 360×260 | A fire lotus seed is hurled into the ground; a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
 | Thanh Lien Draft | `di-hoa/thanh-lien-draft` | one-shot 3.2s | 360×260 | Motion draft v2: a fire lotus seed is flicked into the ground, a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
+| Van Lac Draft | `di-hoa/van-lac-draft` | one-shot 4.5s | 360×260 | Motion draft: an invisible flame serpent with a rose-red heart coils round the target, dives into its chest and burns it from inside in three beats. |
 
 ## moves
 

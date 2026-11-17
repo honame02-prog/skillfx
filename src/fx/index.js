@@ -12,6 +12,7 @@ import * as ultimate_tu_thien_chi from "./ultimate/tu-thien-chi.js";
 import * as di_hoa_cot_linh_draft from "./di-hoa/cot-linh-draft.js";
 import * as di_hoa_thanh_lien from "./di-hoa/thanh-lien.js";
 import * as di_hoa_thanh_lien_draft from "./di-hoa/thanh-lien-draft.js";
+import * as di_hoa_van_lac_draft from "./di-hoa/van-lac-draft.js";
 import * as moves_arrow_shot from "./moves/arrow-shot.js";
 import * as moves_dash_strike from "./moves/dash-strike.js";
 import * as moves_earth_stomp from "./moves/earth-stomp.js";
@@ -272,6 +273,7 @@ export const effects = {
   "di-hoa/cot-linh-draft": di_hoa_cot_linh_draft,
   "di-hoa/thanh-lien": di_hoa_thanh_lien,
   "di-hoa/thanh-lien-draft": di_hoa_thanh_lien_draft,
+  "di-hoa/van-lac-draft": di_hoa_van_lac_draft,
   "moves/arrow-shot": moves_arrow_shot,
   "moves/dash-strike": moves_dash_strike,
   "moves/earth-stomp": moves_earth_stomp,
