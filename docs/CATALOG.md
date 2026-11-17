@@ -1,6 +1,6 @@
 # Catalog
 
-253 effects in 22 categories. Every one is a file in
+254 effects in 23 categories. Every one is a file in
 `src/fx/<category>/<name>.js`; render any of them with `node tools/render.mjs <id> --gif`.
 
 ## ultimate
@@ -18,6 +18,14 @@ huge signature skills: sky-splitting, earth-shattering.
 | Phat No Hoa Lien | `ultimate/phat-no-hoa-lien` | one-shot 7s | 480×380 | Five fire streams spiral round the caster into a lotus that soars, then slams down and unwinds into a twisting five-colour pillar with a far-reaching ground shock. |
 | Sky breaking quake | `ultimate/sky-quake` | one-shot 3.32s | 480×420 | An inverted impact pins the earth with a tightening rune seal; molten faults heave slabs, staggered geysers erupt and a second quake widens the sinking crater. |
 | Tu Thien Chi | `ultimate/tu-thien-chi` | one-shot 7.6s | 480×420 | A celestial fingerprint awakens; a colossal golden finger imprisons heaven and earth, then crushes the target into a world-splitting quake. |
+
+## dị hoả
+
+five alien flames, each its own skill; together the Phat No Hoa Lien.
+
+| effect | id | | size | what it does |
+|---|---|---|---|---|
+| Thanh Lien Draft | `di-hoa/thanh-lien-draft` | one-shot 2.9s | 320×240 | Motion draft: a palm on the ground sends a green lava vein to the target, a lotus of cracks opens and erupts into petals that close and burn. |
 
 ## moves
 

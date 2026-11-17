@@ -4,7 +4,7 @@
 
 # pixelfx.
 
-**<!-- count -->253<!-- /count --> pixel art effects and animations, every one a small piece of code.** Fire,
+**<!-- count -->254<!-- /count --> pixel art effects and animations, every one a small piece of code.** Fire,
 explosions, magic, weather, UI, pickups, critters and more. Play them live, recolor and mirror them, drop them into
 a browser game, or export sprite sheets for any engine. Plus a Claude Code skill that makes new ones the way a
 picky pixel artist would: draft, render, look, refine.
@@ -31,6 +31,7 @@ the idea at library scale, with a skill to keep going.
 | category | effects | some of them |
 |---|---|---|
 | **ultimate** | 9 | ground blast study, heaven imprisoning finger, imprisoned heaven, hoa lien, hoa lien burst, hoa lien draft… |
+| **dị hoả** | 1 | thanh lien draft |
 | **moves** | 12 | arrow shot, dash strike, earth stomp, fireball throw, ground pound, holy smite… |
 | **fire** | 12 | brazier, campfire, candle, fire breath, fire ring, fire tornado… |
 | **explosions** | 12 | barrel explosion, big explosion, cartoon pow, dirt explosion, firework burst, firework rocket… |
