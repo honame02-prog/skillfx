@@ -9,6 +9,7 @@ import * as ultimate_hoa_lien_draft from "./ultimate/hoa-lien-draft.js";
 import * as ultimate_phat_no_hoa_lien from "./ultimate/phat-no-hoa-lien.js";
 import * as ultimate_sky_quake from "./ultimate/sky-quake.js";
 import * as ultimate_tu_thien_chi from "./ultimate/tu-thien-chi.js";
+import * as di_hoa_cot_linh_draft from "./di-hoa/cot-linh-draft.js";
 import * as di_hoa_thanh_lien from "./di-hoa/thanh-lien.js";
 import * as di_hoa_thanh_lien_draft from "./di-hoa/thanh-lien-draft.js";
 import * as moves_arrow_shot from "./moves/arrow-shot.js";
@@ -268,6 +269,7 @@ export const effects = {
   "ultimate/phat-no-hoa-lien": ultimate_phat_no_hoa_lien,
   "ultimate/sky-quake": ultimate_sky_quake,
   "ultimate/tu-thien-chi": ultimate_tu_thien_chi,
+  "di-hoa/cot-linh-draft": di_hoa_cot_linh_draft,
   "di-hoa/thanh-lien": di_hoa_thanh_lien,
   "di-hoa/thanh-lien-draft": di_hoa_thanh_lien_draft,
   "moves/arrow-shot": moves_arrow_shot,
