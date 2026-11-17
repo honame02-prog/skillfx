@@ -18,7 +18,7 @@ export const meta = {
   desc: 'A fire lotus seed is hurled into the ground; a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano.',
   tags: ['di-hoa', 'fire', 'lotus', 'lava', 'volcano', 'move', 'one-shot'],
   size: [360, 260], origin: [60, 235], duration: END, loop: false, fps: 30, bg: 'ground', actor: 2,
-  options: { palette: RAMP, seed: 5 },
+  options: { palette: RAMP, seed: 5, petal: 'A' },
 };
 const WIND = { ...READY, crouch: 4, lean: -6, turn: 0.4, fx: -12, fy: -33, bx: 7, by: -21, ffx: 9, fbx: -8 };
 const HURL = { ...READY, crouch: 6, lean: 9, fx: 24, fy: -24, bx: -6, by: -19, ffx: 12, fbx: -10 };
@@ -69,6 +69,63 @@ function petalFire(p, C, bx, by, tx, ty, W, t, seed, { k = 1, dim = 0, crack = 0
     }
     if (crack > 0 && r < 0.8 && Math.abs(v - 2.5 * Math.sin(u * 9 + seed)) < 0.6 && u > 0.15 && u < 0.85) { o.c = WHITE; o.a = k * crack; return; }
     o.c = pal[b];
+    o.a = k;
+  });
+}
+// ---------------------------------------------------------------- lotus petal v3 (real lotus morphology)
+// Nelumbo petal: elliptic, widest a little above the middle, blunt-pointed (subacute) tip, concave (cupped).
+// Colour like a real lotus: pale at the base, saturation rising toward the tip and edges; fine veins that meet at
+// base and tip; the cup shows as a lighter inner-face crescent along one rim. No dark outline, no hard bands
+// (that is what read as crystal): steps are blended with a 4x4 ordered dither. Fire shows as glow + slow heat
+// shimmer rising, and (style 'B') a small flame wisp on the tip.
+const MELT = 0.14;   // petals burn away this fast at the burst
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
+const hash = (x, y, s) => { const h = Math.sin(x * 127.1 + y * 311.7 + s * 74.7) * 43758.5453; return h - Math.floor(h); };
+function lotusPetal(p, C, bx, by, tx, ty, W, t, seed, { k = 1, dim = 0, side = 1, style = 'A', melt = 0 } = {}) {
+  const dx = tx - bx, dy = ty - by, L = Math.hypot(dx, dy);
+  if (L < 2 || k <= 0 || melt >= 1) return;
+  const ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
+  const M = 0.56;   // widest point
+  const Wn = W * 0.74, hw = (u) => u < M ? Wn * (0.18 + 0.82 * Math.sqrt(1 - ((M - u) / M) ** 2)) : Wn * Math.pow(Math.max(0, 1 - ((u - M) / (1 - M)) ** 2), 1.15);
+  const pad = W + 8, x0 = Math.min(bx, tx) - pad, x1 = Math.max(bx, tx) + pad, y0 = Math.min(by, ty) - pad - 8, y1 = Math.max(by, ty) + pad;
+  const ramp = (x, sx, sy) => {   // continuous position on the palette, dithered between neighbours
+    x = clamp(x, 0, 6);
+    const i = Math.floor(x), f = clamp((x - i - 0.5) * 2.4 + 0.5);   // narrow dithered seam between flat steps
+    return C[Math.min(6, f > BAYER[(sy & 3) * 4 + (sx & 3)] ? i + 1 : i)];
+  };
+  p.shade(x0, y0, x1, y1, (x, y, o) => {
+    const ex = x - bx, ey = y - by, u = (ex * ux + ey * uy) / L, v = (ex * nx + ey * ny) * side;
+    // tip flame wisp (style B): a thin flickering tongue above the tip
+    if (u > 0.97) {
+      if (style !== 'B' || melt > 0) return;
+      const fl = (u - 0.97) * L, hgt = 7 + 3 * Math.sin(t * 13 + seed), sway = 1.4 * Math.sin(t * 9 + fl * 0.5 + seed);
+      if (fl > hgt || Math.abs(v - sway) > 1.6 * (1 - fl / hgt) + 0.2) return;
+      o.c = fl < hgt * 0.5 ? C[5] : C[4]; o.a = k * (1 - fl / hgt * 0.6); return;
+    }
+    if (u < 0) return;
+    const w = hw(u), s = v / Math.max(0.6, w);
+    if (Math.abs(s) > 1) return;
+    if (melt > 0) {   // burning away from the edges in: holes open, their rims flash white
+      const n = hash(Math.floor(x / 2), Math.floor(y / 2), seed) * 0.7 + (Math.abs(s) * 0.5 + Math.abs(u - 0.5)) * 0.6;
+      if (n < melt * 1.3 - 0.05) return;
+      if (n < melt * 1.3 + 0.12) { o.c = WHITE; o.a = k; return; }
+    }
+    // the cup: the inner face shows as a crescent along the far rim, widest toward the tip
+    const lip = 1 - 0.42 * smooth(0.25, 0.95, u);
+    const inner = s > lip;
+    // base pale -> tip saturated; edges a little more saturated; back petals dimmer
+    let tone = 5.15 - 2.2 * smooth(0.1, 1, u) - 1.0 * Math.pow(Math.abs(s), 3) - dim;
+    if (inner) tone = 5.2 - 1.2 * smooth(0.4, 1, u) - dim * 0.6;   // lit inner face
+    else if (s > lip - 0.12 && u > 0.3) tone -= 0.9;            // the fold: a soft shadow line under the rolled rim
+    // the outline is the same hue, two steps deeper: separates overlapping petals without a crystal edge
+    const edgePx = (1 - Math.abs(s)) * w;
+    if (edgePx < 1 && u > 0.06) { o.c = C[clamp(Math.round(2.6 - dim * 0.5), 1, 6)]; o.a = k; return; }
+    // fine veins, converging at base and tip
+    const vs = s / Math.max(0.3, inner ? 1 : lip);
+    if (!inner && u > 0.08 && u < 0.88 && Math.abs(Math.sin(vs * Math.PI * 3.5)) < 0.16) tone += 0.55;
+    // heat shimmer drifting up the petal (slow, low)
+    tone += 0.15 * Math.sin(u * 6 - t * 4.5 + seed) * Math.sin(s * 2.1 + t * 1.3);
+    o.c = ramp(tone + melt * 2, x, y);
     o.a = k;
   });
 }
@@ -145,7 +202,7 @@ const L_END = END - LAND;
 const bloom = {
   meta: { duration: L_END, loop: false, options: {} },
   create(o) {
-    const C = ramp(o), R = new Rng(o.seed + 3), lights = new Lights();
+    const C = ramp(o), R = new Rng(o.seed + 3), lights = new Lights(), STYLE = o.petal ?? 'A', V2 = STYLE === 'v2';
     const ps = new Particles({ rng: new Rng(o.seed + 7), ground: () => 0, sparks: [C[6], C[5], C[3], C[1]] });
     const roots = Array.from({ length: 11 }, (_, i) => {
       const a = i * TAU / 11 + R.range(-0.15, 0.15), len = R.range(16, 40), pts = [];
@@ -167,6 +224,11 @@ const bloom = {
       for (let i = 0; i < 30; i++) {
         const a = -Math.PI * (0.12 + 0.76 * R.next()), v = R.range(120, 260);
         ps.spawn(P.EMBER, R.range(-4, 4), -6, Math.cos(a) * v, Math.sin(a) * v, R.range(0.6, 1.0), C[R.int(3, 5)], R.chance(0.4) ? 2 : 1);
+      }
+      // the petals burn away at once: each one breaks into a puff of motes flung outward along it
+      if (!V2) for (const q of layout(BURST - 0.001)) for (let j = 0; j < 7; j++) {
+        const u = R.range(0.15, 1), x = q.bx + (q.tx - q.bx) * u, y = q.by + (q.ty - q.by) * u, dx = q.tx - q.bx, dy = q.ty - q.by, d = Math.hypot(dx, dy) || 1, v = R.range(40, 110);
+        ps.spawn(R.chance(0.5) ? P.SPARK : P.FIRE, x + R.range(-3, 3), y, dx / d * v + R.range(-20, 20), dy / d * v - R.range(10, 50), R.range(0.12, 0.3), C[R.int(4, 6)], R.chance(0.3) ? 2 : 1, R.range(0, 0.08), q.front ? 0 : PF.BACK);
       }
     }
     return {
@@ -251,10 +313,16 @@ const bloom = {
     }
     function flower(p, layer) {
       const g = G();
-      if (g < BUD || g >= BURST) return;
-      const crack = smooth(FULL, BURST, g), all = layout(g).filter((q) => q.front === (layer === 'front'));
+      if (g < BUD || g >= BURST + (V2 ? 0 : MELT)) return;
+      const crack = smooth(FULL, BURST, g), all = layout(Math.min(g, BURST - 0.001)).filter((q) => q.front === (layer === 'front'));
       all.sort((a, b) => layer === 'front' ? b.ring - a.ring : a.ring - b.ring);
-      for (const q of all) petalFire(p, C, q.bx, q.by, q.tx, q.ty, q.W, g, q.ring * 7 + q.i, { dim: q.front ? 0 : 0.18, crack: crack * 0.9 });
+      if (!V2 && layer === 'back') p.glow(0, -18, 46, C[3], 0.08 * smooth(BUD, OPEN, g));
+      const melt = clamp((g - BURST) / MELT);
+      for (const q of all) {
+        if (V2) petalFire(p, C, q.bx, q.by, q.tx, q.ty, q.W, g, q.ring * 7 + q.i, { dim: q.front ? 0 : 0.18, crack: crack * 0.9 });
+        else lotusPetal(p, C, q.bx, q.by, q.tx, q.ty, q.W, g, q.ring * 7 + q.i, { dim: (q.front ? 0 : 0.7) + q.ring * -0.15 + 0.15, side: Math.cos(q.a) >= 0 ? -1 : 1, style: STYLE, melt });
+      }
+      if (g >= BURST) return;
       if (layer === 'back' && g > OPEN) {   // the seed pod, its holes glowing brighter before the burst
         const k = smooth(OPEN, OPEN + 0.2, g), hot = 0.3 + 0.7 * crack;
         p.ellipse(0, -9, 9, 3, C[2], k);
@@ -287,7 +355,7 @@ const bloom = {
     // petals torn off by the blast, tumbling, burning and cooling as they fall
     function blown(p, layer) {
       const τ = G() - BURST;
-      if (τ < 0 || τ > 1.15) return;
+      if (!V2 || τ < 0 || τ > 1.15) return;
       const fade = 1 - smooth(0.55, 0.85, τ);
       if (fade <= 0) return;
       for (const q of layout(BURST - 0.001)) {
@@ -303,7 +371,7 @@ const bloom = {
 };
 
 export function create(o) {
-  const common = { palette: o.palette ?? RAMP };
+  const common = { palette: o.palette ?? RAMP, petal: o.petal ?? 'A' };
   return chain([
     { fx: hurl, t: 0, until: LAND + 0.3, ...common },
     { fx: bloom, t: LAND, x: TX, ...common },
