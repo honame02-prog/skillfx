@@ -10,7 +10,14 @@ import { createGroundBlast } from './_blast.js';
 import { STONE } from './_lib.js';
 
 const GOLD5 = ['#2a1805', '#6e4a08', '#b8860f', '#e9c12c', '#ffe27a', '#fff5c4', '#ffffff'];
-const ALL5 = [...FLAMES, GOLD5];
+// the five strange fires (Di Hoa 1-5): Thanh Lien teal, Cot Linh cold blue, Van Lac rose, Tam Thien black-violet, Tinh Lien white-gold
+const ALL5 = [
+  FLAMES[0],
+  ['#0b1224', '#1d3557', '#3f6f9e', '#7fb2d9', '#c4e1f0', '#efece2', '#ffffff'],
+  ['#140c12', '#4a1428', '#a8204a', '#ff4f7a', '#ffb3c6', '#efe9ee', '#ffffff'],
+  ['#0a0610', '#1e0f2e', '#5a2a8c', '#9b4dd6', '#e07af0', '#f6d6ff', '#ffffff'],
+  ['#3a2e1c', '#8a6a2a', '#c9a24a', '#e9cf8a', '#efe6cf', '#fbf8f0', '#ffffff'],
+];
 const G1 = 1.55, B0 = 1.3, B1 = 2.1, R1 = 2.95, H1 = 3.2, TI = 3.4, AFTER = 3.6;
 const HEAD = [0, -64], APEX = [36, -262], TX = 168;
 const sm = (u) => u * u * (3 - 2 * u);
