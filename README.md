@@ -176,6 +176,8 @@ or copy `skills/pixelfx` into `~/.claude/skills/`. Then ask for what you want:
 node tools/new.mjs arcane/my-spell       # a working starting point (add --loop for a loop)
 node tools/render.mjs arcane/my-spell    # records/arcane/my-spell/contact.png: look at it
 node tools/check.mjs arcane/my-spell     # spills, seams, unseeded randomness, slow frames
+node tools/gate.mjs arcane/my-spell      # checks + median <= 5 ms / p95 <= 16 ms; records/gate/<id>/strip.png
+node tools/deliver.mjs arcane/my-spell   # delivery MP4 + GIF, upscaled with nearest-neighbor filtering
 ```
 
 Then go round: look at the contact sheet, fix the worst thing, render again. `--gif` and `--mp4` show the motion,
