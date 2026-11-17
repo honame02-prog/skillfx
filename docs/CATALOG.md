@@ -1,6 +1,6 @@
 # Catalog
 
-260 effects in 23 categories. Every one is a file in
+262 effects in 23 categories. Every one is a file in
 `src/fx/<category>/<name>.js`; render any of them with `node tools/render.mjs <id> --gif`.
 
 ## ultimate
@@ -27,9 +27,11 @@ five alien flames, each its own skill; together the Phat No Hoa Lien.
 |---|---|---|---|---|
 | Cot Linh Lanh Hoa | `di-hoa/cot-linh` | one-shot 5s | 360×260 | Cold fire pours down, rolls along the ground and climbs into curved ribs, freezes mid-flame, then shatters beneath a clenched hand. |
 | Cot Linh Draft | `di-hoa/cot-linh-draft` | one-shot 4.4s | 360×260 | Motion draft: a cold white fire pours from a down-turned palm, rolls along the ground, climbs the target, freezes into flame-shaped ice, then shatters. |
+| Tam Thien Diem Viem Hoa | `di-hoa/tam-thien` | one-shot 5s | 360×260 | The sky becomes a rolling sea of black fire, rains down onto the target, gathers into a sphere where a hundred stars ricochet faster and faster to a climax, then fades away. |
 | Tam Thien Draft | `di-hoa/tam-thien-draft` | one-shot 5s | 360×260 | Motion draft v2: the sky catches black fire, fire rains onto the target, gathers into a sphere where stars ricochet, then fades away. |
 | Thanh Lien Dia Tam Hoa | `di-hoa/thanh-lien` | one-shot 4.7s | 360×260 | A fire lotus seed is hurled into the ground; a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
 | Thanh Lien Draft | `di-hoa/thanh-lien-draft` | one-shot 3.2s | 360×260 | Motion draft v2: a fire lotus seed is flicked into the ground, a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
+| Tinh Lien Draft | `di-hoa/tinh-lien-draft` | one-shot 4.6s | 360×260 | Motion draft v1: a single white-fire lotus petal drifts onto the target, bleaches it white under a golden mandorla, and it dissolves into tiny petals. |
 | Van Lac Tam Viem | `di-hoa/van-lac` | one-shot 4.5s | 360×260 | An invisible flame serpent with a rose-red heart coils round the target, dives into its chest, burns it from inside in three beats, then bursts outward. |
 | Van Lac Draft | `di-hoa/van-lac-draft` | one-shot 4.5s | 360×260 | Motion draft: an invisible flame serpent with a rose-red heart coils round the target, dives into its chest and burns it from inside in three beats. |
 
