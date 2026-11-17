@@ -104,16 +104,18 @@ const DUMMY = new Uint32Array(TW * TH);
   for (const [x, y, c] of [[13, 0, TP.straw], [15, 0, TP.strawL], [18, 0, TP.straw], [21, 0, TP.strawL], [24, 0, TP.straw], [9, 4, TP.straw], [28, 6, TP.straw], [8, 7, TP.strawL], [29, 3, TP.strawL]]) px(x, y, c);
 })();
 /** What a hit can leave on the target: [color, how much of it]. */
-export const SKINS = { flash: [TP.white, 1], char: [hex("#1a0c0e"), 0.72], ice: [hex("#a8e8ff"), 0.72], shadow: [hex("#3a1a70"), 0.5], holy: [hex("#fff4c0"), 0.5], red: [hex("#ff2040"), 0.45], shock: [hex("#8fd6ff"), 0.6], poison: [hex("#58c43a"), 0.5] };
+export const SKINS = { flash: [TP.white, 1], char: [hex("#1a0c0e"), 0.72], ice: [hex("#a8e8ff"), 0.72], shadow: [hex("#3a1a70"), 0.5], holy: [hex("#fff4c0"), 0.5], pure: [hex("#fbf8f0"), 0.9], red: [hex("#ff2040"), 0.45], shock: [hex("#8fd6ff"), 0.6], poison: [hex("#58c43a"), 0.5] };
 const STRAW = [TP.strawL, TP.straw, TP.straw, TP.burlapD, TP.burlapD];
 
 /** A straw target on a spring: it sways, flashes, takes a skin, shivers and sheds straw. (x, y): the floor under it, local space. */
 export class Target {
   constructor(x, seed = 5) {
-    Object.assign(this, { x, theta: 0, omega: 0, flashT: 0, skin: null, skinFade: 0, shiver: 0, clock: 0, R: new Rng(seed), straw: [] });
+    Object.assign(this, { x, theta: 0, omega: 0, flashT: 0, skin: null, skinFade: 0, shiver: 0, cut: 0, cutRate: 0, clock: 0, R: new Rng(seed), straw: [] });
   }
-  hit({ push = 1.2, straw = 8, flash = 0.05, skin, shiver = 0, y = -26 } = {}) {
+  /** erase: seconds to wipe the target away from the top down (0 brings it back whole). */
+  hit({ push = 1.2, straw = 8, flash = 0.05, skin, shiver = 0, erase, y = -26 } = {}) {
     this.omega += push;
+    if (erase !== undefined) { this.cutRate = erase > 0 ? 1 / erase : 0; if (!(erase > 0)) this.cut = 0; }
     this.flashT = Math.max(this.flashT, flash);
     if (skin !== undefined) this.skin = skin;
     if (shiver) this.shiver = shiver;
@@ -129,6 +131,7 @@ export class Target {
     this.theta = clamp(this.theta + this.omega * dt, -0.4, 0.42);
     if (this.flashT > 0) this.flashT -= dt;
     if (this.shiver > 0) this.shiver -= dt;
+    if (this.cutRate) this.cut = Math.min(1, this.cut + this.cutRate * dt);
     for (const s of this.straw) {
       s.age += dt;
       s.vy += 210 * dt;
@@ -141,11 +144,13 @@ export class Target {
   draw(C, W, H, X, Y, flip) {
     const tan = Math.tan(this.theta), sv = this.shiver > 0 ? (Math.floor(this.clock * 30) & 1 ? 1 : -1) : 0, name = this.flashT > 0 ? "flash" : this.skin, sk = name ? SKINS[name] : null;
     const base = X + (flip ? -this.x - 1 : this.x);
+    const cut = this.cut * (TH + 3);   // erased rows from the top, with a ragged edge
     for (let r = 0; r < TH; r++) {
+      if (r < cut - 3) continue;
       const o = Math.round((TH - 1 - r) * tan * 0.8) + sv;
       for (let x = 0; x < TW; x++) {
         const c = DUMMY[r * TW + x];
-        if (!c) continue;
+        if (!c || (r < cut && ((x * 7 + r * 13) % 5) < cut - r + 1)) continue;
         const px = base + (flip ? -(x - 19 + o) - 1 : x - 19 + o), py = Y - TH + r;
         if (px >= 0 && py >= 0 && px < W && py < H) C[py * W + px] = sk ? mix(c, sk[0], sk[1]) : c;
       }
