@@ -10,6 +10,8 @@
 //   o.haze      string   tint of the lingering smoke haze (hex)
 //   o.halfWidth number   how far the ground damage reaches each side, px at scale 1 (default 230)
 //   o.duration  number   seconds until everything is gone and the blast draws nothing (default 3.2)
+//   o.outward   number   0 = debris thrown up (default), 1 = debris and grit hurled low and far sideways
+//   o.jet       number   height multiplier for the dirt geysers (default 1)
 //
 // What it draws (all deterministic, contained to its own box, ends empty):
 //   - ground burst: a crater flash, dirt geysers and soil columns thrown up
@@ -23,7 +25,7 @@ import { Particles, Bits, Lights, P, B, Rng, fit, hex, mix, clamp, smooth, ease,
 // Soil fountain / landing physics adapted from Sprite Fusion's open-source explosion
 // (https://www.spritefusion.com/pixel-art-vfx/explosion), MIT, Copyright (c) 2026 Hugo Duprez.
 export function createGroundBlast(o = {}) {
-  const s = o.scale ?? 1, duration = o.duration ?? 3.2, reach = (o.halfWidth ?? 230) * s;
+  const s = o.scale ?? 1, out = o.outward ?? 0, jetK = o.jet ?? 1, duration = o.duration ?? 3.2, reach = (o.halfWidth ?? 230) * s;
   const R = new Rng(o.seed ?? 1);
   const D = fit(o.dirt ?? ["#191622", "#342b3a", "#514353", "#81706d", "#c4ae8c"], 5);
   const H = fit(o.hot ?? ["#352536", "#a57440", "#d8a750", "#ffe8ae", "#fff8dc"], 7);
@@ -70,7 +72,7 @@ export function createGroundBlast(o = {}) {
   }
   const jets = Array.from({ length: 8 }, (_, i) => ({
     at: 0.025 + [5, 2, 0, 3, 1, 4, 6, 7][i] * 0.022 + R.range(0, 0.02), x: (i - 3.5) * 12 * s,
-    vx: (i - 3.5) * R.range(25, 36) * s, speed: R.range(565, 685) * s,
+    vx: (i - 3.5) * R.range(25, 36) * s, speed: R.range(565, 685) * s * jetK,
     phase: R.range(0, TAU),
   }));
   const wave = Array.from({ length: 30 }, (_, i) => {
@@ -85,7 +87,7 @@ export function createGroundBlast(o = {}) {
     const side = i % 2 ? 1 : -1;
     return { at: 0.035 + (i % 8) * 0.026, b: {
       kind: i % 7 === 0 ? B.SHARD : B.CHUNK, x: R.range(-28, 28) * s, y: -6 * s,
-      vx: side * R.range(38, 132) * s, vy: -R.range(515, 675) * s,
+      vx: side * ((a, k) => a * (1 - k) + (150 + a * 1.6) * k)(R.range(38, 132), out) * s, vy: -R.range(515, 675) * (1 - 0.62 * out) * s,
       g: 0.9 * s, drag: 0.055, bounce: R.range(0.18, 0.28),
       s: (i < 9 ? R.range(4, 5.5) : R.range(1.5, 3.8)) * s,
       a: R.range(0, TAU), va: R.range(-11, 11), ramp: D, c: D[3],
@@ -93,7 +95,7 @@ export function createGroundBlast(o = {}) {
     } };
   }).sort((a, b) => a.at - b.at);
   for (let i = 0; i < 110; i++) ps.spawn(P.GRIT, R.range(-22, 22) * s, -4 * s,
-    R.range(-205, 205) * s, -R.range(220, 670) * s, R.range(1.1, 1.9), R.pick(D.slice(1)), i % 4 === 0 ? 2 * s : s, R.range(0.025, 0.24));
+    R.range(-205, 205) * (1 + 1.6 * out) * s, -R.range(220, 670) * (1 - 0.6 * out) * s, R.range(1.1, 1.9), R.pick(D.slice(1)), i % 4 === 0 ? 2 * s : s, R.range(0.025, 0.24));
   for (let i = 0; i < 28; i++) ps.spawn(P.SPARK, R.range(-18, 18) * s, -3 * s,
     R.range(-240, 240) * s, -R.range(80, 350) * s, R.range(0.18, 0.5), H[5], s);
   for (let i = 0; i < 12; i++) ps.spawn(P.EMBER, R.range(-18, 18) * s, -5 * s,
