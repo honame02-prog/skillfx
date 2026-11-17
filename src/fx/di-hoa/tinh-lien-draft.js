@@ -1,4 +1,4 @@
-// DRAFT v3 (motion + shape blocking) — Di Hoa 5: Tinh Lien Yeu Hoa. Script: design/di-hoa/05-tinh-lien-yeu-hoa.md (v3).
+// DRAFT v3.1 (motion + shape blocking) — Di Hoa 5: Tinh Lien Yeu Hoa. Script: design/di-hoa/05-tinh-lien-yeu-hoa.md (v3).
 // Clouds gather; a white lotus of flickering flame blooms on the target; a beast eye parts the clouds and opens in three
 // jerks, its gaze a pale sunbeam; it stares, rocks float up, then the gaze focuses to a searing ray, the ground cracks,
 // the lotus crushes and explodes: a cone of dust bursts up, a giant ghost lotus burns inside it, then all settles.
@@ -67,26 +67,60 @@ export const act = {
 };
 
 // ---------------------------------------------------------------- clouds gathering, parted by the eye
-function clouds(p, t) {
-  const k = smooth(GATHER, 0.6, t) * (1 - smooth(5.0, 6.0, t));
-  if (k <= 0) return;
-  const op = openAt(t), push = op + 0.3 * smooth(APPEAR, OPENS[0], t) + 0.6 * smooth(5.0, 6.0, t);
-  const hx = 40 + 70 * push, hy = 12 + 22 * push, swirl = t * 0.25;
-  p.shade(-60, -235, 300, -128, (x, y, o) => {
-    const dx = (x - EC[0]) / hx, dy = (y - EC[1]) / hy, r = Math.hypot(dx, dy);
-    const ang = Math.atan2(y - EC[1], (x - EC[0]) * 0.4) + swirl;
-    const n = 0.5 + 0.3 * Math.sin(ang * 5 + r * 3 - t * 0.8) * Math.sin(x * 0.04 - t * 0.5 + y * 0.09) + 0.2 * Math.sin(x * 0.11 + y * 0.07 + ang * 3);
-    const lower = (-128 - y) / 60;   // thins out downward
-    const dens = (n * 1.1 + Math.min(1, lower) * 0.5 - 0.35) * k * smooth(1, 1.35 + 0.3 * n, r);
-    if (dens <= 0.12) return;
-    const rim = r < 1.12 + 0.08 * n && op > 0.05;   // lit by the eye at the edge of the gap
-    o.c = rim ? (n > 0.62 ? IRIS[1] : CLOUD[3]) : CLOUD[dens > 0.75 ? 2 : dens > 0.45 ? 1 : 0]; o.a = Math.min(1, dens * 1.4);
+// a coarse noise field: fn sampled every S px, read back with bilinear filtering (noise is the costly part per pixel)
+function grid(x0, y0, x1, y1, S, fn) {
+  const nx = Math.ceil((x1 - x0) / S) + 2, ny = Math.ceil((y1 - y0) / S) + 2, g = new Float32Array(nx * ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) g[j * nx + i] = fn(x0 + i * S, y0 + j * S);
+  return (x, y) => {
+    const fx = Math.max(0, (x - x0) / S), fy = Math.max(0, (y - y0) / S), i = Math.min(nx - 2, fx | 0), j = Math.min(ny - 2, fy | 0);
+    const u = Math.min(1, fx - i), v = Math.min(1, fy - j), q = j * nx + i;
+    return (g[q] * (1 - u) + g[q + 1] * u) * (1 - v) + (g[q + nx] * (1 - u) + g[q + nx + 1] * u) * v;
+  };
+}
+// The clouds boil at 10 fps: each step is computed once and kept (a pure memo keyed by the step, so the order of calls
+// does not matter), then copied out on every frame.
+const CX0 = -60, CY0 = -235, CW = 360, CH = 107, CLOUD_MEMO = new Map();
+function cloudFrame(tq) {
+  if (CLOUD_MEMO.has(tq)) return CLOUD_MEMO.get(tq);
+  const k = smooth(GATHER, 0.6, tq) * (1 - smooth(5.0, 6.0, tq)), op = openAt(tq), buf = new Int32Array(CW * CH);
+  const push = op + 0.3 * smooth(APPEAR, OPENS[0], tq) + 0.6 * smooth(5.0, 6.0, tq), hx = 40 + 70 * push, hy = 12 + 22 * push, swirl = tq * 0.25;
+  const N = grid(CX0, CY0, CX0 + CW, CY0 + CH, 3, (x, y) => {
+    const r = Math.hypot((x - EC[0]) / 110, (y - EC[1]) / 34), ang = Math.atan2(y - EC[1], (x - EC[0]) * 0.4) + swirl;
+    return 0.5 + 0.3 * Math.sin(ang * 5 + r * 3 - tq * 0.8) * Math.sin(x * 0.04 - tq * 0.5 + y * 0.09) + 0.2 * Math.sin(x * 0.11 + y * 0.07 + ang * 3);
   });
+  const cut = 0.12 + 0.9 * (1 - k);   // fading in/out by shrinking, not by alpha (no stipple)
+  if (k > 0) for (let j = 0; j < CH; j++) for (let i = 0; i < CW; i++) {
+    const x = CX0 + i, y = CY0 + j, r = Math.hypot((x - EC[0]) / hx, (y - EC[1]) / hy), n = N(x, y), lower = (-128 - y) / 60;
+    const dens = (n * 1.1 + Math.min(1, lower) * 0.5 - 0.35) * smooth(1, 1.35 + 0.3 * n, r);
+    if (dens <= cut) continue;
+    const rim = op > 0.05 && r < 1.1 + 0.1 * n && n > 0.58;   // patches lit by the eye at the edge of the gap
+    buf[j * CW + i] = rim ? (n > 0.68 ? IRIS[1] : CLOUD[3]) : CLOUD[dens > 0.75 ? 2 : dens > 0.45 ? 1 : 0];
+  }
+  const runs = [];   // same-colour runs per row: [row, i0, i1, colour]
+  for (let j = 0; j < CH; j++) for (let i = 0; i < CW;) {
+    const c = buf[j * CW + i];
+    let e = i;
+    while (e + 1 < CW && buf[j * CW + e + 1] === c) e++;
+    if (c) runs.push(j, i, e, c);
+    i = e + 1;
+  }
+  const out = Int32Array.from(runs);
+  if (CLOUD_MEMO.size > 6) CLOUD_MEMO.delete(CLOUD_MEMO.keys().next().value);
+  CLOUD_MEMO.set(tq, out);
+  return out;
+}
+function clouds(p, t) {
+  if (t < GATHER || t > 6.0) return;
+  const R = cloudFrame(Math.floor(t * 10) / 10);
+  for (let q = 0; q < R.length; q += 4) {   // copy the runs straight to the screen
+    const y = CY0 + R[q] + 0.5, a = p.cellX(CX0 + R[q + 1] + 0.5, y), b = p.cellX(CX0 + R[q + 2] + 0.5, y), sy = p.cellY(CX0 + R[q + 1] + 0.5, y);
+    for (let sx = Math.min(a, b); sx <= Math.max(a, b); sx++) p.put(sx, sy, R[q + 3], 1);
+  }
 }
 
 // ---------------------------------------------------------------- the beast eye
 function eye(p, t) {
-  const k = eyeK(t);
+  const k = eyeK(t) > 0.35 ? 1 : 0;
   if (k <= 0) return;
   const op = openAt(t), H = EH * op, pw = pupilW(t), look = 0.6 * Math.sin(t * 1.3), lidH = 5 + 3 * k;
   p.shade(EC[0] - EW - 6, EC[1] - EH - 14, EC[0] + EW + 6, EC[1] + EH + 10, (x, y, o) => {
@@ -125,13 +159,16 @@ function beam(p, t) {
   const lock = lockAt(t), fl = pulses(t), y0 = EC[1] + 5, y1 = LC[1] + 4 * lock;   // when focused it stops on the lotus
   const wTop = (3 + 6 * op) * (1 - 0.6 * lock), wBot = (10 + 34 * op) * (1 - 0.92 * lock) + 1, fade = 1 - smooth(BOOM, BOOM + 0.1, t);
   const str = (0.07 + 0.12 * op + 0.18 * fl + 0.35 * lock) * k * fade;
+  const Y0 = Math.floor(y0), RW = new Float32Array(-Y0 + 2), RB = new Float32Array(RW.length), RS = new Float32Array(RW.length);
+  for (let i = 0; i < RW.length; i++) {   // per row: width, the pulses running down the beam, the sway of the rays
+    const v = (Y0 + i - y0) / (0 - y0);
+    RW[i] = wTop + (wBot - wTop) * v; RS[i] = Math.sin(t * 1.7 + v * 2) * 1.5;
+    for (const o0 of OPENS) { const s = (t - o0) / 0.25; if (s > 0 && s < 1.2) RB[i] += Math.exp(-(((v - s) / 0.06) ** 2)) * (1 - s / 1.2); }
+  }
   p.shade(TX - wBot * 1.5 - 2, y0, TX + wBot * 1.5 + 2, 0, (x, y, o) => {
-    const v = (y - y0) / (0 - y0), w = wTop + (wBot - wTop) * v, e = Math.abs(x - TX) / w;
+    const ri = Math.max(0, Math.min(RW.length - 1, Math.round(y - Y0))), w = RW[ri], e = Math.abs(x - TX) / w;
     if (e > 1.5 || (lock > 0.5 && y > y1)) return;
-    // pulses running down the beam at each opening
-    let band = 0;
-    for (const o0 of OPENS) { const s = (t - o0) / 0.25; if (s > 0 && s < 1.2) band += Math.exp(-(((v - s) / 0.06) ** 2)) * (1 - s / 1.2); }
-    const ray = 0.7 + 0.3 * Math.sin((x - TX) / w * 9 + Math.sin(t * 1.7 + v * 2) * 1.5);   // god rays, swaying
+    const band = RB[ri], ray = 0.7 + 0.3 * Math.sin((x - TX) / w * 9 + RS[ri]);   // god rays, swaying
     if (e > 1) { o.l = L[3]; o.k = str * 0.35 * (1.5 - e) * 2 * ray; return; }   // soft halo
     o.l = e < 0.25 ? L[6] : L[4]; o.k = Math.min(0.9, str * (1 - e * e) * ray + band * 0.35 * k + (lock > 0.3 && e < 0.4 ? 0.4 * lock : 0));
   });
@@ -170,7 +207,7 @@ function flamePetal(p, bx, by, ang, len, w, t, seed, col, edge, k) {
   }
   const tl = len * (1.08 + 0.12 * Math.sin(t * 17 + seed * 7)), tb = 2 * Math.sin(t * 9 + seed * 2);
   const pts = [...left, [tl, tb], ...right.reverse()].map(([a, b]) => [bx + a * c - b * s, by + a * s + b * c]);
-  p.poly(pts, col, k);
+  if (col) p.poly(pts, col, k);
   p.polyline([...pts, pts[0]], edge, k);
   p.line(bx + c * len * 0.1, by + s * len * 0.1, bx + c * len * 0.6, by + s * len * 0.6, L[3], k);
 }
@@ -232,20 +269,23 @@ function coneDust(p, t) {
   const a = t - BOOM;
   if (a < 0.02 || a > END - BOOM) return;
   const rise = out3(clamp(a / 0.6)), H = 25 + 115 * rise;                         // height of the cone
-  const slump = smooth(1.5, 2.6, a), thin = smooth(1.8, 3.0, a);                    // it sags, spreads, thins
-  const Htop = H * (1 - 0.45 * slump), drift = 30 * slump;
-  p.shade(TX - 180, -Htop - 22, TX + 180, 0, (x, y, o) => {
-    const h = -y, v = h / Htop, wob = Math.sin(h * 0.09 - a * 2.2) * 6 + Math.sin(h * 0.21 + a * 3.1) * 3;
-    const w = 8 + h * (0.62 + 0.5 * slump) + wob + 22 * (1 - Math.min(1, h / 12)) * slump, dx = x - TX - drift * v;
-    const e = Math.abs(dx) / w;
+  const slump = smooth(1.5, 2.6, a), thin = smooth(1.8, 2.9, a);                    // it sags, spreads, thins
+  const Htop = H * (1 - 0.45 * slump), drift = 30 * slump, y0 = Math.floor(-Htop - 22);
+  const W = new Float32Array(-y0 + 2);   // half width of the cone per row
+  for (let i = 0; i < W.length; i++) { const h = -(y0 + i); W[i] = 8 + h * (0.62 + 0.5 * slump) + Math.sin(h * 0.09 - a * 2.2) * 6 + Math.sin(h * 0.21 + a * 3.1) * 3 + 22 * (1 - Math.min(1, Math.max(0, h) / 12)) * slump; }
+  const wMax = Math.min(180, Math.max(...W) * 1.15 + drift);
+  const N = grid(TX - wMax, y0, TX + wMax, 0, 3, (x, y) => {   // billows rolling upward inside the cone
+    const h = -y, dx = x - TX - drift * h / Htop;
+    return 0.5 + 0.32 * Math.sin(dx * 0.12 + Math.sin(h * 0.05) * 2 - a * 0.6) * Math.sin(h * 0.14 - a * 2.6) + 0.18 * Math.sin(dx * 0.27 - a) * Math.sin(h * 0.31 + a * 1.3);
+  });
+  p.shade(TX - wMax, y0, TX + wMax, 0, (x, y, o) => {
+    const h = -y, v = h / Htop, w = W[Math.max(0, Math.min(W.length - 1, Math.round(y - y0)))], dx = x - TX - drift * v, e = Math.abs(dx) / w;
     if (e > 1.15 || v > 1.12) return;
-    // billows: lumpy, rolling upward inside the cone
-    const n = 0.5 + 0.32 * Math.sin(dx * 0.12 + Math.sin(h * 0.05) * 2 - a * 0.6) * Math.sin(h * 0.14 - a * 2.6) + 0.18 * Math.sin(dx * 0.27 - a) * Math.sin(h * 0.31 + a * 1.3);
-    const edge = 1 - smooth(0.7, 1.1, e + (n - 0.5) * 0.3), top = 1 - smooth(0.85, 1.1, v + (n - 0.5) * 0.25);
-    const dens = edge * top * (0.75 + 0.5 * n) - thin * (1.2 - 0.4 * (1 - v));
-    if (dens <= 0.08) return;
+    const n = N(x, y), edge = 1 - smooth(0.7, 1.1, e + (n - 0.5) * 0.3), top = 1 - smooth(0.85, 1.1, v + (n - 0.5) * 0.25);
+    const dens = edge * top * (0.75 + 0.5 * n) - thin * (1.6 - 0.4 * (1 - v));
+    if (dens <= 0.2) return;   // a hard, ragged edge instead of a stippled one
     const shade = e * 0.6 + n * 0.8 - v * 0.2 - 0.15 * dx / w;   // lit from the upper left, darker core
-    o.c = DUST[Math.max(0, Math.min(4, Math.round(shade * 3.2)))]; o.a = Math.min(1, dens * 1.3);
+    o.c = DUST[Math.max(0, Math.min(4, Math.round(shade * 3.2)))];
   });
 }
 function boom(p, t, layer) {
@@ -269,22 +309,23 @@ function boom(p, t, layer) {
     if (b < 0 || b > P.life) continue;
     const drag = (1 - Math.exp(-2.4 * b)) / 2.4, x = TX + P.vx * drag, f = b / P.life;
     const r = (P.r0 + (P.r1 - P.r0) * out3(Math.min(1, b / 0.6))) * (1 - smooth(0.5, 1, f));
-    p.disc(x, -r * 0.6, r, DUST[P.c], 0.75 - 0.35 * f);
+    p.disc(x, -r * 0.6, r, DUST[P.c], 1);
   }
   coneDust(p, t);
   // the ghost lotus burning inside the dust
   const g = smooth(GHOST[0], GHOST[0] + 0.3, t) * (1 - smooth(GHOST[1] - 0.4, GHOST[1], t));
   if (g > 0.05) {
-    const fl = 0.75 + 0.25 * Math.sin(t * 9), k = g * fl * 0.5;
-    lotusShape(p, t, 'back', TX, -62, 2.1, 0, k, L[3]);
-    lotusShape(p, t, 'front', TX, -62, 2.1, 0, k, L[4]);
+    if (g > 0.3 && Math.sin(t * 23) > -0.8) {   // outlines of fire flickering through the dust
+      lotusShape(p, t, 'back', TX, -62, 2.1, 0, 1, L[1]);
+      lotusShape(p, t, 'front', TX, -62, 2.1, 0, 1, L[2]);
+    }
     p.glow(TX, -60, 40, L[5], 0.25 * g);
   }
   for (const R of ROCKS) {   // flying earth on parabolas, landing and lying still
     const tl = (2 * -R.vy) / 520, b = Math.min(a, tl), x = TX + R.vx * b, y = Math.min(0, -4 + R.vy * b + 260 * b * b);
-    const k = 1 - smooth(2.2, 2.7, a);
-    p.disc(x, y - R.s * 0.5, R.s * 0.7, DUST[R.c], k);
-    if (a < tl) p.dot(x - R.vx * 0.01, y - (R.vy + 520 * b) * 0.01, DUST[R.c + 1], k * 0.8);
+    if (a > 2.2 + 0.5 * (R.c + R.s) / 5) continue;
+    p.disc(x, y - R.s * 0.5, R.s * 0.7, DUST[R.c], 1);
+    if (a < tl) p.dot(x - R.vx * 0.01, y - (R.vy + 520 * b) * 0.01, DUST[R.c + 1], 1);
   }
 }
 
