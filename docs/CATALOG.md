@@ -25,9 +25,9 @@ five alien flames, each its own skill; together the Phat No Hoa Lien.
 
 | effect | id | | size | what it does |
 |---|---|---|---|---|
-| Cot Linh Lanh Hoa | `di-hoa/cot-linh` | one-shot 4.4s | 360×260 | Cold fire pours down, rolls along the ground and climbs into curved ribs, freezes mid-flame, then shatters beneath a clenched hand. |
+| Cot Linh Lanh Hoa | `di-hoa/cot-linh` | one-shot 5s | 360×260 | Cold fire pours down, rolls along the ground and climbs into curved ribs, freezes mid-flame, then shatters beneath a clenched hand. |
 | Cot Linh Draft | `di-hoa/cot-linh-draft` | one-shot 4.4s | 360×260 | Motion draft: a cold white fire pours from a down-turned palm, rolls along the ground, climbs the target, freezes into flame-shaped ice, then shatters. |
-| Tam Thien Draft | `di-hoa/tam-thien-draft` | one-shot 4.6s | 360×260 | Motion draft: a star nebula opens over the target, its black-fire stars rain down, link into a constellation and flare into a curtain of black fire. |
+| Tam Thien Draft | `di-hoa/tam-thien-draft` | one-shot 5s | 360×260 | Motion draft v2: the sky catches black fire, fire rains onto the target, gathers into a sphere where stars ricochet, then fades away. |
 | Thanh Lien Dia Tam Hoa | `di-hoa/thanh-lien` | one-shot 4.7s | 360×260 | A fire lotus seed is hurled into the ground; a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
 | Thanh Lien Draft | `di-hoa/thanh-lien-draft` | one-shot 3.2s | 360×260 | Motion draft v2: a fire lotus seed is flicked into the ground, a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
 | Van Lac Tam Viem | `di-hoa/van-lac` | one-shot 4.5s | 360×260 | An invisible flame serpent with a rose-red heart coils round the target, dives into its chest, burns it from inside in three beats, then bursts outward. |
