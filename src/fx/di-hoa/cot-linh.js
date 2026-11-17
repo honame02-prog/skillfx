@@ -82,6 +82,7 @@ const SHARDS = TONGUES.flatMap((q) => {
       w: Math.max(0.8, g.w * (1 - j / n) * 0.8), s, back: q.i % 3 === 0 };
   });
 });
+const HANG_SHARDS = Array.from({ length: 18 }, (_, i) => SHARDS[Math.floor(i * SHARDS.length / 18)]);
 
 function palmFire(p, C, t) {
   if (t < 0.05 || t > SWEEP + 0.05) return;
@@ -233,7 +234,29 @@ function ribPixels(C) {
     return pixels;
   };
   groundFire = Array.from({ length: 4 }, (_, phase) => fireTile([[0, -5], [0, 1], [-2, 8]], 3, phase));
-  burnFire = Array.from({ length: 4 }, (_, phase) => fireTile([[0, 0], [0, -16], [0, -32]], 5, phase));
+  // Bake actual root-to-front curves, rather than bending a straight white strip.
+  burnFire = BONES.map((q) => Array.from({ length: 12 }, (_, phase) => {
+    const front = (phase + 1) / 12, pts = q.path.filter((_, j) => j / 32 < front);
+    const f = front * 32, j = Math.min(31, Math.floor(f)), a = q.path[j], b = q.path[j + 1];
+    pts.push([a[0] + (b[0] - a[0]) * (f - j), a[1] + (b[1] - a[1]) * (f - j)]);
+    if (pts.length < 3) pts.splice(1, 0, [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2]);
+    const pixels = [], capture = { shade(x0, y0, x1, y1, fn) {
+      const o = {};
+      for (let y = Math.floor(y0); y <= Math.ceil(y1); y++) for (let x = Math.floor(x0); x <= Math.ceil(x1); x++) {
+        o.c = 0; o.a = 1; fn(x + 0.5, y + 0.5, o);
+        if (o.c) pixels.push({ x, y, c: o.c, a: o.a });
+      }
+    } };
+    liveFlame(capture, C, pts, 4 + hash(q.i, 32) * 2, phase / 24, 260 + q.i, { mist: 0.75, dim: 0.55 });
+    // Separate flickering tongues lick sideways and up off the consumed rib.
+    for (let s = 0; s < 3; s++) {
+      const at = q.path[Math.round(front * (0.45 + s * 0.22) * 32)], side = s % 2 ? -1 : 1;
+      const dx = side * (4 + hash(q.i, s, 60) * 5), rise = 9 + hash(q.i, s, 61) * 9;
+      liveFlame(capture, C, [at, [at[0] + dx, at[1] - rise * 0.45],
+        [at[0] + dx * 0.65, at[1] - rise]], 2.2, phase / 24, q.i * 3 + s, { mist: 0.65, dim: 0.4 });
+    }
+    return pixels;
+  }));
   bonePixels = BONES.map((q) => {
     const pixels = [], paint = bakeIceFlame(C, q.pts, q.w, 130 + q.i, { dim: q.back ? 0.35 : 0 });
     paint({ dot(x, y, c) {
@@ -270,25 +293,30 @@ function shatter(p, C, t, back) {
     p.glow(TX, -32, 20, C[5], 0.25 * (1 - dt / 0.085));
   }
   const k = 1 - smooth(RIBS, BURN + 0.12, t);
-  for (let i = 0; i < SHARDS.length; i++) {
-    const q = SHARDS[i];
+  for (let i = 0; i < HANG_SHARDS.length; i++) {
+    const q = HANG_SHARDS[i];
     if (q.back !== back) continue;
     const [x, y, spin, gx, gy] = shardPosition(q, t);
     if (t >= HANG && t < PIN) {
-      const next = shardPosition(SHARDS[(i + 1) % SHARDS.length], t), pts = [];
+      const near = HANG_SHARDS.slice(i + 1).map((r) => shardPosition(r, t))
+        .filter((r) => Math.hypot(r[0] - x, r[1] - y) < 27)
+        .sort((a, b) => Math.hypot(a[0] - x, a[1] - y) - Math.hypot(b[0] - x, b[1] - y))[0];
+      const next = near, pts = [];
+      if (next) {
       for (let j = 0; j <= 8; j++) {
         const u = j / 8;
         pts.push([x + (next[0] - x) * u, y + (next[1] - y) * u + Math.sin(u * TAU + t * 12 + i) * 2 * Math.sin(u * Math.PI)]);
       }
-      p.polyline(pts, C[i % 2 ? 4 : 5], smooth(HANG, HANG + 0.06, t) * 0.55);
+      p.polyline(pts, C[4], 1);
+      }
     }
-    const melt = 1 - 0.6 * smooth(RIBS, BURN, t), cs = Math.cos(spin) * melt, sn = Math.sin(spin) * melt;
-    const pts = q.pts.map(([a, b]) => [x + a * cs - b * sn, y + a * sn + b * cs]);
-    const [a, m, b] = pts, dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy) || 1;
-    const nx = -dy / len * q.w * melt, ny = dx / len * q.w * melt;
-    p.poly([[a[0] - nx, a[1] - ny], m, b, [a[0] + nx, a[1] + ny]], C[2], k);
-    p.poly([a, [m[0] + nx * 0.65, m[1] + ny * 0.65], b], C[q.s % 2 ? 5 : 4], k);
-    p.line(a[0], a[1], b[0], b[1], C[6], k * (0.6 + 0.3 * Math.sin(t * 8 + q.s)));
+    const melt = 1 - 0.6 * smooth(RIBS, BURN, t), angle = spin + (t - HANG) * 0.45;
+    const size = (4 + hash(q.s, 42) * 3) * melt, cs = Math.cos(angle), sn = Math.sin(angle);
+    const turn = ([a, b]) => [x + (a * cs - b * sn) * size, y + (a * sn + b * cs) * size];
+    const pts = [[-0.5, -0.35], [0.15, -0.55], [0.5, 0.1], [-0.05, 0.5]].map(turn), center = turn([0, 0]);
+    p.poly(pts, C[2], k);
+    p.poly([pts[0], pts[1], center, pts[3]], C[4], k);
+    p.polyline([pts[3], pts[0], pts[1]], C[6], k);
     const hit = clamp((t - (PIN + 0.065)) / 0.14);
     if (hit > 0 && hit < 1) for (let j = 0; j < 3; j++) {
       const ox = (j - 1) * (2 + hit * 6), oy = -Math.sin(hit * Math.PI) * (5 + hash(i, j) * 6);
@@ -308,33 +336,26 @@ function hanCot(p, C, t, back) {
       if (a[0] < 298 && b[0] < 298 && a[1] < 23 && b[1] < 23)
         p.line(...a, ...b, C[5], (1 - smooth(RIBS + 0.2, 4.6, t)) * 0.7);
     }
-    p.polyline(curve([[TX, 0], [TX - 3, -48 * grow], [TX + 1, -103 * grow]], 20), C[2], fade * (1 - smooth(BURN, 4.25, t)) * 0.65);
   }
   const pixels = ribPixels(C);
   for (const q of BONES) {
     if (q.back !== back) continue;
-    const burn = clamp((t - BURN - (q.i % 4) * 0.018) / 0.15), rootY = q.pts[0][1];
+    const rawBurn = (t - BURN - (q.i % 4) * 0.012) / 0.15;
+    const burn = clamp(rawBurn), rootY = q.pts[0][1];
     for (const v of pixels[q.i]) {
       if (burn >= 1 || (burn > 0 && v.u < burn)) continue;
-      p.dot(v.x, rootY + (v.y - rootY) * grow, burn > 0 && v.u < burn + 0.09 ? C[6] : v.c, fade);
+      p.dot(v.x, rootY + (v.y - rootY) * grow, v.c, fade);
     }
-    if (burn > 0 && t < 4.28) {
-      const k = 1 - smooth(BURN + 0.19, 4.28, t), w = (4 + hash(q.i, 32) * 2) / 5;
-      // Warp the coldFlame raster onto the rib's tangent, from base toward tip.
-      for (const v of burnFire[(Math.floor(t * 24) + q.i) % 4]) {
-        const u = burn - 0.28 - v.y / 32 * 0.28;
-        if (u < 0 || u > 1) continue;
-        const f = u * 32, j = Math.min(31, Math.floor(f)), a = q.path[j], b = q.path[j + 1];
-        const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy) || 1;
-        p.dot(a[0] + (f - j) * dx - dy / len * v.x * w,
-          a[1] + (f - j) * dy + dx / len * v.x * w, v.c, v.a * k);
-      }
+    if (rawBurn > 0 && rawBurn < 1.08) {
+      const k = (1 - smooth(0.85, 1.08, rawBurn)) * 0.8;
+      for (const v of burnFire[q.i][Math.min(11, Math.floor(burn * 12))])
+        p.dot(v.x, v.y, v.c, v.a * k);
     }
-    for (let j = 0; j < 12; j++) {
-      const u = (j + 0.5) / 12, age = t - (BURN + (q.i % 4) * 0.018 + u * 0.15);
+    for (let j = 0; j <= 12; j++) {
+      const u = j / 12, age = t - (BURN + (q.i % 4) * 0.012 + u * 0.15);
       if (age < 0) continue;
-      const at = q.path[Math.round(u * 32)], up = j % 5 === 0;
-      p.dot(at[0] + (hash(q.i, j, 40) - 0.5) * age * 19, at[1] + (up ? -12 : 8) * age + age * age * 7,
+      const at = q.path[Math.round(u * 32)];
+      p.dot(at[0] + (hash(q.i, j, 40) - 0.5) * age * 19, at[1] + 12 * age + age * age * 20,
         C[j % 3 ? 5 : 6], (1 - smooth(0.18, 0.85, age)) * fade * 0.8);
     }
     if ((q.i >> 1) % 2 === 0 && t > 4.15 && t < 4.8) {
