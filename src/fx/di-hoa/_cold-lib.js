@@ -100,3 +100,45 @@ export function iceFlame(p, C, pts, W, seed = 0, { k = 1, glint = -1, dim = 0, c
     o.a = k;
   });
 }
+
+// Cap the material at the actual tip: nearest-segment distance alone otherwise extends
+// the last pixel-wide filament beyond the centreline. The approved material is unchanged.
+export function tipCapped(p, pts) {
+  const tip = pts[pts.length - 1], prev = pts[pts.length - 2];
+  const dx = tip[0] - prev[0], dy = tip[1] - prev[1], len = Math.hypot(dx, dy) || 1;
+  const out = Object.create(p);
+  out.shade = (x0, y0, x1, y1, fn) => p.shade(x0, y0, x1, y1, (x, y, o) => {
+    if (((x - tip[0]) * dx + (y - tip[1]) * dy) / len > 0.6) return;
+    return fn(x, y, o);
+  });
+  return out;
+}
+
+// The held statue never moves. Bake the expensive curve-distance/facet shader once;
+// retain the shader's exact crack thresholds and apply its moving glint when painting.
+export function bakeIceFlame(C, pts, W, seed = 0, { dim = 0 } = {}) {
+  const pixels = [], path = curve(pts), len = lengthOf(path), facet = Math.max(4, len / 5);
+  const capture = {
+    shade(x0, y0, x1, y1, fn) {
+      const o = {};
+      for (let y = Math.floor(y0); y <= Math.ceil(y1); y++) for (let x = Math.floor(x0); x <= Math.ceil(x1); x++) {
+        o.c = 0; o.a = 1;
+        fn(x + 0.5, y + 0.5, o);
+        if (!o.c) continue;
+        const { u, d } = along(path, len, x + 0.5, y + 0.5);
+        const w = Math.max(0.4, width(W, u) * 1.08), interior = w - Math.abs(d) >= 1;
+        const fi = Math.floor(u * len / facet);
+        const cracked = interior && Math.abs(Math.sin(fi * 2.1 + seed) * w * 0.6 - d) < 0.6;
+        pixels.push({ x, y, c: o.c, interior, threshold: cracked ? hash(fi, 7, seed) : 2 });
+      }
+    },
+  };
+  iceFlame(tipCapped(capture, pts), C, pts, W, seed, { dim });
+  return (p, { k = 1, glint = -1, crack = 0 } = {}) => {
+    for (const q of pixels) {
+      const g = q.x + 0.5 + (q.y + 0.5) * 0.6 - glint;
+      const bright = q.interior && glint >= 0 && g > 0 && g < 2;
+      p.dot(q.x, q.y, bright || crack > q.threshold ? C[6] : q.c, k);
+    }
+  };
+}
