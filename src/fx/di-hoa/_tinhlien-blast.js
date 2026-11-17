@@ -35,22 +35,25 @@ const PUFF_PIXELS = Array.from({ length: 22 }, (_, r) => {
     if (d > (r + 1) ** 2) continue;
     let band = 0;
     if (d <= r * r) {
-      band = (x - r * 0.25) ** 2 + (y - r * 0.3) ** 2 < (r * 0.88) ** 2 ? 1 : 2;
-      if ((x + r * 0.3) ** 2 + (y + r * 0.35) ** 2 < (r * 0.55) ** 2) band = 3;
-      if ((x + r * 0.42) ** 2 + (y + r * 0.5) ** 2 < Math.max(0.6, r * 0.13) ** 2) band = 4;
+      band = x * 0.45 + y > r * 0.38 ? 1 : 2;                                          // shade below a soft chord, lower right
+      if ((x + r * 0.2) ** 2 + (y + r * 0.5) ** 2 < (r * 0.62) ** 2) band = 3;      // lit cap, upper left
+      if (r >= 12 && (x + r * 0.35) ** 2 + (y + r * 0.62) ** 2 < (r * 0.2) ** 2) band = 4;   // a glint only on the big billows
     }
     cells.push([x, y, band]);
   }
   return cells;
 });
-function puff(p, x, y, radius, palette, cool = false) {
+// rim: 1 = only the dark silhouette pass (whole disc r+1), 0 = only the body bands. Drawing every rim first and every
+// body after merges the puffs into one cloud mass with a single outer outline (cauliflower), not a pile of balls.
+function puff(p, x, y, radius, palette, cool = false, rim = 0) {
   const r = Math.min(21, Math.round(radius));
   if (r < 1) return;
   x = Math.round(x); y = Math.round(y);
   for (const [dx, dy, band] of PUFF_PIXELS[r]) {
+    if (rim ? false : band === 0) continue;
     const xx = x + dx, yy = y + dy;
     if (xx < -59 || xx > 298 || yy > 0 || yy < -234) continue;
-    p.put(p.cellX(xx, yy), p.cellY(xx, yy), palette[cool ? Math.max(0, band - 1) : band]);
+    p.put(p.cellX(xx, yy), p.cellY(xx, yy), rim ? palette[0] : palette[cool ? Math.max(1, band - 1) : band]);
   }
 }
 const RAYS = Array.from({ length: 9 }, (_, i) => { const q = i * TAU / 9; return [Math.cos(q), Math.sin(q), 28 + 18 * hsh(i, 30)]; });
@@ -73,8 +76,9 @@ function coneDust(p, t) {
   });
   // High/far first; near rims overlap bodies to separate cauliflower lobes.
   poses.sort((a, b) => a.y - b.y);
-  for (const P of poses) puff(p, P.x, P.y, P.r,
-    warm && Math.abs(P.x - TX) < 33 + -P.y * 0.17 ? WARM : DUST, a > 2.25);
+  const pal = (P) => warm && Math.abs(P.x - TX) < 33 + -P.y * 0.17 ? WARM : DUST;
+  for (const P of poses) puff(p, P.x, P.y, P.r, pal(P), false, 1);
+  for (const P of poses) puff(p, P.x, P.y, P.r, pal(P), a > 2.25);
 }
 function groundDust(p, t) {
   const a = Math.floor((t - BOOM) * 15) / 15;
@@ -88,8 +92,9 @@ function groundDust(p, t) {
     poses.push({ x, y, r });
   }
   poses.sort((a, b) => a.y - b.y);
-  for (const P of poses) puff(p, P.x, P.y, P.r,
-    t >= GHOST[0] && t < GHOST[1] && Math.abs(P.x - TX) < 32 ? WARM : DUST, a > 2.25);
+  const pal = (P) => t >= GHOST[0] && t < GHOST[1] && Math.abs(P.x - TX) < 32 ? WARM : DUST;
+  for (const P of poses) puff(p, P.x, P.y, P.r, pal(P), false, 1);
+  for (const P of poses) puff(p, P.x, P.y, P.r, pal(P), a > 2.25);
 }
 
 export function blast(p, t, layer) {
