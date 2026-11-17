@@ -2,6 +2,7 @@
 // An invisible flame serpent (only faint rims and a rose-red heart) leaves the caster's chest, coils round the target,
 // dives into its chest and burns it from inside in three heartbeats; a clench makes the heart flame burst out.
 import { smooth, clamp, TAU, WHITE, READY, hex, poseAt, mix } from '../../core/index.js';
+import { spine, drawSerpent } from './_serpent-lib.js';
 
 const C = ['#140c12', '#4a1428', '#a8204a', '#ff4f7a', '#ffb3c6', '#efe9ee', '#ffffff'].map(hex);
 const RIM = hex('#efe9ee'), SHADE = hex('#b9b3c4'), ASH = ['#2b2626', '#5a524f', '#8f8580'].map(hex);
@@ -40,37 +41,26 @@ function headAt(t) {
   const [hx, hy] = hand(OUT + 0.05);
   if (t < OUT) return [4, -30];
   if (t < REACH) {   // S-curve flight from the palm to the target's side
-    const u = sm((t - OUT) / (REACH - OUT)), x = hx + (TX - 16 - hx) * u, y = hy - 18 * Math.sin(u * Math.PI) + 7 * Math.sin(u * TAU * 1.5) * (1 - u);
+    const u = sm((t - OUT) / (REACH - OUT)), x = hx + (TX - 17 - hx) * u, y = hy + (-8 - hy) * u - 22 * Math.sin(u * Math.PI) + 7 * Math.sin(u * TAU * 1.5) * (1 - u);
     return [x, y];
   }
   if (t < DIVE) {   // coiling round the target, rising
     const u = (t - REACH) / (DIVE - REACH), a = Math.PI + u * TAU * 1.5;
-    return [TX + Math.cos(a) * 15, -8 - 46 * u + Math.sin(a) * 3];
+    return [TX + Math.cos(a) * 17, -8 - 46 * u + Math.sin(a) * 3];
   }
   const u = sm(clamp((t - DIVE) / (IN - DIVE)));   // rears up then dives into the chest
-  return [TX + 8 * (1 - u) - 4 * Math.sin(u * Math.PI), -56 + (56 + CHEST[1]) * u - 10 * Math.sin(u * Math.PI)];
+  return [TX + 17 + (CHEST[0] - TX - 17) * u + 6 * Math.sin(u * Math.PI), -54 + (54 + CHEST[1]) * u - 14 * Math.sin(u * Math.PI)];
 }
-const BODY = 22, LAG = 0.02;   // body samples, seconds between samples
+const BODY_L = 88, SLIDE = 260;   // body length (px); speed it slides into the chest (px/s)
+const coilAngle = (ti) => Math.PI + ((ti - REACH) / (DIVE - REACH)) * TAU * 1.5;
 function serpent(p, t, layer) {
-  if (t < OUT || t > IN + BODY * LAG) return;
-  for (let i = BODY - 1; i >= 0; i--) {
-    const ti = t - i * LAG;
-    if (ti < OUT) continue;
-    if (ti > IN && t >= IN) continue;   // the part already inside the chest is hidden
-    const [x, y] = headAt(Math.min(ti, IN)), r = 5.5 * (1 - i / BODY) + 1.2;
-    // in front of the target or behind it while coiling
-    const coil = ti > REACH && ti < DIVE, behind = coil && Math.sin(Math.PI + ((ti - REACH) / (DIVE - REACH)) * TAU * 1.5) < 0;
-    if (behind !== (layer === 'back')) continue;
-    p.circle(x, y, r, RIM, 0.45);
-    p.circle(x, y, r * 0.55, SHADE, 0.18);
-    if (i % 3 === 0) p.dot(x, y - r, WHITE, 0.6);   // scale glints
-    if (i === 0) {   // head: two flame crests and the rose heart at the neck
-      const [px, py] = headAt(Math.max(OUT, ti - LAG)), dx = x - px, dy = y - py, d = Math.hypot(dx, dy) || 1;
-      p.line(x, y, x - dy / d * 6 + dx / d * 3, y + dx / d * 6 + dy / d * 3, RIM, 0.6);
-      p.line(x, y, x + dy / d * 6 + dx / d * 3, y - dx / d * 6 + dy / d * 3, RIM, 0.6);
-    }
-    if (i === 3) { p.disc(x, y, 2.4, C[3], 1); p.dot(x, y, C[6], 1); }
-  }
+  if (t < OUT || t > IN + BODY_L / SLIDE) return;
+  const offset = Math.max(0, t - IN) * SLIDE, sp = spine(headAt, Math.min(t, IN), BODY_L - offset + 1, OUT);
+  const keep = (ti, ly) => {   // coiling: the half of each turn behind the target goes to the back layer
+    const behind = ti > REACH && ti < DIVE && Math.sin(coilAngle(ti)) < 0;
+    return behind === (ly === 'back');
+  };
+  drawSerpent(p, sp, t, { L: BODY_L, W: 6.5, layer, keep, offset, mouth: smooth(DIVE, DIVE + 0.12, t), heart: 0.6 + 0.4 * smooth(DIVE, IN, t), seed: 2 });
 }
 // the ember in the caster's chest, the shimmer round him
 function caster(p, t) {
@@ -105,27 +95,37 @@ function heart(p, t, layer) {
     }
   }
 }
-// the burst: rose flash from the chest, a clear column shooting up, ash rising, the serpent's soul fading upward
+// the burst: the heart flame explodes OUTWARD — rose flash, a clear shock ring, clear flame tongues flung all round,
+// rose embers and ash scattering with gravity
+const RAYS = Array.from({ length: 16 }, (_, i) => ({ a: -Math.PI / 2 + (i / 16 - 0.5) * TAU * 0.92 + Math.sin(i * 7.3) * 0.12, L: 34 + ((i * 37) % 23), w: 2 + (i % 3) }));
 function burn(p, t, layer) {
   const τ = t - BURN;
-  if (τ < 0 || τ > 1.1) return;
+  if (τ < 0 || τ > 1.1 || layer !== 'front') return;
   const [cx, cy] = CHEST;
-  if (layer === 'front') {
-    if (τ < 0.1) p.disc(cx, cy, 10 + 140 * τ, C[4], 1 - τ / 0.1);
-    const h = 150 * out3(clamp(τ / 0.2)), w = 10 * (1 - smooth(0.3, 0.8, τ));
-    if (w > 0.5) for (const s of [-1, 1]) {   // the clear column: only its rims and a few inner streaks
-      p.line(cx + s * w, cy + 10, cx + s * w * 0.4, cy - h, RIM, 0.7);
-      p.line(cx + s * w * 0.4, cy, cx + s * w * 0.15, cy - h * 0.8, C[4], 0.5);
-    }
-    for (let i = 0; i < 20; i++) {   // ash
-      const s = τ - (i % 5) * 0.04;
-      if (s > 0) p.dot(cx + Math.sin(i * 2.7) * (6 + 30 * s), cy - 10 - (i * 7) % 40 - 60 * s, ASH[i % 3], 1 - smooth(0.5, 1, s));
-    }
-    // soul of the serpent: a fading ring trail rising in an S
-    for (let i = 0; i < 10; i++) {
-      const u = clamp(τ * 1.4 - i * 0.04), x = cx + Math.sin(u * 7 + i * 0.3) * 10, y = cy - 20 - 120 * u;
-      if (u > 0 && u < 1) p.circle(x, y, 4 * (1 - i / 10) + 1, RIM, 0.35 * (1 - u));
-    }
+  if (τ < 0.09) p.disc(cx, cy, 8 + 160 * τ, C[4], 1 - τ / 0.09);
+  // the shock ring in the air (clear, like a lens) and its echo on the ground
+  const R = 10 + 120 * out3(clamp(τ / 0.5)), kr = 1 - smooth(0.2, 0.5, τ);
+  if (kr > 0) {
+    const ring = (rr) => Array.from({ length: 73 }, (_, i) => [cx + Math.cos(i * TAU / 72) * rr, Math.min(-1, cy + Math.sin(i * TAU / 72) * rr)]);
+    p.polyline(ring(R), RIM, 0.55 * kr);
+    p.polyline(ring(R - 2), C[4], 0.3 * kr);
+    p.polyline(Array.from({ length: 49 }, (_, i) => [cx + Math.cos(i * TAU / 48) * R * 1.1, Math.sin(i * TAU / 48) * R * 0.14]), RIM, 0.5 * kr);
+  }
+  // clear flame tongues shot outward: rims + a rose tip, stretching then thinning away
+  for (const r of RAYS) {
+    const u = clamp(τ / 0.6), ext = r.L * out3(clamp(τ / 0.18)) + 40 * u, head = cx + Math.cos(r.a) * ext, hy = Math.min(-1, cy + Math.sin(r.a) * ext + 30 * u * u);
+    const tail = Math.max(0, ext - r.L * (1 - u)), tx = cx + Math.cos(r.a) * tail, ty = Math.min(-1, cy + Math.sin(r.a) * tail);
+    const k = 1 - smooth(0.35, 0.6, τ), nx = -Math.sin(r.a) * r.w, ny = Math.cos(r.a) * r.w;
+    if (k <= 0) continue;
+    p.line(tx + nx, ty + ny, head, hy, RIM, 0.6 * k);
+    p.line(tx - nx, ty - ny, head, hy, RIM, 0.6 * k);
+    p.line(tx, ty, head, hy, SHADE, 0.25 * k);
+    p.disc(head, hy, 1.4, C[4], k);
+  }
+  for (let i = 0; i < 40; i++) {   // rose embers and ash, flung out, falling
+    const a = (i / 40) * TAU + Math.sin(i * 3.1), v = 60 + (i * 53) % 110, s = Math.max(0, τ - (i % 4) * 0.02);
+    const x = cx + Math.cos(a) * v * s, y = Math.min(0, cy + Math.sin(a) * v * s + 140 * s * s);
+    p.dot(x, y, i % 3 ? C[3 + (i % 2)] : ASH[i % 3], 1 - smooth(0.5, 1.0, s));
   }
 }
 
