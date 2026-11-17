@@ -1,6 +1,6 @@
 // Approved draft motion with cold fire and cut-ice materials.
 import { smooth, clamp, TAU, READY, poseAt } from '../../core/index.js';
-import { coldRamp, coldFlame, hash, curve, tipCapped, bakeIceFlame } from './_cold-lib.js';
+import { coldRamp, fastColdFlame as coldFlame, hash, curve, tipCapped, bakeIceFlame } from './_cold-lib.js';
 
 const TX = 150, END = 5.0, POUR = 0.6, SWEEP = 0.75, ARRIVE = 1.5, FREEZE = 2.1, FROZEN = 2.35, SHATTER = 3.2, HANG = 3.32, PIN = 3.6, RIBS = 3.72, BURN = 3.95;
 const sm = (u) => u * u * (3 - 2 * u), out3 = (u) => 1 - (1 - u) ** 3;

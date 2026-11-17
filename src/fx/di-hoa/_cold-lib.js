@@ -142,3 +142,47 @@ export function bakeIceFlame(C, pts, W, seed = 0, { dim = 0 } = {}) {
     }
   };
 }
+
+// Same live material and ten-segment curve; prepare segment invariants once,
+// rather than allocating nearest-point results and recomputing lengths per pixel.
+export function fastColdFlame(p, C, pts, W, t, seed = 0, { k = 1, mist = 1, dim = 0 } = {}) {
+  if (k <= 0 || W < 0.3) return;
+  const path = curve(pts), len = lengthOf(path);
+  if (len < 1.5) return;
+  const segments = [];
+  let acc = 0;
+  for (let i = 0; i < path.length - 1; i++) {
+    const [ax, ay] = path[i], [bx, by] = path[i + 1];
+    const ex = bx - ax, ey = by - ay, l2 = ex * ex + ey * ey || 1, l = Math.sqrt(l2);
+    segments.push({ ax, ay, ex, ey, l2, l, acc });
+    acc += l;
+  }
+  const [x0, y0, x1, y1] = box(path, W + 3);
+  const forkWave = 0.32 + 0.12 * Math.sin(t * 8 + seed);
+  p.shade(x0, y0, x1, y1, (x, y, o) => {
+    let best = Infinity, nearest = segments[0], position = 0;
+    for (let i = 0; i < segments.length; i++) {
+      const q = segments[i];
+      const s = clamp(((x - q.ax) * q.ex + (y - q.ay) * q.ey) / q.l2);
+      const px = q.ax + q.ex * s - x, py = q.ay + q.ey * s - y, d2 = px * px + py * py;
+      if (d2 < best) { best = d2; nearest = q; position = s; }
+    }
+    const q = nearest, u = (q.acc + position * q.l) / len;
+    const d = ((x - q.ax) * q.ey - (y - q.ay) * q.ex) / q.l;
+    if (u <= 0 && Math.abs(d) > W) return;
+    const w = Math.max(0.4, width(W, u)), r = Math.abs(d) / w;
+    if (r >= 1.45) return;
+    const n = hash(Math.floor(x), Math.floor(y - t * 26), seed);
+    if (r > 1) {
+      if (mist > 0 && n > 0.86 - 0.1 * u) { o.c = C[3 + (n > 0.95 ? 1 : 0)]; o.a = k * 0.55 * mist; }
+      return;
+    }
+    if (r > 0.72 && n < (r - 0.72) * 2.6 * (0.6 + 0.6 * u)) return;
+    const fork = smooth(0.62, 0.9, u) * forkWave;
+    if (r < fork) return;
+    const streak = 0.75 * Math.sin(d * 1.25 + u * 5 - t * 9 + seed) * Math.sin(u * 3.1 - t * 3.7 + seed * 2);
+    const rr = fork > 0 ? (r - fork) / (1 - fork) : r;
+    o.c = pick(C, 5.7 - 2.9 * Math.pow(rr, 1.25) - 1.9 * u + streak * (0.4 + 0.6 * rr) - dim, x, y);
+    o.a = k;
+  });
+}
