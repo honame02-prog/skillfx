@@ -35,9 +35,18 @@ export function bodyWidth(s, L, W = 5.5) {
   return u < 0.55 ? W * (1 - 0.15 * u) : W * 0.92 * Math.pow(Math.max(0, (1 - u) / 0.45), 1.1);   // long body, long tail taper
 }
 // nearest spine point to (x, y): arc length s, signed side distance d (+ = left of the head's travel), sample time, normal
-function nearest(sp, x, y) {
+function chunks(sp, pad, n = 6) {   // groups of n segments with a padded bounding box, to skip far pixels fast
+  const out = [];
+  for (let i = 0; i < sp.length - 1; i += n) {
+    const j = Math.min(sp.length - 1, i + n); let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (let k = i; k <= j; k++) { x0 = Math.min(x0, sp[k].x); y0 = Math.min(y0, sp[k].y); x1 = Math.max(x1, sp[k].x); y1 = Math.max(y1, sp[k].y); }
+    out.push({ i, j, x0: x0 - pad, y0: y0 - pad, x1: x1 + pad, y1: y1 + pad });
+  }
+  return out;
+}
+function nearest(sp, x, y, ch) {
   let best = Infinity, S = 0, D = 0, T = 0, N = [0, -1];
-  for (let i = 0; i < sp.length - 1; i++) {
+  for (const c of ch) if (x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1) for (let i = c.i; i < c.j; i++) {
     const a = sp[i], b = sp[i + 1], ex = b.x - a.x, ey = b.y - a.y, l2 = ex * ex + ey * ey || 1;
     const f = clamp(((x - a.x) * ex + (y - a.y) * ey) / l2), qx = a.x + ex * f - x, qy = a.y + ey * f - y, d2 = qx * qx + qy * qy;
     if (d2 < best) {
@@ -45,7 +54,7 @@ function nearest(sp, x, y) {
       const l = Math.sqrt(l2), side = ((x - a.x) * ey - (y - a.y) * ex) >= 0 ? 1 : -1; D = side * Math.sqrt(d2); N = [ey / l, -ex / l];
     }
   }
-  return { s: S, d: D, time: T, n: N };
+  return best === Infinity ? { d: null } : { s: S, d: D, time: T, n: N };
 }
 
 // Draw it. o.keep(time, layer) -> false hides that part of the body (coiling behind the target, already inside the chest).
@@ -54,10 +63,12 @@ export function drawSerpent(p, sp, t, { L = 70, W = 5.5, k = 1, mouth = 0, heart
   if (sp.length < 2 || k <= 0) return;
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const q of sp) { x0 = Math.min(x0, q.x); y0 = Math.min(y0, q.y); x1 = Math.max(x1, q.x); y1 = Math.max(y1, q.y); }
-  const pad = W * 2.2 + 6, C = HEART, coarse = sp.filter((_, i) => i % 3 === 0 || i === sp.length - 1);   // ~3 px segments: 3x cheaper
+  const pad = W * 2.2 + 6, C = HEART, coarse = sp.filter((_, i) => i % 3 === 0 || i === sp.length - 1), ch = chunks(coarse, pad);   // ~3 px segments: 3x cheaper
   // which side of the spine is "up" (the back): the side whose normal points more upward, per sample
   p.shade(x0 - pad, y0 - pad, x1 + pad, y1 + pad, (x, y, o) => {
-    const q0 = nearest(coarse, x, y), d = q0.d, time = q0.time, n = q0.n, s = q0.s + offset;
+    const q0 = nearest(coarse, x, y, ch);
+    if (q0.d === null) return;
+    const d = q0.d, time = q0.time, n = q0.n, s = q0.s + offset;
     if (s < offset + 0.5 && offset > 0) return;   // the part already inside
     if (keep && !keep(time, layer)) return;
     if (s < 11 && offset < 2) return;   // the head is drawn as its own shape below
