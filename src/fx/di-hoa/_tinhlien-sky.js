@@ -59,7 +59,7 @@ const SKIN = ['#0b0508', '#190b12', '#2a121c', '#3f1b27', '#5c2832', '#7a3a3a'].
 const SCL = ['#140805', '#24100a', '#3a1a0e', '#55260f'].map(hex);
 const IRX = ['#2c0f04', '#5a2206', '#9a400a', '#d06a10', '#f0981c', '#ffc640', '#fff0a0'].map(hex);
 const COLL = hex('#c0300c'), PUPR = hex('#4a0a06'), WET = hex('#ffeccc'), WAT = hex('#c98a6a'), VEINX = hex('#7a1a10');
-const SLANT = 4;   // outer corners lifted: a menacing tilt
+const SLANT = 4, FH = new Float32Array(2 * EW + 17), FB = new Float32Array(2 * EW + 17);   // outer corners lifted: a menacing tilt
 const PROF = Array.from({ length: 2 * EW + 17 }, (_, i) => {   // per column: opening profile, lid-mass profile, |u|, tilt
   const dx = i - EW - 8, u = dx / EW, a = Math.abs(u);
   return [Math.pow(Math.max(0, 1 - u * u), 0.7), Math.pow(Math.max(0, 1 - (u / 1.12) ** 2), 0.55), a, u * SLANT * a];
@@ -82,6 +82,25 @@ for (let v = 0; v < 12; v++) {
     if (s === 12 && hsh(v, 74) > 0.4) a += side * 0.9;   // a fork
   }
 }
+// one pixel of the burning rim: d px out from the lid edge, against the local flame height; tongues sway, split and
+// tear off as they rise; white-gold at the root, orange, red at the tips
+function flame(o, dx, d, F, x0, t, dir) {
+  const i0 = dx - x0, h0 = F[i0] ?? 0;
+  if (h0 <= 0.5 || d > h0 * 1.7) return;
+  // the rim is a row of tongues: each cell has its own height and rhythm, sways more as it rises, tapers to a tip,
+  // and now and then throws a detached lick above itself
+  const sway = Math.sin(d * 0.28 - t * 8 + dx * 0.05) * 1.8 * Math.min(1, d / (h0 + 1)), X = dx + sway + 200;
+  const Wc = 6, cell = Math.floor(X / Wc), lx = X - cell * Wc - Wc / 2;
+  const hc = h0 * (0.55 + 0.45 * Math.abs(Math.sin(t * (6 + 2 * hsh(cell, 90)) + cell * 2.3))) * (0.8 + 0.4 * hsh(cell, 91));
+  const f = d / hc;
+  let inside = f <= 1 && Math.abs(lx) < Wc * 0.62 * Math.pow(Math.max(0, 1 - f), 0.75) + (f < 0.35 ? Wc * 0.5 : 0);
+  if (!inside) {   // a lick torn off the tip, rising and shrinking
+    const q = (t * (2.2 + hsh(cell, 92)) + hsh(cell, 93)) % 1, cy = hc * (1.05 + 0.6 * q), rr = 1.8 * (1 - q);
+    if (rr > 0.6 && Math.abs(d - cy) < rr && Math.abs(lx) < rr) { o.c = q < 0.5 ? IRX[4] : IRX[3]; }
+    return;
+  }
+  o.c = f < 0.2 ? IRX[6] : f < 0.45 ? IRX[5] : f < 0.68 ? IRX[4] : f < 0.88 ? IRX[3] : COLL;
+}
 function eye(p, t) {
   const op = openAt(t), shut = smooth(SHUT[0], SHUT[1], t), lock = lockAt(t);
   if (shut > 0.97) {   // shut: a last thin amber seam, then nothing
@@ -99,7 +118,15 @@ function eye(p, t) {
   const H = EH * op, pw = pupilW(t) * 0.55 * (1 - 0.35 * flash), Lt = 9 + 3 * lock, Lb = 6;
   const lookX = Math.sin(t * 1.3) * 1.2 * (1 - lock), lookY = 3 + lock;   // it looks down at the target
   const squint = lock * 0.22;                                                    // the lower lid rises when it locks on
-  const x0 = -EW - 8, y0 = -H - Lt - 13, y1 = H * 0.75 + Lb + 6;
+  // flame heights per column along the rim: tall rolling tongues on the upper lid, short ones under the lower lid
+  const boost = (1 + 0.5 * lock + 0.4 * flash) * smooth(APPEAR - 0.1, APPEAR + 0.3, t);
+  for (let i = 0; i < FH.length; i++) {
+    const dx = i - EW - 8, a = Math.abs(dx / EW), body = Math.max(0, 1 - a * a * 0.7);
+    const roll = Math.abs(Math.sin(dx * 0.13 + t * 5.3 + Math.sin(dx * 0.041 - t * 2.1) * 2.5)) ** 1.5;
+    FH[i] = (4 + 13 * body * (0.35 + 0.65 * roll) + 2.5 * Math.sin(dx * 0.37 - t * 11)) * boost;
+    FB[i] = (3 + 5 * body * (0.4 + 0.6 * Math.abs(Math.sin(dx * 0.17 - t * 6.1 + 1.7)))) * boost;
+  }
+  const x0 = -EW - 8, y0 = -H - Lt - 30, y1 = H * 0.75 + Lb + 12;
   p.shade(EC[0] + x0, EC[1] + y0, EC[0] - x0, EC[1] + y1, (x, y, o) => {
     const dx = Math.round(x - EC[0]), dy = y - EC[1], col = PROF[dx - x0];
     if (!col) return;
@@ -108,13 +135,7 @@ function eye(p, t) {
     const lt = -(H + Lt) * pl - 2, lb = bot + Lb * pl + 1;
     if (a > 1.12) return;
     // ---- brow ridge: rows of overlapping scales above the lid mass
-    if (ty < lt) {
-      if (ty < lt - 10 * pl - 1 || pl <= 0.05) return;
-      const row = Math.floor((lt - ty) / 4), sx = dx + (row & 1) * 3.5, cell = ((sx % 7) + 7) % 7, sy = (lt - ty) % 4;
-      const edge = Math.abs(cell - 3.5) / 3.5 + (3 - sy) * 0.12;   // round-bottomed scale
-      o.c = sy < 0.9 && edge < 0.8 ? SKIN[4] : edge > 0.85 ? SKIN[0] : SKIN[row === 0 ? 2 : 1];
-      return;
-    }
+    if (ty < lt) return flame(o, dx, lt - ty, FH, x0, t, 1);
     // ---- upper lid: crease, lid skin, wet margin, lash line
     if (ty < top) {
       const d = top - ty;
@@ -126,7 +147,7 @@ function eye(p, t) {
     }
     // ---- lower lid: waterline, lid skin, shadow
     if (ty > bot) {
-      if (ty > lb) return;
+      if (ty > lb) return flame(o, dx, ty - lb, FB, x0, t, -1);
       const d = ty - bot;
       o.c = d < 1 ? WAT : d < 2 ? SKIN[4] : d > Lb * pl - 1 ? SKIN[1] : SKIN[3];
       return;
@@ -160,15 +181,16 @@ function eye(p, t) {
     const gx = EC[0] + ((t * 40) % (EW * 1.2)) - EW * 0.6, gu = (gx - EC[0]) / EW;
     p.dot(gx, EC[1] + H * (0.75 - squint) * Math.pow(Math.max(0, 1 - gu * gu), 0.7) - gu * SLANT * Math.abs(gu) + 1, WET, 1);
   }
-  // flame lashes: tongues of fire along the upper lid, curling outward, longest mid-lid
-  for (let i = 0; i <= 14; i++) {
-    const u = -0.98 + 1.96 * i / 14, a = Math.abs(u), pl = Math.pow(Math.max(0, 1 - (u / 1.12) ** 2), 0.55), x = EC[0] + u * EW;
-    const tilt = u * SLANT * a, yt = EC[1] - (H + Lt) * pl - 1 - tilt;
-    const h = (6 + 5 * hsh(i, 3) + 5 * (1 - a)) * (0.7 + 0.3 * Math.sin(t * 13 + i * 2.1)) * (1 + 0.6 * lock), lean = u * (5 + 3 * a), w = 2.2 + (1 - a);
-    const tip = [x + lean, yt - h], mid = [x + lean * 0.4 - u, yt - h * 0.5];
-    p.poly([[x - w, yt + 1], [mid[0] - w * 0.6, mid[1]], tip, [mid[0] + w * 0.6, mid[1]], [x + w, yt + 1]], IRX[3], 1);
-    p.poly([[x - w * 0.45, yt + 1], [mid[0] - w * 0.2, mid[1] + 1], [mid[0] + lean * 0.15, mid[1] - h * 0.2], [x + w * 0.45, yt + 1]], IRX[5], 1);
-    p.dot(tip[0], tip[1], L[5], 1);
+  // embers dancing off the burning rim, without end: born on the rim, rising and swaying, flickering out
+  for (let i = 0; i < 40; i++) {
+    const P = 0.7 + 0.5 * hsh(i, 80), ph = (t / P + hsh(i, 81)) % 1, low = i % 5 === 0;
+    const u = hsh(i, 82) * 2 - 1, a = Math.abs(u), pl = Math.pow(Math.max(0, 1 - (u / 1.12) ** 2), 0.55);
+    const rim = low ? EC[1] + (H * 0.75 + Lb) * Math.pow(Math.max(0, 1 - u * u), 0.7) + 3 : EC[1] - (H + Lt) * pl - 2 - FH[Math.round(u * EW) + EW + 8] * 0.6;
+    const x = EC[0] + u * EW + Math.sin(ph * 7 + i) * 3 + u * ph * 10, y = rim - u * SLANT * a - ph * (low ? 10 : 30);
+    if (Math.sin(t * 31 + i * 5.3) < -0.4 || y < CY0 + 1) continue;
+    const c = ph < 0.3 ? IRX[6] : ph < 0.6 ? IRX[5] : ph < 0.85 ? IRX[4] : IRX[3];
+    p.dot(x, y, c, 1);
+    if (i % 4 === 0 && ph < 0.5) { p.dot(x + 1, y, c, 1); p.dot(x, y + 1, IRX[3], 1); }
   }
 }
 export function sky(p, t, layer) { if (layer === 'back') { clouds(p, t); eye(p, t); } }
