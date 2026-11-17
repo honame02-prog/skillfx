@@ -1,7 +1,23 @@
 # Catalog
 
-244 effects in 21 categories. Every one is a file in
+253 effects in 22 categories. Every one is a file in
 `src/fx/<category>/<name>.js`; render any of them with `node tools/render.mjs <id> --gif`.
+
+## ultimate
+
+huge signature skills: sky-splitting, earth-shattering.
+
+| effect | id | | size | what it does |
+|---|---|---|---|---|
+| Ground blast study | `ultimate/blast-test` | one-shot 3.2s | 480×420 | Eight staggered soil fountains throw tumbling rocks high above a rolling dust shock; low smoke drifts through the settling grit. |
+| Heaven imprisoning finger | `ultimate/heaven-finger` | one-shot 7.6s | 480×420 | A carved golden hand emerges slowly, locks heaven in a cage of runes, then plunges into the earth and unravels upward into golden glyphs. |
+| Imprisoned heaven | `ultimate/heaven-sky` | one-shot 7.6s | 480×420 | Opaque ink banks roll into a three-armed storm. Buried thunder lights their bellies; a golden eye opens, heaven freezes, and the impact shreds the sky outward. |
+| Hoa Lien | `ultimate/hoa-lien` | loop 3.2s | 148×136 | Translucent lotus flames curl and shed rising embers in four distinct colors, with dark roots, luminous hearts and a small white stamen beneath a quiet dharma wheel. |
+| Hoa Lien Burst | `ultimate/hoa-lien-burst` | one-shot 4.2s | 480×380 | A cracking lotus ruptures into separate whorls of alien fire, a petal shock front, a rolling mushroom crown and a rain of burning petals and brands. |
+| Hoa Lien Draft | `ultimate/hoa-lien-draft` | one-shot 6.8s | 480×380 | Motion draft: qi streams spiral round the caster into a lotus overhead, it soars, then slams down and unwinds into a five-colour pillar with a far-reaching shock wave. |
+| Phat No Hoa Lien | `ultimate/phat-no-hoa-lien` | one-shot 7s | 480×380 | Five fire streams spiral round the caster into a lotus that soars, then slams down and unwinds into a twisting five-colour pillar with a far-reaching ground shock. |
+| Sky breaking quake | `ultimate/sky-quake` | one-shot 3.32s | 480×420 | An inverted impact pins the earth with a tightening rune seal; molten faults heave slabs, staggered geysers erupt and a second quake widens the sinking crater. |
+| Tu Thien Chi | `ultimate/tu-thien-chi` | one-shot 7.6s | 480×420 | A celestial fingerprint awakens; a colossal golden finger imprisons heaven and earth, then crushes the target into a world-splitting quake. |
 
 ## moves
 
