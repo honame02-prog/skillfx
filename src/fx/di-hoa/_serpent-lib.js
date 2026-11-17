@@ -32,7 +32,7 @@ export function bodyWidth(s, L, W = 5.5) {
   if (s < 12) return W * (1.35 - 0.6 * (s - 9) / 3);                       // jaw hinge into the neck
   if (s < 18) return W * (0.75 + 0.25 * (s - 12) / 6);                     // neck
   const u = s / L;
-  return u < 0.6 ? W : W * Math.pow(Math.max(0, (1 - u) / 0.4), 0.9);     // body, tail taper
+  return u < 0.55 ? W * (1 - 0.15 * u) : W * 0.92 * Math.pow(Math.max(0, (1 - u) / 0.45), 1.1);   // long body, long tail taper
 }
 // nearest spine point to (x, y): arc length s, signed side distance d (+ = left of the head's travel), sample time, normal
 function nearest(sp, x, y) {
@@ -66,8 +66,17 @@ export function drawSerpent(p, sp, t, { L = 70, W = 5.5, k = 1, mouth = 0, heart
     // that emptiness IS the invisibility.
     // dorsal fins: outlined clear flame tongues flickering backward along the back
     if (r > 1) {
+      if (s < 11 && offset < 2) return;
+      const out0 = Math.abs(d) - w;
+      // flame aura licking off the whole body: short clear tongues streaming backward, rose tips here and there
+      const pa = s / 4.2 + t * 3.2 + (back ? 0 : 0.5) + seed, sa = pa - Math.floor(pa);
+      const aura = (1.6 + 1.4 * Math.sin(s * 0.53 - t * 11 + (back ? 0 : 2))) * Math.pow(sa, 1.3) * (1 - smooth(0.85, 1, u)) + 0.6;
+      if (out0 <= aura && !(back && s >= 14 && u <= 0.9)) {
+        if (out0 > aura - 1) { o.c = sa > 0.85 && (Math.floor(pa) % 3 === 0) ? C[4] : RIM; o.a = k; return; }
+        o.l = TINT; o.k = 0.14 * k; return;
+      }
       if (!back || s < 14 || u > 0.9) return;
-      const ph = s / 7 - t * 2.4 + seed, saw = ph - Math.floor(ph), fin = (3 + 2 * Math.sin(s * 0.7 + t * 9)) * Math.pow(saw, 1.5) * (1 - smooth(0.7, 0.9, u));
+      const ph = s / 6 + t * 3 + seed, saw = ph - Math.floor(ph), fin = Math.max(aura, (3.5 + 2.5 * Math.sin(s * 0.7 - t * 9)) * Math.pow(saw, 1.4) * (1 - smooth(0.7, 0.9, u)));
       const out = Math.abs(d) - w;
       if (out > fin + 0.5 || fin < 1) return;
       if (out > fin - 1) { o.c = saw > 0.75 ? C[4] : RIM; o.a = k; return; }          // fin edge, pink near its tip
@@ -103,7 +112,7 @@ export function drawSerpent(p, sp, t, { L = 70, W = 5.5, k = 1, mouth = 0, heart
   if (offset < 2 && (!keep || keep(h0.time, layer))) {
     let fx = h0.x - hb.x, fy = h0.y - hb.y; const fl = Math.hypot(fx, fy) || 1; fx /= fl; fy /= fl;
     let sx = -fy, sy = fx; if (sy > 0) { sx = -sx; sy = -sy; }   // "up" side of the head is the screen-up side
-    const S = W / 6.5 * 1.15, toW = ([a, b]) => [h0.x + (fx * a + sx * b) * S, h0.y + (fy * a + sy * b) * S];
+    const S = Math.max(W, 5.2) / 6.5 * 1.05, toW = ([a, b]) => [h0.x + (fx * a + sx * b) * S, h0.y + (fy * a + sy * b) * S];
     // local: a = forward (snout at 0, back negative), b = up
     const jaw = mouth * 0.55, rot = ([a, b]) => { const ca = Math.cos(jaw), sa = Math.sin(jaw), A = a + 13, B = b + 1; return [-13 + A * ca - B * sa * -1, -1 + B * ca + A * sa * -1]; };
     const upper = [[0, 0.5], [-3, 2.8], [-7, 4.8], [-11, 6.8], [-14.5, 6.2], [-17, 4.2], [-17, -1], [-12, -1.4], [-6, -0.6]];

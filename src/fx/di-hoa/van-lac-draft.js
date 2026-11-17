@@ -6,7 +6,7 @@ import { spine, drawSerpent } from './_serpent-lib.js';
 
 const C = ['#140c12', '#4a1428', '#a8204a', '#ff4f7a', '#ffb3c6', '#efe9ee', '#ffffff'].map(hex);
 const RIM = hex('#efe9ee'), SHADE = hex('#b9b3c4'), ASH = ['#2b2626', '#5a524f', '#8f8580'].map(hex);
-const TX = 150, END = 4.5, OUT = 0.6, REACH = 1.2, DIVE = 1.8, IN = 2.0, BEATS = [2.2, 2.65, 3.1], BURN = 3.4;
+const TX = 150, END = 4.5, OUT = 0.6, REACH = 1.25, DIVE = 1.8, IN = 2.0, BEATS = [2.2, 2.65, 3.1], BURN = 3.4;
 const CHEST = [TX + 1, -30];
 const sm = (u) => u * u * (3 - 2 * u), out3 = (u) => 1 - (1 - u) ** 3;
 export const meta = {
@@ -41,7 +41,7 @@ function headAt(t) {
   const [hx, hy] = hand(OUT + 0.05);
   if (t < OUT) return [4, -30];
   if (t < REACH) {   // S-curve flight from the palm to the target's side
-    const u = sm((t - OUT) / (REACH - OUT)), x = hx + (TX - 17 - hx) * u, y = hy + (-8 - hy) * u - 22 * Math.sin(u * Math.PI) + 7 * Math.sin(u * TAU * 1.5) * (1 - u);
+    const u = sm((t - OUT) / (REACH - OUT)), x = hx + (TX - 17 - hx) * u, y = hy + (-8 - hy) * u - 26 * Math.sin(u * Math.PI) + 9 * Math.sin(u * TAU * 2.5) * Math.sin(u * Math.PI);
     return [x, y];
   }
   if (t < DIVE) {   // coiling round the target, rising
@@ -51,7 +51,7 @@ function headAt(t) {
   const u = sm(clamp((t - DIVE) / (IN - DIVE)));   // rears up then dives into the chest
   return [TX + 17 + (CHEST[0] - TX - 17) * u + 6 * Math.sin(u * Math.PI), -54 + (54 + CHEST[1]) * u - 14 * Math.sin(u * Math.PI)];
 }
-const BODY_L = 88, SLIDE = 260;   // body length (px); speed it slides into the chest (px/s)
+const BODY_L = 135, SLIDE = 260;   // body length (px); speed it slides into the chest (px/s)
 const coilAngle = (ti) => Math.PI + ((ti - REACH) / (DIVE - REACH)) * TAU * 1.5;
 function serpent(p, t, layer) {
   if (t < OUT || t > IN + BODY_L / SLIDE) return;
@@ -60,7 +60,7 @@ function serpent(p, t, layer) {
     const behind = ti > REACH && ti < DIVE && Math.sin(coilAngle(ti)) < 0;
     return behind === (ly === 'back');
   };
-  drawSerpent(p, sp, t, { L: BODY_L, W: 6.5, layer, keep, offset, mouth: smooth(DIVE, DIVE + 0.12, t), heart: 0.6 + 0.4 * smooth(DIVE, IN, t), seed: 2 });
+  drawSerpent(p, sp, t, { L: BODY_L, W: 4.4, layer, keep, offset, mouth: smooth(DIVE, DIVE + 0.12, t), heart: 0.6 + 0.4 * smooth(DIVE, IN, t), seed: 2 });
 }
 // the ember in the caster's chest, the shimmer round him
 function caster(p, t) {
