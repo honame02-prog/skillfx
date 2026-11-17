@@ -9,8 +9,8 @@ import { FLAMES, drawColored } from '../ultimate/_lotus-lib.js';
 import { createGroundBlast } from '../ultimate/_blast.js';
 import { STONE } from '../ultimate/_lib.js';
 
-const RAMP = FLAMES[0], TX = 150, END = 3.3;
-const CHARGE = 0.05, THROW = 0.4, LAND = 0.55, BUD = 1.1, OPEN = 1.45, FULL = 1.9, BURST = 2.05;
+const RAMP = FLAMES[0], TX = 150, END = 4.7;
+const CHARGE = 0.05, THROW = 0.6, LAND = 0.75, BUD = 1.45, BEAT = [1.7, 1.95], OPEN = 2.05, FULL = 2.65, BURST = 3.0;
 const COOL = ['#0c0809', '#22140f', '#5a1c10', '#a8381a', '#f07a2a'].map(hex), DIRT = STONE.map(hex);
 const sm = (u) => u * u * (3 - 2 * u), out3 = (u) => 1 - (1 - u) ** 3;
 export const meta = {
@@ -18,20 +18,22 @@ export const meta = {
   desc: 'A fire lotus seed is hurled into the ground; a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano.',
   tags: ['di-hoa', 'fire', 'lotus', 'lava', 'volcano', 'move', 'one-shot'],
   size: [360, 260], origin: [60, 235], duration: END, loop: false, fps: 30, bg: 'ground', actor: 2,
-  options: { palette: RAMP, seed: 5, petal: 'A' },
+  options: { palette: RAMP, seed: 5, petal: 'B' },
 };
 const WIND = { ...READY, crouch: 4, lean: -6, turn: 0.4, fx: -12, fy: -33, bx: 7, by: -21, ffx: 9, fbx: -8 };
 const HURL = { ...READY, crouch: 6, lean: 9, fx: 24, fy: -24, bx: -6, by: -19, ffx: 12, fbx: -10 };
 const MUDRA = { ...READY, crouch: 3, fx: 9, fy: -30, bx: 10, by: -31, armsFront: true };
 export const act = {
   target: { x: TX },
-  poses: [[-0.2, READY], [0.25, WIND], [THROW - 0.02, { ...WIND, lean: -8, fx: -14, fy: -35 }], [THROW + 0.05, HURL, 'snap'],
-    [0.8, { ...HURL, crouch: 4, lean: 5 }], [1.05, MUDRA], [FULL, { ...MUDRA, crouch: 5 }],
+  poses: [[-0.2, READY], [0.45, WIND], [THROW - 0.02, { ...WIND, lean: -8, fx: -14, fy: -35 }], [THROW + 0.05, HURL, 'snap'],
+    [1.0, { ...HURL, crouch: 4, lean: 5 }], [1.3, MUDRA], [FULL, { ...MUDRA, crouch: 5 }],
     [BURST, { ...READY, crouch: 0, fx: 6, fy: -45, bx: 8, by: -45 }, 'snap'], [BURST + 0.5, { ...READY, crouch: 2, fx: 9, fy: -40, bx: 10, by: -38 }], [END, READY]],
   hits: [
     { t: THROW + 0.03, stop: 0.03, shake: 0.08, amp: 1, target: false },
     { t: LAND, stop: 0.06, shake: 0.22, amp: 2.5, push: 0.4, straw: 4 },
     { t: BUD + 0.12, shake: 0.25, amp: 2, push: 0.6, straw: 6 },
+    { t: BEAT[0], shake: 0.12, amp: 1.2, target: false },
+    { t: BEAT[1], shake: 0.14, amp: 1.6, target: false },
     { t: BURST, stop: 0.13, shake: 0.55, amp: 4.5, push: 3.2, straw: 32, flash: 0.1, skin: 'char' },
     { t: END - 0.35, push: 0, straw: 0, skin: null },
   ],
@@ -78,7 +80,7 @@ function petalFire(p, C, bx, by, tx, ty, W, t, seed, { k = 1, dim = 0, crack = 0
 // base and tip; the cup shows as a lighter inner-face crescent along one rim. No dark outline, no hard bands
 // (that is what read as crystal): steps are blended with a 4x4 ordered dither. Fire shows as glow + slow heat
 // shimmer rising, and (style 'B') a small flame wisp on the tip.
-const MELT = 0.14;   // petals burn away this fast at the burst
+const MELT = 0.14, CROWN = 186;   // petals burn away this fast; height of the column top   // petals burn away this fast at the burst
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
 const hash = (x, y, s) => { const h = Math.sin(x * 127.1 + y * 311.7 + s * 74.7) * 43758.5453; return h - Math.floor(h); };
 function lotusPetal(p, C, bx, by, tx, ty, W, t, seed, { k = 1, dim = 0, side = 1, style = 'A', melt = 0 } = {}) {
@@ -202,7 +204,7 @@ const L_END = END - LAND;
 const bloom = {
   meta: { duration: L_END, loop: false, options: {} },
   create(o) {
-    const C = ramp(o), R = new Rng(o.seed + 3), lights = new Lights(), STYLE = o.petal ?? 'A', V2 = STYLE === 'v2';
+    const C = ramp(o), R = new Rng(o.seed + 3), lights = new Lights(), STYLE = o.petal ?? 'B', V2 = STYLE === 'v2';
     const ps = new Particles({ rng: new Rng(o.seed + 7), ground: () => 0, sparks: [C[6], C[5], C[3], C[1]] });
     const roots = Array.from({ length: 11 }, (_, i) => {
       const a = i * TAU / 11 + R.range(-0.15, 0.15), len = R.range(16, 40), pts = [];
@@ -244,8 +246,24 @@ const bloom = {
           const u = R.range(0.55, 1);
           ps.spawn(P.FIRE, q.bx + (q.tx - q.bx) * u, q.by + (q.ty - q.by) * u, R.range(-5, 5), -R.range(18, 45), R.range(0.1, 0.2), 0, R.range(1.1, 2), 0, q.front ? 0 : PF.BACK);
         }
+        // the earth's heat is drawn in: motes stream from all round into the seed pod, faster and denser to the burst
+        if (!V2 && g > FULL - 0.1 && g < BURST - 0.04) {
+          const k = smooth(FULL - 0.1, BURST, g);
+          for (let n = 0; n < 2; n++) if (R.chance((30 + 90 * k) * dt)) {
+            const a = R.range(0, TAU), d = R.range(55, 95), x = Math.cos(a) * d, y = -10 + Math.sin(a) * d * 0.45 - R.range(0, 30), life = R.range(0.18, 0.3);
+            ps.spawn(P.SPARK, x, y, -x / life, (-10 - y) / life, life, C[R.int(4, 6)], 1, 0, Math.sin(a) < 0 ? PF.BACK : 0);
+          }
+        }
+        if (!V2 && g >= BURST + 0.85 && g - dt < BURST + 0.85) for (let i = 0; i < 40; i++) {
+          const a = R.range(-Math.PI * 0.95, -Math.PI * 0.05), d = R.range(4, 26);
+          ps.spawn(R.chance(0.6) ? P.EMBER : P.SPARK, Math.cos(a) * d, -CROWN + Math.sin(a) * d * 0.8, Math.cos(a) * R.range(20, 70), R.range(-30, 25), R.range(0.5, 1.1), C[R.int(3, 6)], R.chance(0.3) ? 2 : 1);
+        }
+        for (const b of BEAT) if (!V2 && g >= b && g - dt < b) {
+          lights.add(0, -16, 50, C[4], 0.5, 0.22);
+          for (let i = 0; i < 14; i++) { const a = R.range(-Math.PI, 0); ps.spawn(P.SPARK, 0, -12, Math.cos(a) * R.range(50, 120), Math.sin(a) * R.range(30, 90), R.range(0.15, 0.3), C[R.int(4, 6)]); }
+        }
         // the volcano throat: big tongues straight up while the column stands
-        if (g > BURST && g < BURST + 0.45) for (acc += dt * 120; acc >= 1; acc--) {
+        if (g > BURST && g < BURST + 0.7) for (acc += dt * 120; acc >= 1; acc--) {
           const w = R.range(-1, 1);
           ps.spawn(P.FIRE, w * 7, -4, w * 25, -R.range(260, 400), R.range(0.12, 0.2), 0, R.range(3, 6), 0, 0);
         }
@@ -259,6 +277,7 @@ const bloom = {
         pond(p);
         if (ground) ground.drawBack(p);
         flower(p, 'back');
+        crown(p, 'back');
         shock(p, true);
         blown(p, 'back');
         drawColored(ps, p, C, 'back');
@@ -270,6 +289,7 @@ const bloom = {
         if (ground) ground.draw(p);
         flower(p, 'front');
         column(p);
+        crown(p, 'front');
         shock(p, false);
         blown(p, 'front');
         drawColored(ps, p, C, 'front');
@@ -281,11 +301,12 @@ const bloom = {
     // the lava pond: jagged dark crust, banded molten surface with turning swirls, bubbles; roots of fire; cools after the burst
     function pond(p) {
       const g = G(), cool = smooth(BURST + 0.25, BURST + 1.0, g);
-      for (let i = 0; i < 3; i++) {   // the earth ripples like water as the seed sinks
-        const u = clamp((t - i * 0.07) / 0.32);
-        if (u > 0 && u < 1) p.polyline(Array.from({ length: 41 }, (_, k) => [Math.cos(k * TAU / 40) * (6 + 54 * u), Math.sin(k * TAU / 40) * (6 + 54 * u) * 0.2]), C[5], (1 - u) * 0.9);
+      // the earth ripples like water: as the seed sinks, as the bud breaks the surface, at each heartbeat
+      for (const [t0, n, R0, R1, c] of [[LAND, 3, 6, 60, 5], [BUD, 2, 10, 75, 4], [BEAT[0], 2, 14, 95, 5], [BEAT[1], 3, 14, 120, 6]]) for (let i = 0; i < n; i++) {
+        const u = clamp((g - t0 - i * 0.08) / 0.45), r = R0 + (R1 - R0) * out3(u);
+        if (u > 0 && u < 1) p.polyline(Array.from({ length: 49 }, (_, k) => [Math.cos(k * TAU / 48) * r, Math.sin(k * TAU / 48) * r * 0.2 + 0.5]), C[c], (1 - u) * 0.85);
       }
-      const rx = 62 * out3(clamp((t - 0.06) / 0.35)), ry = rx * 0.22;
+      const rx = 62 * out3(clamp((t - 0.06) / 0.55)), ry = rx * 0.22;
       if (rx < 2) return;
       const pal = C.map((c, i) => mix(c, COOL[Math.min(4, i)], cool));
       p.shade(-rx - 5, -ry - 3, rx + 5, ry + 3, (x, y, o) => {
@@ -306,7 +327,7 @@ const bloom = {
       }
       const rk = smooth(0.1, 0.5, t) * (1 - smooth(BURST + 0.6, BURST + 1.1, g));
       for (const r of roots) {   // fire roots creeping out under the floor
-        const grow = smooth(0.1, 0.55, t), pts = r.pts.filter(([, s]) => s <= grow).map(([a, s]) => { const d = rx + r.len * s; return [Math.cos(a) * d, Math.sin(a) * d * 0.22]; });
+        const grow = smooth(0.1, 0.9, t), pts = r.pts.filter(([, s]) => s <= grow).map(([a, s]) => { const d = rx + r.len * s; return [Math.cos(a) * d, Math.sin(a) * d * 0.22]; });
         if (pts.length > 1) { p.polyline(pts.map(([x, y]) => [x, y + 1]), C[1], rk); p.polyline(pts, cool < 0.5 ? C[4] : COOL[3], rk); }
       }
       if (cool < 0.7) p.glow(0, -2, rx * 0.8, C[3], 0.12 * (1 - cool));
@@ -316,7 +337,9 @@ const bloom = {
       if (g < BUD || g >= BURST + (V2 ? 0 : MELT)) return;
       const crack = smooth(FULL, BURST, g), all = layout(Math.min(g, BURST - 0.001)).filter((q) => q.front === (layer === 'front'));
       all.sort((a, b) => layer === 'front' ? b.ring - a.ring : a.ring - b.ring);
-      if (!V2 && layer === 'back') p.glow(0, -18, 46, C[3], 0.08 * smooth(BUD, OPEN, g));
+      const beat = BEAT.reduce((m, b) => Math.max(m, g >= b ? Math.exp(-(g - b) * 9) : 0), 0);
+      if (!V2 && layer === 'back') p.glow(0, -18, 46 + 20 * beat, C[3], 0.08 * smooth(BUD, OPEN, g) + 0.25 * beat);
+      if (!V2 && layer === 'front' && beat > 0.05) p.glow(0, -16, 18 + 10 * beat, C[5], 0.35 * beat);
       const melt = clamp((g - BURST) / MELT);
       for (const q of all) {
         if (V2) petalFire(p, C, q.bx, q.by, q.tx, q.ty, q.W, g, q.ring * 7 + q.i, { dim: q.front ? 0 : 0.18, crack: crack * 0.9 });
@@ -334,8 +357,8 @@ const bloom = {
     // the volcano column: wavy flame edges, hard bands, rising flicker; it lifts off the ground and thins away
     function column(p) {
       const τ = G() - BURST;
-      if (τ < 0 || τ > 1.1) return;
-      const top = -230 * out3(clamp(τ / 0.16)), w0 = 15 * (1 - smooth(0.3, 0.95, τ)), bot = -2 - 210 * smooth(0.4, 1.0, τ);
+      if (τ < 0 || τ > 1.6) return;
+      const top = -CROWN * out3(clamp(τ / 0.16)), w0 = 15 * (1 - smooth(0.55, 1.45, τ)), bot = -2 - (CROWN - 20) * smooth(0.75, 1.5, τ);
       if (w0 < 0.6 || bot <= top) return;
       p.shade(-w0 * 1.3 - 2, top, w0 * 1.3 + 2, bot, (x, y, o) => {
         const h = clamp((bot - y) / Math.max(1, bot - top)), wave = 1 + 0.12 * Math.sin(y * 0.09 + τ * 30) + 0.1 * Math.sin(y * 0.31 - τ * 47 + x * 0.2);
@@ -345,6 +368,20 @@ const bloom = {
         o.c = C[r > 0.85 ? 1 : heat < 0.2 ? 2 : heat < 0.45 ? 3 : heat < 0.68 ? 4 : heat < 0.88 ? 5 : 6];
         o.a = 1;
       });
+    }
+    // on top of the column a lotus of fire opens wide, hangs, then burns away into falling motes
+    function crown(p, layer) {
+      const τ = G() - BURST;
+      if (V2 || τ < 0.1 || τ > 1.05) return;
+      const open = out3(clamp((τ - 0.1) / 0.3)), melt = clamp((τ - 0.85) / 0.18), cy = -CROWN + 4 + 3 * Math.sin(τ * 6);
+      const list = [];
+      for (let i = 0; i < 9; i++) {
+        const sp = (i / 8 - 0.5) * 2, back = i % 2 === 1, a = sp * (0.4 + 1.25 * open), L = (back ? 25 : 31) * (0.4 + 0.6 * open) * (1 - 0.15 * Math.abs(sp));
+        list.push({ i, back, bx: sp * 5, by: cy + Math.abs(sp) * 2, tx: sp * 5 + Math.sin(a) * L, ty: cy - Math.cos(a) * L * 0.92, W: back ? 8.5 : 10 });
+      }
+      for (const q of list) if (q.back === (layer === 'back'))
+        lotusPetal(p, C, q.bx, q.by, q.tx, q.ty, q.W, G(), 40 + q.i, { k: 1, dim: q.back ? 0.7 : 0, side: q.tx < 0 ? 1 : -1, style: STYLE, melt });
+      if (layer === 'front' && melt < 1) p.glow(0, cy - 8, 30, C[4], 0.3 * open * (1 - melt));
     }
     function shock(p, back) {
       const τ = G() - BURST;
@@ -371,7 +408,7 @@ const bloom = {
 };
 
 export function create(o) {
-  const common = { palette: o.palette ?? RAMP, petal: o.petal ?? 'A' };
+  const common = { palette: o.palette ?? RAMP, petal: o.petal ?? 'B' };
   return chain([
     { fx: hurl, t: 0, until: LAND + 0.3, ...common },
     { fx: bloom, t: LAND, x: TX, ...common },
