@@ -25,8 +25,8 @@ five alien flames, each its own skill; together the Phat No Hoa Lien.
 
 | effect | id | | size | what it does |
 |---|---|---|---|---|
-| Thanh Lien Dia Tam Hoa | `di-hoa/thanh-lien` | one-shot 2.9s | 320×240 | A palm on the ground sends a green lava crack to the target; a lotus of cracks erupts into fire petals that fold over it and burn. |
-| Thanh Lien Draft | `di-hoa/thanh-lien-draft` | one-shot 2.9s | 320×240 | Motion draft: a palm on the ground sends a green lava vein to the target, a lotus of cracks opens and erupts into petals that close and burn. |
+| Thanh Lien Dia Tam Hoa | `di-hoa/thanh-lien` | one-shot 3.3s | 360×260 | A fire lotus seed is hurled into the ground; a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
+| Thanh Lien Draft | `di-hoa/thanh-lien-draft` | one-shot 3.2s | 360×260 | Motion draft v2: a fire lotus seed is flicked into the ground, a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
 
 ## moves
 
