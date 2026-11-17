@@ -1,6 +1,6 @@
 # Catalog
 
-262 effects in 23 categories. Every one is a file in
+263 effects in 23 categories. Every one is a file in
 `src/fx/<category>/<name>.js`; render any of them with `node tools/render.mjs <id> --gif`.
 
 ## ultimate
@@ -31,7 +31,8 @@ five alien flames, each its own skill; together the Phat No Hoa Lien.
 | Tam Thien Draft | `di-hoa/tam-thien-draft` | one-shot 5s | 360×260 | Motion draft v2: the sky catches black fire, fire rains onto the target, gathers into a sphere where stars ricochet, then fades away. |
 | Thanh Lien Dia Tam Hoa | `di-hoa/thanh-lien` | one-shot 4.7s | 360×260 | A fire lotus seed is hurled into the ground; a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
 | Thanh Lien Draft | `di-hoa/thanh-lien-draft` | one-shot 3.2s | 360×260 | Motion draft v2: a fire lotus seed is flicked into the ground, a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
-| Tinh Lien Draft | `di-hoa/tinh-lien-draft` | one-shot 4.6s | 360×260 | Motion draft v1: a single white-fire lotus petal drifts onto the target, bleaches it white under a golden mandorla, and it dissolves into tiny petals. |
+| Tinh Lien Yeu Hoa | `di-hoa/tinh-lien` | one-shot 6.5s | 360×260 | Clouds part for a beast eye whose gaze is a pale sunbeam on a flickering flame-lotus; the gaze focuses, the lotus explodes into a towering cone of dust with a ghost lotus burning inside. |
+| Tinh Lien Draft | `di-hoa/tinh-lien-draft` | one-shot 6.5s | 360×260 | Motion draft v3: clouds part for a beast eye whose gaze is a pale sunbeam on a flickering flame-lotus; the gaze focuses, the lotus explodes into a towering cone of dust with a ghost lotus burning inside. |
 | Van Lac Tam Viem | `di-hoa/van-lac` | one-shot 4.5s | 360×260 | An invisible flame serpent with a rose-red heart coils round the target, dives into its chest, burns it from inside in three beats, then bursts outward. |
 | Van Lac Draft | `di-hoa/van-lac-draft` | one-shot 4.5s | 360×260 | Motion draft: an invisible flame serpent with a rose-red heart coils round the target, dives into its chest and burns it from inside in three beats. |
 
