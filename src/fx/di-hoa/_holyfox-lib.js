@@ -53,7 +53,9 @@ export function holyFox(p, t, o) {
   const pull = devour * devour, lit = 1 - 0.5 * devour;
   const lpx = lx + (Cx - lx) * pull, lpy = ly + (Cy - ly) * pull;
   const ls = 2.1 * S * (0.25 + 0.75 * lotus) * (1 - 0.85 * devour);
-  if (layer !== 'front' && lotus > 0 && reveal > 0.3 && ls > 0.15) fireLotus(p, t, lpx, lpy, ls, 0.3 + 0.7 * devour);
+  if (layer !== 'front' && lotus > 0 && reveal > 0.3 && ls > 0.15) {
+    if (o.lotusFn) o.lotusFn(p, lpx, lpy, ls, t, devour, lotus); else fireLotus(p, t, lpx, lpy, ls, 0.3 + 0.7 * devour);
+  }
 
   if (layer === 'back') return { chest: [Cx, Cy], lotusTop: [lpx, lpy - 30 * ls], size: ls };
   // 2. the body
@@ -79,7 +81,7 @@ export function holyFox(p, t, o) {
     if (devour > 0) {
       // drawn in: sample farther out (the body stretches toward the chest), a small twist near the chest only
       let dx = sx - CHEST[0], dy = sy - CHEST[1];
-      const r = Math.hypot(dx, dy), th = devour * 2.2 * Math.exp(-r / 14), c = Math.cos(th), s = Math.sin(th);
+      const r = Math.hypot(dx, dy), tw = o.twist ?? 2.2, th = devour * tw * Math.exp(-r / (o.twistR ?? 14)), c = Math.cos(th), s = Math.sin(th);
       const ex = dx * c - dy * s; dy = dx * s + dy * c; dx = ex;
       const k = 1 + devour * 0.45 * (r / RMAX);
       sx = CHEST[0] + dx * k; sy = CHEST[1] + dy * k;
