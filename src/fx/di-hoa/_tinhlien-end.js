@@ -125,6 +125,10 @@ const PULL = Array.from({ length: 84 }, (_, i) => ({
   angle: i % 3 === 0 ? 0.62 + (i % 2) * Math.PI + 1.1 * (hsh(i, 3) - 0.5) : 2.3 * (hsh(i, 3) - 0.5),
   drift: 0.75 + 0.65 * hsh(i, 4), spark: i % 3 === 0, hot: hsh(i, 5) > 0.46,
 }));
+const FOOT_DUST = Array.from({ length: 12 }, (_, i) => ({
+  side: i % 2 ? 1 : -1,
+  offset: hsh(i, 61), depth: hsh(i, 62), width: 1 + 3 * hsh(i, 63),
+}));
 
 function ribbon(p, x, y, half, gain) {
   for (let col = Math.round(x - half); col <= Math.round(x + half); col++) {
@@ -184,6 +188,19 @@ function column(p, t) {
     ribbon(p, center + reach, y, half, (0.37 + 0.59 * Math.max(0, face)) * glow);
     ribbon(p, center - reach, y, half * 0.76, (0.22 + 0.52 * Math.max(0, -face)) * glow);
   }
+  // The ragged tail spills a few small clumps in the direction of the pull.
+  if (spread > 0.35 && dustFoot > -32) {
+    const v = 1 - dustFoot / dustTop;
+    const mid = EYE_X + Math.sin(dustFoot * 0.076 - age * 17) * (4 + 14 * v) * draw;
+    for (const m of FOOT_DUST) {
+      const x = mid + m.side * (16 + 38 * m.offset) * spread;
+      const y = Math.min(0, dustFoot + 3 - 20 * m.depth);
+      const w = m.width * spread;
+      p.line(x - w, y, x + w, y, DUST[1]);
+      p.line(x - w * 0.4, y - 1, x + w * 0.6, y - 1, DUST[2]);
+      if (w > 2.4) p.dot(x, y - 2, DUST[3]);
+    }
+  }
   for (const mote of PULL) {
     const v = 1 - (mote.phase + age * mote.speed) % 1;
     const y = EYE_Y + v * (-3 - EYE_Y);
@@ -198,6 +215,22 @@ function column(p, t) {
       p.dot(x, y, mote.spark ? L[5] : y < -90 ? DUST[4] : DUST[2]);
     }
   }
+
+  const spineLight = lit * smooth(5.02, 5.2, t);
+  if (spineLight <= 0) return;
+  const spineFoot = Math.max(foot, dustFoot);
+  const sway = age * 12;
+  for (let y = Math.ceil(top); y < spineFoot; y++) {
+    const v = (y - EYE_Y) / (-EYE_Y);
+    const x = Math.round(EYE_X + 4.5 * v * Math.sin(y * 0.05 - sway));
+    const gain = spineLight * (0.73 + 0.27 * smooth(0, 9, spineFoot - y));
+    if (v > 0.42) {
+      p.light(x - 2, y, L[5], 0.61 * gain);
+      p.light(x + 1, y, L[5], 0.69 * gain);
+    }
+    p.light(x - 1, y, L[6], 0.91 * gain);
+    p.light(x, y, L[6], gain);
+  }
 }
 
 function ellipse(rx, ry, n) {
@@ -208,6 +241,7 @@ function ellipse(rx, ry, n) {
 }
 
 const RIPPLE = ellipse(1, 1, 24);
+const GROUND_RIPPLE = ellipse(1, 1, 48);
 const SNAP = SHUT[0] + 0.06;
 function gulp(p, t) {
   const a = t - SNAP;
@@ -275,6 +309,15 @@ function groundRing(p, pts, c, grow) {
   if (c) p.polyline(pts.map(([x, y]) => [TX + x * grow, y * grow]), c);
 }
 
+function groundRipple(p, t) {
+  if (t < SHUT[1] || t >= 6.2) return;
+  const u = (t - SHUT[1]) / (6.2 - SHUT[1]);
+  const grow = 1 - (1 - u) ** 2;
+  const rx = 17 + 120 * grow, ry = 3 + 14 * grow;
+  const color = L[u < 0.25 ? 6 : u < 0.49 ? 5 : u < 0.74 ? 3 : 2];
+  p.polyline(GROUND_RIPPLE.map(([x, y]) => [TX + x * rx, -1 + y * ry]), color);
+}
+
 function scorch(p, t) {
   if (t <= BURN_APPEAR || t >= END) return;
   const age = (t - BURN_START) / (END - BURN_START);
@@ -316,5 +359,6 @@ export function ending(p, t, layer) {
   column(p, t);
   lightLotus(p, t);
   gulp(p, t);
+  groundRipple(p, t);
   ash(p, t);
 }

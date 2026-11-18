@@ -113,7 +113,7 @@ function beam(p, t) {
   groundIris(p, t, op, lock, fade);
 }
 
-const FLOAT = Array.from({ length: 12 }, (_, i) => ({
+const FLOAT = Array.from({ length: 16 }, (_, i) => ({
   x: TX + (i % 2 ? 1 : -1) * (10 + 7 * Math.floor(i / 2) + 7 * hsh(i, 20)),
   h: 7 + 29 * hsh(i, 21), s: 1.5 + Math.floor(hsh(i, 22) * 3),
   c: 1 + Math.floor(hsh(i, 23) * 2), d: hsh(i, 24) * 0.26, phase: hsh(i, 25) * TAU,
@@ -147,10 +147,12 @@ function fissures(p, t) {
       const dx = (x1 - x0) * u, dy = (y1 - y0) * u;
       const len = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy))));
       const strength = hold * (0.35 + 0.53 * heat) * (1 - j * 0.12);
+      const core = hold * (0.45 + 0.83 * heat) * (1 - j * 0.1);
       for (let k = 0; k <= len; k++) {
         const x = TX + x0 + dx * k / len, y = y0 + dy * k / len;
-        p.light(x, y, L[3], strength);
-        p.light(x, y + 1, L[2], strength * 0.47);
+        p.light(x, y, L[6], core);
+        p.light(x, y - 1, L[3], strength * 0.5);
+        p.light(x, y + 1, L[3], strength * 0.74);
       }
       if (j === 2 && u > 0.45) {
         const n = u * (3 + i % 3);

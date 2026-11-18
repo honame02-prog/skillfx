@@ -120,13 +120,14 @@ function stem(pixels, a, rise, g) {
   }
 }
 
-// Uneven, overlapping rolls across the wave, with smaller breaks at the advancing tips.
+// Position, breadth, height and lift of the overlapping dust rolls.
 const GROUND_ROLLS = [
-  [-0.91, 0.10, 0.55], [-0.74, 0.15, 0.88], [-0.52, 0.19, 0.97], [-0.28, 0.17, 0.69],
-  [-0.08, 0.18, 0.93], [0.13, 0.17, 0.72], [0.31, 0.17, 0.91], [0.55, 0.20, 1],
-  [0.78, 0.15, 0.72], [0.92, 0.09, 0.50],
-  [-0.82, 0.11, 0.43], [-0.44, 0.16, 0.57], [-0.15, 0.13, 0.45],
-  [0.25, 0.14, 0.44], [0.65, 0.14, 0.53], [0.87, 0.11, 0.37],
+  [-0.94, 0.10, 0.34, 0], [-0.76, 0.20, 0.81, 3], [-0.43, 0.26, 1.08, 1],
+  [-0.16, 0.17, 0.56, 3], [0.07, 0.24, 0.92, 0], [0.39, 0.20, 0.65, 2],
+  [0.64, 0.23, 1, 3], [0.88, 0.15, 0.54, 1], [0.99, 0.07, 0.28, 0],
+  [-0.81, 0.13, 0.42, 0], [-0.59, 0.10, 0.29, 1], [-0.31, 0.18, 0.48, 0],
+  [-0.09, 0.08, 0.24, 0], [0.26, 0.15, 0.39, 0], [0.52, 0.10, 0.26, 1],
+  [0.76, 0.16, 0.37, 0],
 ];
 
 function groundDust(pixels, t, a) {
@@ -138,27 +139,27 @@ function groundDust(pixels, t, a) {
   if (width < 2) return;
   const height = (7 + 33 * smooth(0, 0.44, b)) * (1 - 0.37 * smooth(0.84, 1.52, b)) * (1 - pull);
   const drift = Math.sin(b * 5) * spread;
-  for (const [position, breadth, scale] of GROUND_ROLLS) {
+  for (const [position, breadth, scale, lift] of GROUND_ROLLS) {
     const side = Math.sign(position), phase = b * 5 + position * 8;
     const cx = TX + position * width + Math.sin(phase) * drift * 3;
-    const floor = -pull * (18 + (1 - Math.abs(position)) * 36);
+    const floor = -lift * spread - pull * (18 + (1 - Math.abs(position)) * 36);
     const h = height * scale * (0.93 + 0.07 * Math.cos(phase));
     const rx = width * breadth;
-    for (let y = Math.ceil(floor - h); y <= Math.min(0, floor + 1); y++) {
+    for (let y = Math.ceil(floor - h); y <= Math.min(0, floor + 0.14 * h); y++) {
       const v = (floor - y) / h;
-      const mid = cx + side * rx * (0.31 * v - 0.20 * v * v);
+      const mid = cx + side * rx * (0.44 * v - 0.22 * v * v);
+      const dome = (v - 0.43) / 0.57;
       const offset = (y - TOP) * WIDTH - LEFT;
       for (let x = Math.max(LEFT + 1, Math.ceil(mid - rx)); x <= Math.min(RIGHT - 1, mid + rx); x++) {
         const u = (x - mid) / rx * side;
-        const dome = (v - 0.20) / 0.80;
-        if (u * u + dome * dome > 1) continue;
-        if (v < 0.09 && ordered(x, y) > 0.7 + v * 3) continue;
-        const fold = (u - 0.19) ** 2 + (v - 0.61) ** 2 * 2.9;
-        const ridge = v + 0.17 * u + 0.075 * Math.sin(phase + 5 * u);
-        let tone = ridge > 0.66 ? 3 : ridge > 0.18 ? 2 : 1;
-        if (fold > 0.28 && fold < 0.41 && v < 0.73 + u * 0.18) tone = 1;
-        if (fold < 0.14 && ridge > 0.56) tone = 4;
-        pixels[offset + x] = EARTH[tone];
+        const curve = Math.sin(phase + 6 * u);
+        if (u * u + dome * dome > 0.94 + 0.11 * curve) continue;
+        const fold = (u - 0.19) ** 2 + (v - 0.58 + 0.06 * curve) ** 2 * 2.9;
+        const ridge = v + 0.18 * u + 0.09 * curve;
+        let tone = ridge > 0.71 ? 3 : ridge > 0.21 ? 2 : 1;
+        if (fold > 0.24 && fold < 0.4 && v < 0.76 + u * 0.21) tone = 1;
+        if (fold < 0.15 && ridge > 0.56) tone = 3;
+        pixels[offset + x] = DUST[tone];
       }
     }
   }
@@ -173,6 +174,7 @@ function vortex(pixels, t) {
   const foot = top * clear;
   for (let y = Math.ceil(top * draw); y < Math.min(-1, foot + 12); y++) {
     const v = 1 - y / top;
+    const looseFoot = y > foot - 25;
     const turn = y * 0.076 - (t - INHALE[0]) * 17;
     const mid = EC[0] + Math.sin(turn) * (4 + 14 * v) * draw;
     const w = (11 + 46 * v ** 0.8) * draw * edge;
@@ -181,17 +183,18 @@ function vortex(pixels, t) {
       const u = (x - mid) / w, d = Math.abs(u);
       const fold = Math.sin(turn + u * 4.7);
       const boundary = 0.86 + 0.12 * Math.sin(turn - Math.sign(u));
-      const tail = foot + 8 * fold - 18 * d * clear;
-      if (y > tail && ordered(x, y) > clamp(1 - (y - tail) / 4)) continue;
-      if (d > boundary && ordered(x, y) > (1 - d) * 4) continue;
+      if (looseFoot) {
+        const tail = foot + 8 * fold - 18 * d * clear + (2.5 + 3 * d) * Math.sin(u * 14 + t * 8);
+        if (y > tail || d > boundary) continue;
+      } else if (d > boundary && ordered(x, y) > (1 - d) * 4) continue;
       if (d > 0.55 && fold < -0.68 && Math.sin(y * 0.17 + u * 7 - t * 11) > 0.2) continue;
-      const tone = d > boundary ? 0 : fold > 0.38 ? 3 : fold < -0.44 ? 1 : 2;
+      const tone = d > boundary - (looseFoot ? 0.05 : 0) ? 0 : fold > 0.38 ? 3 : fold < -0.44 ? 1 : 2;
       pixels[offset + x] = dustColor(x, y, tone, 0);
     }
   }
 }
 
-const footHeat = (a) => 1 - smooth(0.045, 0.30, a);
+const footHeat = (a) => 1 - smooth(0.11, 0.47, a);
 
 function lightDustFromBelow(pixels, a) {
   const heat = footHeat(a);
@@ -227,6 +230,7 @@ function dustFrame(t) {
   for (let y = TOP; y <= 0; y++) {
     const row = new Uint32Array(WIDTH);
     const offset = (y - TOP) * WIDTH;
+    const nearGround = y >= -40 && a > 0.3;
     let first = WIDTH, last = -1;
     for (let i = 1; i < WIDTH - 1; i++) {
       const j = offset + i;
@@ -235,9 +239,9 @@ function dustFrame(t) {
         const topEdge = pixels[j + WIDTH];
         const sideEdge = pixels[j + 1] || pixels[j - 1];
         if (topEdge || sideEdge || pixels[j - WIDTH]) {
-          const threshold = ordered(i, y);
-          if (threshold < 0.88) color = dustColor(i + LEFT, y, topEdge ? 1 : 0, g);
-        } else if (((i + y) & 3) === 0 && (pixels[j + WIDTH * 2] || pixels[j + 2] || pixels[j - 2])) {
+          const edge = nearGround ? Math.sin(i * 0.39 + y * 0.27) < 0.89 : ordered(i, y) < 0.88;
+          if (edge) color = dustColor(i + LEFT, y, topEdge ? 1 : 0, g);
+        } else if (!nearGround && ((i + y) & 3) === 0 && (pixels[j + WIDTH * 2] || pixels[j + 2] || pixels[j - 2])) {
           color = dustColor(i + LEFT, y, 1, 0);
         }
       }
@@ -351,24 +355,33 @@ const RING = Array.from({ length: 41 }, (_, i) => [Math.cos(i * TAU / 40), Math.
 
 function groundFlash(p, a) {
   const heat = footHeat(a);
-  if (heat <= 0) return;
-  const reach = 47 + 52 * out3(clamp(a / 0.28));
-  const depth = 3 + 6 * heat;
-  p.shade(TX - reach, -depth * 2 - 2, TX + reach, depth * 2, (x, y, o) => {
+  const afterglow = smooth(0.16, 0.28, a) * (1 - smooth(0.38, 0.47, a));
+  const glow = Math.max(heat, 0.68 * afterglow);
+  if (glow <= 0) return;
+  const reach = 32 + 64 * out3(clamp(a / 0.28));
+  const depth = 1.6 + 1.2 * heat + 1.35 * afterglow;
+  const hotSpan = 0.32 + 0.34 * heat + 0.19 * afterglow;
+  p.shade(TX - reach, -depth * 3 - 2, TX + reach, depth * 2, (x, y, o) => {
     const u = (x - TX) / reach;
-    const mid = -2 + 2 * u * u + Math.sin(u * 11) * 0.65;
+    const mid = -1 + 2 * u * u + Math.sin(u * 11) * 0.65;
     const v = (y - mid) / depth;
-    const energy = 1 - u * u - v * v;
-    const halo = 1 - u * u - v * v * 0.29;
+    const energy = glow * (1 - (u / hotSpan) ** 2 - v * v);
+    const halo = 1 - u * u - v * v * 0.18;
     if (halo > 0) {
       o.l = L[3];
-      o.k = halo * halo * heat * 0.32;
+      o.k = halo * halo * glow * 0.23;
     }
-    if (energy > 1 - heat) {
-      const level = (energy + heat - 1) * 4.4;
-      o.c = L[3 + Math.min(3, Math.floor(level))];
-    }
+    if (energy > 0.042) o.c = L[3 + Math.min(3, Math.floor(energy * 4.6))];
   });
+}
+
+function shockWaves(p, a) {
+  const grow = out3(a / 0.25);
+  const outer = 27 + 115 * grow, inner = 12 + 95 * grow;
+  const crest = RING.map(([x, y]) => [TX + x * outer, -2 + y * outer * 0.17]);
+  if (a < 0.15) p.polyline(crest.map(([x, y]) => [x, y - 1]), L[3]);
+  p.polyline(crest, L[a < 0.075 ? 6 : a < 0.18 ? 5 : 3]);
+  p.polyline(RING.map(([x, y]) => [TX + x * inner, -2 + y * inner * 0.12]), L[a < 0.14 ? 4 : 3]);
 }
 
 export function blast(p, t, layer) {
@@ -388,22 +401,17 @@ export function blast(p, t, layer) {
   if (a < 0.25) {
     const f = 1 - a / 0.25;
     p.glow(LC[0], LC[1], 44, L[6], 0.35 * f);
-    p.disc(LC[0], LC[1], 16 * f, L[6], 1);
-    for (let ring = 0; ring < 2; ring++) {
-      const r = 14 + (ring ? 108 : 132) * out3(clamp(a / 0.25));
-      const pts = RING.map(([x, y]) => [TX + x * r, -2 + y * r * 0.1]);
-      p.polyline(pts, ring ? L[3] : L[5]);
-      if (!ring && a < 0.15) p.polyline(pts.map(([x, y]) => [x, y - 1]), L[4]);
-    }
+    p.disc(LC[0], LC[1], 11 * f, L[6], 1);
   }
   drawDust(p, a);
   groundFlash(p, a);
+  if (a < 0.25) shockWaves(p, a);
   if (a < 0.095) {
     for (const [dx, dy, len] of RAYS) {
       const r = len * (0.75 + a * 3);
       p.poly([[TX + dx * 10 - dy * 2, LC[1] + dy * 10 + dx * 2], [TX + dx * r, LC[1] + dy * r], [TX + dx * 10 + dy * 2, LC[1] + dy * 10 - dx * 2]], L[5]);
     }
-    p.disc(LC[0], LC[1], 12 * (1 - a / 0.095), L[6], 1);
+    p.disc(LC[0], LC[1], 9 * (1 - a / 0.095), L[6], 1);
   }
   rubble(p, t, a);
   embers(p, t);
