@@ -19,6 +19,8 @@ import * as di_hoa_thanh_lien from "./di-hoa/thanh-lien.js";
 import * as di_hoa_thanh_lien_draft from "./di-hoa/thanh-lien-draft.js";
 import * as di_hoa_tinh_lien from "./di-hoa/tinh-lien.js";
 import * as di_hoa_tinh_lien_draft from "./di-hoa/tinh-lien-draft.js";
+import * as di_hoa_tinh_lien_v2 from "./di-hoa/tinh-lien-v2.js";
+import * as di_hoa_tinh_lien_v2_draft from "./di-hoa/tinh-lien-v2-draft.js";
 import * as di_hoa_van_lac from "./di-hoa/van-lac.js";
 import * as di_hoa_van_lac_draft from "./di-hoa/van-lac-draft.js";
 import * as moves_arrow_shot from "./moves/arrow-shot.js";
@@ -288,6 +290,8 @@ export const effects = {
   "di-hoa/thanh-lien-draft": di_hoa_thanh_lien_draft,
   "di-hoa/tinh-lien": di_hoa_tinh_lien,
   "di-hoa/tinh-lien-draft": di_hoa_tinh_lien_draft,
+  "di-hoa/tinh-lien-v2": di_hoa_tinh_lien_v2,
+  "di-hoa/tinh-lien-v2-draft": di_hoa_tinh_lien_v2_draft,
   "di-hoa/van-lac": di_hoa_van_lac,
   "di-hoa/van-lac-draft": di_hoa_van_lac_draft,
   "moves/arrow-shot": moves_arrow_shot,
