@@ -1,7 +1,7 @@
 import { smooth } from '../../core/index.js';
 import { DUST, CLOUD, hsh } from './_tinhlien-common.js';
 import { crack, rock } from './_whitehole-lib.js';
-import { TX, END, H, OPEN, DEVOUR, HOLE, coreR } from './_tlv2-common.js';
+import { TX, H, OPEN, DEVOUR, HOLE, AFTER, coreR } from './_tlv2-common.js';
 
 // The first two fissures run just behind the ground line, where the debris lifts off.
 const FISSURES = [
@@ -15,31 +15,34 @@ const RIM = [[-40, 0], [-30, -3], [-13, -4], [15, -4], [33, -2], [40, 0],
 const BOWL = [[-34, 0], [-27, -2], [-12, -3], [14, -3], [30, -2], [35, 0],
   [23, 2], [6, 3], [-14, 3], [-28, 2]];
 
-const LAST_CAPTURE = HOLE[1] - 0.05;
+const TEAR_START = OPEN + 0.05;
+const TEAR_END = HOLE[1] - 0.2;
+const LAST_CAPTURE = HOLE[1] + 0.15;
+const CRATER_END = AFTER[1] - 0.24;
 const DEBRIS = Array.from({ length: 36 }, (_, i) => {
   const [length, direction] = FISSURES[i % 2];
   const x = TX + Math.cos(direction) * length * (0.23 + 0.77 * hsh(i, 5));
   const y = -1 - 3 * hsh(i, 6);
   const lift = 4 + 6 * hsh(i, 8);
   const dx = x - H[0], dy = y - lift - H[1];
-  const start = DEVOUR[0] + (i + hsh(i, 1)) / 36 * 1.12;
-  const jump = 0.09 + 0.05 * hsh(i, 2);
-  const capture = Math.min(LAST_CAPTURE, start + jump + 0.53 + 0.32 * hsh(i, 4));
+  const start = TEAR_START + (i + hsh(i, 1)) / 36 * (TEAR_END - TEAR_START);
+  const jump = 0.09 + 0.04 * hsh(i, 2);
+  const capture = Math.min(LAST_CAPTURE, start + jump + 0.46 + 0.24 * hsh(i, 4));
   // On either side, the first part of the turn carries the chunk up off the floor.
   return {
-    x, y, lift, start, jump, capture,
+    x, y, lift, start, jump, capture, dust: 1.8 + 0.8 * hsh(i, 3),
     radius: Math.hypot(dx, dy), angle: Math.atan2(dy, dx),
     turn: Math.sign(TX - x) * (2.5 + hsh(i, 9)), size: 2.6 + 2.8 * hsh(i, 7),
   };
 });
 
 export function ground(p, t, layer) {
-  if (t <= OPEN || t >= END) return;
+  if (t <= OPEN || t >= CRATER_END) return;
 
   if (layer === 'back') {
-    const k = smooth(OPEN, OPEN + 0.3, t) * (1 - smooth(END - 0.6, END, t));
+    const k = smooth(OPEN, OPEN + 0.22, t) * (1 - smooth(CRATER_END - 0.36, CRATER_END, t));
     if (k * 110 < 1) return;
-    const hot = 1 - smooth(3.8, 4.3, t);
+    const hot = 1 - smooth(DEVOUR[1] + 0.08, DEVOUR[1] + 0.34, t);
     for (const [length, direction, seed] of FISSURES) {
       crack(p, TX, 0, length, direction, seed, k, hot);
     }
@@ -50,20 +53,23 @@ export function ground(p, t, layer) {
     return;
   }
 
-  if (layer !== 'front' || t < DEVOUR[0] || t >= HOLE[1]) return;
+  if (layer !== 'front' || t < TEAR_START || t >= LAST_CAPTURE) return;
   const cutoff = coreR(t) + 2;
-  for (const [i, chunk] of DEBRIS.entries()) {
-    const { x, y, lift, start, jump, capture, radius, angle, turn, size } = chunk;
+  for (let i = 0; i < DEBRIS.length; i++) {
+    const { x, y, lift, start, jump, capture, radius, angle, turn, size, dust } = DEBRIS[i];
     const age = t - start;
-    if (age < 0) continue;
+    if (age < 0) break;
+    if (t >= capture) continue;
 
-    const hasDust = i % 4 === 0 || i % 4 === 3;
-    if (hasDust && age < 0.32) {
-      const u = age / 0.32;
-      p.disc(x + Math.sign(turn) * 5 * u, y - 8 * u, 1 + (1 - u) * (1 + i % 3 * 0.5), DUST[u < 0.35 ? 3 : 2], 1);
+    if (age < 0.26) {
+      const u = age / 0.26;
+      const r = dust * (1 - u);
+      const drift = Math.sign(turn) * u;
+      const color = DUST[u < 0.35 ? 3 : 2];
+      if (r >= 0.6) p.disc(x + 6 * drift, y - 6 * u, r, color, 1);
+      if (r >= 1) p.dot(x - 2 - 4 * drift, y - 1 - 8 * u, color);
     }
 
-    if (t >= capture) continue;
     if (age < jump) {
       const u = age / jump;
       rock(p, x, y - lift * u * (2 - u), size, angle + turn * u * 0.15, i);
@@ -72,7 +78,7 @@ export function ground(p, t, layer) {
 
     const u = (age - jump) / (capture - start - jump);
     const e = u * u;
-    const r = radius + (cutoff - radius) * e;
+    const r = radius + (cutoff - 1 - radius) * e;
     if (r <= cutoff) continue;
     const a = angle + turn * e;
     rock(p, H[0] + Math.cos(a) * r, H[1] + Math.sin(a) * r,
