@@ -19,6 +19,20 @@ for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
   const ch = ROWS[y][x];
   PX[y * SW + x] = ch === '.' ? -1 : ch === 'e' ? 7 : ch === 'n' ? 8 : +ch;
 }
+// static flame-reach table: DOWN[(iy+24)*SW+ix] = smallest j in 1..14 such that the tongue source is j rows below (same rule as
+// the original per-pixel scan), 15 when none. iy runs from -24 (rows above the sprite) to SH-1.
+const DOWN = new Uint8Array((SH + 24) * SW).fill(15);
+let IYMIN = SH;   // first row with any reachable source
+for (let iy = -24; iy < SH; iy++) for (let ix = 0; ix < SW; ix++) {
+  let j = 1;
+  for (; j <= 14; j++) {
+    const yy = iy + j;
+    if (yy < 0 || yy >= SH) continue;
+    if (PX[yy * SW + ix] >= 0 || (j > 2 && ((ix > 0 && PX[yy * SW + ix - 1] >= 0) || (ix < SW - 1 && PX[yy * SW + ix + 1] >= 0)))) break;
+  }
+  if (j <= 14) { DOWN[(iy + 24) * SW + ix] = j; if (iy < IYMIN) IYMIN = iy; }
+}
+const FLOWC = new Float64Array(SW * SH);
 const RMAX = Math.hypot(Math.max(CHEST[0], SW - CHEST[0]), Math.max(CHEST[1], SH - CHEST[1]));
 
 /** world position of the chest (vortex centre) for feet at F and scale S */
@@ -44,10 +58,24 @@ export function holyFox(p, t, o) {
   if (layer === 'back') return { chest: [Cx, Cy], lotusTop: [lpx, lpy - 30 * ls], size: ls };
   // 2. the body
   const [X0, Y0] = toW(-8, -24), [X1, Y1] = toW(SW + 8, SH + 2);
-  const nz = grid(X0, Y0, X1, Y1, 3, (x, y) => noiseLite((x - F[0]) / S * 0.13 + seed, (y - F[1]) / S * 0.13 + t * 0.4));
+  // the noise is only read while the mist condenses or the body is devoured
+  const nz = (devour > 0 || reveal < 1) ? grid(X0, Y0, X1, Y1, 3, (x, y) => noiseLite((x - F[0]) / S * 0.13 + seed, (y - F[1]) / S * 0.13 + t * 0.4)) : null;
+  // per-frame column terms of the flame tongues and lazy per-sprite-pixel flow cache
+  const WG = new Float64Array(SW), COLSIN = new Float64Array(SW), FLOWX = new Float64Array(SW);
+  const beatT = t * 18;
+  for (let ix = 0; ix < SW; ix++) {
+    const cl = Math.floor(ix / 2), beat = Math.floor(beatT + cl * 0.61);
+    const gust = 0.35 + 0.65 * hsh01(cl * 7.1 + beat * 3.3);
+    const wave = 0.5 + 0.5 * Math.sin(ix * 0.9 + t * 13 + Math.sin(ix * 0.37 + t * 4) * 2.4);
+    WG[ix] = 7 * wave * gust;
+    COLSIN[ix] = Math.sin(ix * 0.5 + t * 2.3) * 2.5;
+    FLOWX[ix] = ix * 0.31 - t * 1.7;
+  }
+  FLOWC.fill(NaN);
+  const tFlow = t * 16;
   p.shade(X0, Y0, X1, Y1, (x, y, out) => {
     let sx = (x - F[0]) / S + FEET[0], sy = (y - F[1]) / S + FEET[1];
-    const n = nz(x, y);
+    const n = nz ? nz(x, y) : 0;
     if (devour > 0) {
       // drawn in: sample farther out (the body stretches toward the chest), a small twist near the chest only
       let dx = sx - CHEST[0], dy = sy - CHEST[1];
@@ -57,6 +85,7 @@ export function holyFox(p, t, o) {
       sx = CHEST[0] + dx * k; sy = CHEST[1] + dy * k;
       if ((r / RMAX) * 0.85 + n * 0.35 > 1.15 - devour * 1.35) return;   // outer parts swallowed first
     }
+    if (sx < -3 || sx > SW + 3 || sy >= SH + 4 || sy < IYMIN - 4) return;   // too far from the sprite for the flow to reach it
     // the whole body burns: turbulent upward flow distorts the lookup (stronger toward the top and the sides)
     const up = clamp(1 - sy / SH), side = Math.min(1, Math.abs(sx - FEET[0]) / (SW * 0.5));
     const tur = (0.6 + 1.4 * up) * (0.5 + 0.5 * side) * lit;
@@ -67,17 +96,9 @@ export function holyFox(p, t, o) {
     let v = iy < 0 ? -1 : PX[iy * SW + ix];
     if (v < 0) {
       // fierce white fire from every edge: tongues rise from the body (also from the sides, via the diagonal columns)
-      let j = 1;
-      for (; j <= 14; j++) {
-        const yy = iy + j;
-        if (yy < 0 || yy >= SH) continue;
-        if (PX[yy * SW + ix] >= 0 || (j > 2 && ((ix > 0 && PX[yy * SW + ix - 1] >= 0) || (ix < SW - 1 && PX[yy * SW + ix + 1] >= 0)))) break;
-      }
+      const j = DOWN[(iy + 24) * SW + ix];
       if (j > 14) return;
-      const cl = Math.floor(ix / 2), beat = Math.floor(t * 18 + cl * 0.61);
-      const gust = 0.35 + 0.65 * hsh01(cl * 7.1 + beat * 3.3);                      // each tongue jumps every ~1/18 s
-      const wave = 0.5 + 0.5 * Math.sin(ix * 0.9 + t * 13 + Math.sin(ix * 0.37 + t * 4) * 2.4);
-      const hgt = (2 + 7 * wave * gust) * (0.55 + 0.45 * lit) * (0.5 + 0.5 * up);
+      const hgt = (2 + WG[ix]) * (0.55 + 0.45 * lit) * (0.5 + 0.5 * up);
       const f = j / hgt;
       if (reveal < 0.85) return;
       if (f > 1) {   // embers torn off the tongue tips
@@ -96,7 +117,9 @@ export function holyFox(p, t, o) {
       else { out.c = IRIS[3]; out.a = 1; out.l = IRIS[4]; out.k = 0.35 * eye; return; }
     }
     if (v === 8) { out.c = devour > 0.3 ? FOX[4] : NOSE; out.a = 1; return; }
-    const flow = Math.sin(iy * 0.5 + t * 16 + Math.sin(ix * 0.5 + t * 2.3) * 2.5) * Math.sin(ix * 0.31 - t * 1.7 + iy * 0.08);
+    const fi = iy * SW + ix;
+    let flow = FLOWC[fi];
+    if (flow !== flow) FLOWC[fi] = flow = Math.sin(iy * 0.5 + tFlow + COLSIN[ix]) * Math.sin(FLOWX[ix] + iy * 0.08);
     const tier = Math.min(6, Math.max(0, v - (v >= 5 && iy > CHEST[1] - 8 ? 1 : 0)) + Math.round(devour * 3) + (flow > 0.6 ? 1 : 0));
     out.c = FOX[tier]; out.a = 1;
   });
