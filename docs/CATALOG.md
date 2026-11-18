@@ -1,6 +1,6 @@
 # Catalog
 
-264 effects in 23 categories. Every one is a file in
+265 effects in 23 categories. Every one is a file in
 `src/fx/<category>/<name>.js`; render any of them with `node tools/render.mjs <id> --gif`.
 
 ## ultimate
@@ -17,6 +17,7 @@ huge signature skills: sky-splitting, earth-shattering.
 | Hoa Lien Draft | `ultimate/hoa-lien-draft` | one-shot 6.8s | 480×380 | Motion draft: qi streams spiral round the caster into a lotus overhead, it soars, then slams down and unwinds into a five-colour pillar with a far-reaching shock wave. |
 | Phat No Hoa Lien | `ultimate/phat-no-hoa-lien` | one-shot 7s | 480×380 | Five fire streams spiral round the caster into a lotus that soars, then slams down and unwinds into a twisting five-colour pillar with a far-reaching ground shock. |
 | Phat No Hoa Lien Draft4 | `ultimate/phat-no-hoa-lien-v4-draft` | one-shot 8.65s | 480×380 | Draft v4: the lotus lands, swells to its limit and explodes into five-coloured clouds and dust; a five-colour pillar widens to its limit, then dissolves. |
+| Phat No Hoa Lien Draft5 | `ultimate/phat-no-hoa-lien-v5-draft` | one-shot 8.65s | 480×380 | Draft v5: crushing darkness, an ivory pillar, outlined ash clouds and a cooling five-petal ground seal. |
 | Sky breaking quake | `ultimate/sky-quake` | one-shot 3.32s | 480×420 | An inverted impact pins the earth with a tightening rune seal; molten faults heave slabs, staggered geysers erupt and a second quake widens the sinking crater. |
 | Tu Thien Chi | `ultimate/tu-thien-chi` | one-shot 7.6s | 480×420 | A celestial fingerprint awakens; a colossal golden finger imprisons heaven and earth, then crushes the target into a world-splitting quake. |
 
@@ -32,7 +33,7 @@ five alien flames, each its own skill; together the Phat No Hoa Lien.
 | Tam Thien Draft | `di-hoa/tam-thien-draft` | one-shot 5s | 360×260 | Motion draft v2: the sky catches black fire, fire rains onto the target, gathers into a sphere where stars ricochet, then fades away. |
 | Thanh Lien Dia Tam Hoa | `di-hoa/thanh-lien` | one-shot 4.7s | 360×260 | A fire lotus seed is hurled into the ground; a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
 | Thanh Lien Draft | `di-hoa/thanh-lien-draft` | one-shot 3.2s | 360×260 | Motion draft v2: a fire lotus seed is flicked into the ground, a lava pond grows a bud that blooms round the target, then the seed pod erupts like a volcano. |
-| Tinh Lien Yeu Hoa | `di-hoa/tinh-lien` | one-shot 6.5s | 360×260 | A beast eye parts the clouds and its pale sunbeam gaze burns a white flame-lotus on the target, which explodes into a towering cone of dust with a ghost lotus inside. |
+| Tinh Lien Yeu Hoa | `di-hoa/tinh-lien` | one-shot 7.8s | 360×320 | A beast eye parts the clouds and its pale sunbeam gaze burns a white flame-lotus on the target, which explodes into a towering cone of dust with a ghost lotus inside. |
 | Tinh Lien Draft | `di-hoa/tinh-lien-draft` | one-shot 6.5s | 360×260 | Motion draft v3: clouds part for a beast eye whose gaze is a pale sunbeam on a flickering flame-lotus; the gaze focuses, the lotus explodes into a towering cone of dust with a ghost lotus burning inside. |
 | Van Lac Tam Viem | `di-hoa/van-lac` | one-shot 4.5s | 360×260 | An invisible flame serpent with a rose-red heart coils round the target, dives into its chest, burns it from inside in three beats, then bursts outward. |
 | Van Lac Draft | `di-hoa/van-lac-draft` | one-shot 4.5s | 360×260 | Motion draft: an invisible flame serpent with a rose-red heart coils round the target, dives into its chest and burns it from inside in three beats. |
