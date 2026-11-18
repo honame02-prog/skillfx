@@ -124,4 +124,4 @@ function ghost(p, t) {
   lotusShape(p, t, 'front', TX, -62, size, 0, 1);
   p.glow(TX, -68, 35, L[4], 0.16 * g);
 }
-export function lotus(p, t, layer) { liveLotus(p, t, layer); if (layer === 'front') ghost(p, t); }
+export function lotus(p, t, layer) { liveLotus(p, t, layer); }   // v4: the ghost lotus is now light inside the dust (_tinhlien-end.js)

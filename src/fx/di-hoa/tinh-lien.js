@@ -1,6 +1,7 @@
 // Di Hoa 5: Tinh Lien Yeu Hoa — detail. Script: design/di-hoa/05-tinh-lien-yeu-hoa.md (v3); approved draft: tinh-lien-draft.js.
 // Frame + four parts: _tinhlien-{sky,gaze,lotus,blast}.js, shared data in _tinhlien-common.js.
-import { TX, END, APPEAR, OPENS, LOCK, BOOM, POSES } from './_tinhlien-common.js';
+import { TX, END, APPEAR, OPENS, LOCK, BOOM, POSES, INHALE, SHUT } from './_tinhlien-common.js';
+import { ending } from './_tinhlien-end.js';
 import { sky } from './_tinhlien-sky.js';
 import { gaze } from './_tinhlien-gaze.js';
 import { lotus } from './_tinhlien-lotus.js';
@@ -15,7 +16,7 @@ export const meta = {
 };
 const ticks = [];
 for (let i = 0; i < 3; i++) {
-  const h = { t: OPENS[i] + 0.05, stop: 0.04, shake: 0.12 + 0.08 * i, amp: 1.5 + i, push: 0.4 + 0.2 * i, straw: 4 + 3 * i, flash: 0.03 };
+  const h = { t: OPENS[i] + 0.05, stop: 0.06, shake: 0.22 + 0.12 * i, amp: 2.5 + 1.5 * i, push: 0.4 + 0.2 * i, straw: 4 + 3 * i, flash: 0.03 };
   if (i === 2) h.skin = 'holy';
   ticks.push(h);
   const t1 = i < 2 ? OPENS[i + 1] : LOCK;
@@ -31,6 +32,8 @@ export const act = {
     { t: BOOM, stop: 0.2, shake: 1, amp: 7, push: 3.5, straw: 45, flash: 0.08, skin: 'char' },
     { t: 4.1, shake: 0.35, amp: 3, push: 1.2, straw: 10, flash: 0 },
     { t: 4.5, stop: 0.06, shake: 0.5, amp: 4, push: 1.8, straw: 16, flash: 0.04 },
+    ...[0, 1, 2, 3].map(i => ({ t: INHALE[0] + 0.15 + i * 0.25, shake: 0.12, amp: 1.5, push: 0, straw: 3, flash: 0 })),   // the pull
+    { t: SHUT[1], stop: 0.08, shake: 0.45, amp: 5, push: 0, straw: 6, flash: 0.05 },                                             // the eye snaps shut
     { t: END - 0.4, push: 0, straw: 0, flash: 0, skin: null },
   ],
 };
@@ -40,9 +43,11 @@ export function drawBack(p, t) {
   gaze(p, t, 'back');
   lotus(p, t, 'back');
   blast(p, t, 'back');
+  ending(p, t, 'back');
 }
 export function draw(p, t) {
   gaze(p, t, 'front');
   blast(p, t, 'front');
   lotus(p, t, 'front');
+  ending(p, t, 'front');
 }
