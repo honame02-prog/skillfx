@@ -81,7 +81,7 @@ export function holyFox(p, t, o) {
     if (devour > 0) {
       // drawn in: sample farther out (the body stretches toward the chest), a small twist near the chest only
       let dx = sx - CHEST[0], dy = sy - CHEST[1];
-      const r = Math.hypot(dx, dy), tw = o.twist ?? 2.2, th = devour * tw * Math.exp(-r / (o.twistR ?? 14)), c = Math.cos(th), s = Math.sin(th);
+      const r = Math.hypot(dx, dy), tw = o.twist ?? 2.2, th = devour * tw * Math.exp(-r / (o.twistR ?? 14)), c = Math.cos(th), s = fsin(th);
       const ex = dx * c - dy * s; dy = dx * s + dy * c; dx = ex;
       const k = 1 + devour * 0.45 * (r / RMAX);
       sx = CHEST[0] + dx * k; sy = CHEST[1] + dy * k;
@@ -91,8 +91,8 @@ export function holyFox(p, t, o) {
     // the whole body burns: turbulent upward flow distorts the lookup (stronger toward the top and the sides)
     const up = clamp(1 - sy / SH), side = Math.min(1, Math.abs(sx - FEET[0]) / (SW * 0.5));
     const tur = (0.6 + 1.4 * up) * (0.5 + 0.5 * side) * lit;
-    sx += Math.sin(sy * 0.55 + t * 15 + Math.sin(sx * 0.4 + t * 5)) * 0.7 * tur;
-    sy += (0.5 + 0.5 * Math.sin(sx * 0.8 - t * 17 + sy * 0.3)) * 1.1 * tur;
+    sx += fsin(sy * 0.55 + t * 15 + fsin(sx * 0.4 + t * 5)) * 0.7 * tur;
+    sy += (0.5 + 0.5 * fsin(sx * 0.8 - t * 17 + sy * 0.3)) * 1.1 * tur;
     const ix = Math.floor(sx), iy = Math.floor(sy);
     if (ix < 0 || ix >= SW || iy >= SH) return;
     let v = iy < 0 ? -1 : PX[iy * SW + ix];
@@ -121,7 +121,7 @@ export function holyFox(p, t, o) {
     if (v === 8) { out.c = devour > 0.3 ? FOX[4] : NOSE; out.a = 1; return; }
     const fi = iy * SW + ix;
     let flow = FLOWC[fi];
-    if (flow !== flow) FLOWC[fi] = flow = Math.sin(iy * 0.5 + tFlow + COLSIN[ix]) * Math.sin(FLOWX[ix] + iy * 0.08);
+    if (flow !== flow) FLOWC[fi] = flow = fsin(iy * 0.5 + tFlow + COLSIN[ix]) * fsin(FLOWX[ix] + iy * 0.08);
     const tier = Math.min(6, Math.max(0, v - (v >= 5 && iy > CHEST[1] - 8 ? 1 : 0)) + Math.round(devour * 3) + (flow > 0.6 ? 1 : 0));
     out.c = FOX[tier]; out.a = 1;
   });
@@ -146,6 +146,14 @@ function fireLotus(p0, t, x, y, s, inst) {
   };
   row(7, 32, 34, 8.3, 0, 0);
   row(5, 24, 25, 8.1, 1, 3);
+}
+// sin(x) to ~6e-8 (cheaper than Math.sin); used by the body shader's per-pixel flow only
+const INV_TAU = 1 / (2 * Math.PI), HALF_PI = Math.PI / 2;
+function fsin(x) {
+  x -= 6.283185307179586 * Math.round(x * INV_TAU);
+  if (x > HALF_PI) x = 3.141592653589793 - x; else if (x < -HALF_PI) x = -3.141592653589793 - x;
+  const x2 = x * x;
+  return x * (1 + x2 * (-0.16666666666666666 + x2 * (0.008333333333333333 + x2 * (-0.0001984126984126984 + x2 * (2.7557319223985893e-6 + x2 * -2.505210838544172e-8)))));
 }
 function hsh01(x) { const h = Math.sin(x * 91.7) * 43758.5453; return h - Math.floor(h); }
 function noiseLite(x, y) {
