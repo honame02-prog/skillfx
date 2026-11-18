@@ -32,6 +32,14 @@ for (let iy = -24; iy < SH; iy++) for (let ix = 0; ix < SW; ix++) {
   }
   if (j <= 14) { DOWN[(iy + 24) * SW + ix] = j; if (iy < IYMIN) IYMIN = iy; }
 }
+// occlusion mask for the lotus behind the body: sprite pixels whose whole 7x7 neighbourhood is solid body (the flow distortion
+// moves the lookup by at most ~2.2 sprite px), so the opaque body always paints over them
+const SOLID = new Uint8Array(SW * SH);
+for (let y = 3; y < SH - 3; y++) for (let x = 3; x < SW - 3; x++) {
+  let ok = 1;
+  for (let dy = -3; dy <= 3 && ok; dy++) for (let dx = -3; dx <= 3; dx++) if (PX[(y + dy) * SW + x + dx] < 0) { ok = 0; break; }
+  SOLID[y * SW + x] = ok;
+}
 const FLOWC = new Float64Array(SW * SH);
 const RMAX = Math.hypot(Math.max(CHEST[0], SW - CHEST[0]), Math.max(CHEST[1], SH - CHEST[1]));
 
@@ -54,7 +62,7 @@ export function holyFox(p, t, o) {
   const lpx = lx + (Cx - lx) * pull, lpy = ly + (Cy - ly) * pull;
   const ls = 2.1 * S * (0.25 + 0.75 * lotus) * (1 - 0.85 * devour);
   if (layer !== 'front' && lotus > 0 && reveal > 0.3 && ls > 0.15) {
-    if (o.lotusFn) o.lotusFn(p, lpx, lpy, ls, t, devour, lotus); else fireLotus(p, t, lpx, lpy, ls, 0.3 + 0.7 * devour);
+    if (o.lotusFn) o.lotusFn(p, lpx, lpy, ls, t, devour, lotus, (devour === 0 && reveal >= 1) ? { m: SOLID, w: SW, h: SH, S: 1 / S, cx: FEET[0] - F[0] / S, cy: FEET[1] - F[1] / S } : null); else fireLotus(p, t, lpx, lpy, ls, 0.3 + 0.7 * devour);
   }
 
   if (layer === 'back') return { chest: [Cx, Cy], lotusTop: [lpx, lpy - 30 * ls], size: ls };

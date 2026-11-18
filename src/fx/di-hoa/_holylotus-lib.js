@@ -36,8 +36,16 @@ function fsin(x) {
 }
 const sm3 = (e0, e1, x) => { const t = (x - e0) / (e1 - e0), c = t < 0 ? 0 : t > 1 ? 1 : t; return c * c * (3 - 2 * c); };
 const hwF = (u, W) => u < M ? W * (0.2 + 0.8 * Math.sqrt(1 - ((M - u) / M) ** 2)) : W * Math.sqrt(Math.max(0, 1 - ((u - M) / (1 - M)) ** 2)) * (0.35 + 0.65 * fsin((u - M) / (1 - M) * 1.2 + HALF_PI));
+// static half-width profile hwF(u, 1) on a fine grid (the sqrt cusp at u = 0 needs it), and the per-petal "breathe" terms on a coarse one
+const NP = 2048, UG = 0.93, KP = NP / UG, PROF = new Float64Array(NP + 2);
+for (let i = 0; i < NP + 2; i++) PROF[i] = hwF(i / KP, 1);
+const NB = 128, KB = NB / UG;
+const BR1 = new Float64Array(NB + 2), BR2 = new Float64Array(NB + 2);
+// the sin(pi * 1.5 * vs) vein band: |sin(pi x)| < 0.13  <=>  |x - round(x)| < VEINW
+const VEINW = Math.asin(0.13) / Math.PI;
 function petalPx(p, bx, by, tx, ty, W, t, seed, o) {
-  const { dim = 0, side = 1, wisp = 1, heat = 0, sway = 0 } = o;
+  const { dim = 0, side = 1, wisp = 1, heat = 0, sway = 0, occ = null } = o;
+  const om = occ ? occ.m : null, oS = occ ? occ.S : 0, ocx = occ ? occ.cx : 0, ocy = occ ? occ.cy : 0, ow = occ ? occ.w : 0, oh = occ ? occ.h : 0;
   const dx = tx - bx, dy = ty - by, Ln = Math.hypot(dx, dy);
   if (Ln < 2) return;
   const ux = dx / Ln, uy = dy / Ln, nx = -uy, ny = ux;
@@ -51,36 +59,41 @@ function petalPx(p, bx, by, tx, ty, W, t, seed, o) {
   }
   const sx0 = Math.max(Math.floor(ax), p.ox), sx1 = Math.min(Math.ceil(bxx), p.ox + p.w - 1);
   const sy0 = Math.max(Math.floor(ay), p.oy), sy1 = Math.min(Math.ceil(byy), p.oy + p.h - 1);
-  const { tx: ptx, ty: pty, cs, sn, fx } = p;
+  const { tx: ptx, ty: pty, cs, sn, fx, C, L: LT, w: pw, ox: pox, oy: poy, lightK } = p;
+  const direct = p.fade === 1;   // fade 1: writes need no dither test
   const VMAX = Math.max(0.6, W * 1.2);   // half-width never exceeds 1.11 W (or 0.6): farther pixels are empty (the wisp is tested first)
   const tw = t * 6.5, tw2 = t * 10, tf = t * 9, tg = t * 2.1;
   const wispH = WH * wisp * (0.8 + 0.2 * fsin(t * 11 + ph)), hp2 = ph * 2;
+  // per petal: the breathing of the outline as a function of u (both rims), tabulated
+  for (let i = 0; i < NB + 2; i++) {
+    const u = i / KB, g = sm3(0.15, 0.8, u), b2 = 0.04 * fsin(u * 11 - tw2 + hp2);
+    BR1[i] = (0.07 * fsin(u * 5.5 - tw + ph) + b2) * g;
+    BR2[i] = (0.07 * fsin(u * 5.5 - tw + ph + 1.9) + b2) * g;
+  }
   // per row, the span of sx where the pixel can be inside the oriented box u in [-0.02, wisp top], |v| <= VM (u and v are linear in sx);
   // a 1 px margin each side, and every pixel inside is still tested exactly as before
   const umax = wisp > 0 ? 0.93 + wispH / Ln : 0.93, VM = Math.max(VMAX, wisp > 0 ? W * 0.42 + 0.4 + Math.abs(sway) + 1.2 : 0);
   const du = (cs * fx * ux - sn * uy) / Ln, dv = (cs * fx * nx - sn * ny) * side;
+  const dlx = cs * fx, dly = -sn;
   for (let sy = sy0; sy <= sy1; sy++) {
     const ddy = sy + 0.5 - pty;
     let lo = sx0, hi = sx1;
-    {
-      const ddx0 = sx0 + 0.5 - ptx, lx0 = (ddx0 * cs + ddy * sn) * fx, ly0 = -ddx0 * sn + ddy * cs;
-      const e0x = lx0 - bx, e0y = ly0 - by, u0 = (e0x * ux + e0y * uy) / Ln, v0 = (e0x * nx + e0y * ny) * side;
-      // k = sx - sx0 must satisfy lo_ <= a0 + d*k <= hi_
-      const span = (a0, d, lo_, hi_) => {
-        if (Math.abs(d) < 1e-9) { if (a0 < lo_ - 1e-6 || a0 > hi_ + 1e-6) hi = -1e9; return; }
-        let k0 = (lo_ - a0) / d, k1 = (hi_ - a0) / d;
-        if (k0 > k1) { const q = k0; k0 = k1; k1 = q; }
-        lo = Math.max(lo, sx0 + Math.floor(k0) - 1); hi = Math.min(hi, sx0 + Math.ceil(k1) + 1);
-      };
-      span(u0, du, -0.02, umax); span(v0, dv, -VM, VM);
-      if (lo > hi) continue;
+    const ddx0 = sx0 + 0.5 - ptx, lx0 = (ddx0 * cs + ddy * sn) * fx, ly0 = -ddx0 * sn + ddy * cs;
+    const e0x = lx0 - bx, e0y = ly0 - by, u0 = (e0x * ux + e0y * uy) / Ln, v0 = (e0x * nx + e0y * ny) * side;
+    // k = sx - sx0 must satisfy lo_ <= a0 + d*k <= hi_
+    for (let pass = 0; pass < 2; pass++) {
+      const a0 = pass ? v0 : u0, d = pass ? dv : du, lo_ = pass ? -VM : -0.02, hi_ = pass ? VM : umax;
+      if (Math.abs(d) < 1e-9) { if (a0 < lo_ - 1e-6 || a0 > hi_ + 1e-6) { hi = -1e9; break; } continue; }
+      let k0 = (lo_ - a0) / d, k1 = (hi_ - a0) / d;
+      if (k0 > k1) { const q = k0; k0 = k1; k1 = q; }
+      lo = Math.max(lo, sx0 + Math.floor(k0) - 1); hi = Math.min(hi, sx0 + Math.ceil(k1) + 1);
     }
+    if (lo > hi) continue;
+    const rowI = (sy - poy) * pw - pox;
     for (let sx = lo; sx <= hi; sx++) {
-      const ddx = sx + 0.5 - ptx;
-      const lx = (ddx * cs + ddy * sn) * fx, ly = -ddx * sn + ddy * cs;
-      const ex = lx - bx, ey = ly - by, u = (ex * ux + ey * uy) / Ln;
+      const kx = sx - sx0, u = u0 + du * kx;
       if (u < -0.02) continue;
-      const v = (ex * nx + ey * ny) * side;
+      const v = v0 + dv * kx;
       if (u > 0.93) {
         if (wisp <= 0) continue;
         const f = (u - 0.93) * Ln / wispH;
@@ -88,26 +101,56 @@ function petalPx(p, bx, by, tx, ty, W, t, seed, o) {
         const c = sway * f * f + 1.2 * fsin(t * 8 + f * 3 + ph) * f;
         const w = W * 0.42 * Math.sqrt(Math.max(0, 1 - f * f)) * (1 - 0.35 * f) + 0.4;
         if (Math.abs(v - c) > w) continue;
-        p.put(sx, sy, tone(4.6 - f * 1.6 + heat, lx, ly), 1);
+        const lx = lx0 + dlx * kx, ly = ly0 + dly * kx;
+        if (direct) C[rowI + sx] = tone(4.6 - f * 1.6 + heat, lx, ly); else p.put(sx, sy, tone(4.6 - f * 1.6 + heat, lx, ly), 1);
         const kk = 0.12 * (1 - f);
         if (kk > 0) p.add(sx, sy, L[6], kk);
         continue;
       }
       if (v > VMAX || -v > VMAX) continue;
-      const breathe = 1 + (0.07 * fsin(u * 5.5 - tw + ph + (v > 0 ? 0 : 1.9)) + 0.04 * fsin(u * 11 - tw2 + hp2)) * sm3(0.15, 0.8, u);
-      const w = Math.max(0.6, hwF(u < 0 ? 0 : u, W) * breathe), s = v / w, as = Math.abs(s);
+      const uu = u < 0 ? 0 : u;
+      const fp = uu * KP, ip = fp | 0, pr = PROF[ip] + (PROF[ip + 1] - PROF[ip]) * (fp - ip);
+      const fb = uu * KB, ib = fb | 0, BR = v > 0 ? BR1 : BR2, br = BR[ib] + (BR[ib + 1] - BR[ib]) * (fb - ib);
+      const w0 = W * pr * (1 + br), w = w0 > 0.6 ? w0 : 0.6, s = v / w, as = s < 0 ? -s : s;
       if (as > 1) continue;
+      const lx = lx0 + dlx * kx, ly = ly0 + dly * kx;
       const edge = (1 - as) * w;
-      if (edge < 1 && u > 0.05) { p.put(sx, sy, RAMP[clamp(Math.round((s < 0 ? 0.6 : 1.6) - dim * 0.4 + heat * 2.5), 0, 6)], 1); continue; }
-      const lip = 1 - 0.4 * sm3(0.25, 0.95, u), inner = s > lip;
-      const flow = 0.35 * fsin(u * 8 - tf + ph + s * 1.3) * fsin(s * 2.4 + tg + ph);
-      let b = 1.6 + 2.1 * sm3(0, 0.45, u) - 1.2 * as * as * Math.sqrt(as) + 0.6 * (1 - as) * sm3(0.3, 0.7, u) + flow - dim * 1.2 + heat * 2.8;
-      if (inner) b = 4.9 - 0.5 * sm3(0.5, 1, u) - dim * 0.6 + heat;
-      else if (s > lip - 0.14 && u > 0.3) b -= 1.1;
-      const vs = s / (inner ? 1 : lip);
-      if (!inner && u > 0.1 && u < 0.86 && Math.abs(fsin(vs * Math.PI * 1.5)) < 0.13) b -= 0.6;
-      p.put(sx, sy, tone(b, lx, ly), 1);
-      if (u > 0.2) { const kk = 0.06 * (1 - as); if (kk > 0) p.add(sx, sy, L[6], kk); }
+      if (om !== null) {   // fully under the opaque body drawn in front: skip the colour (it would be overpainted), keep the added light
+        const ox = Math.floor(lx * oS + ocx), oy = Math.floor(ly * oS + ocy);
+        if (ox >= 0 && ox < ow && oy >= 0 && oy < oh && om[oy * ow + ox] === 1) {
+          if (u > 0.2 && !(edge < 1 && u > 0.05)) { const kk = 0.06 * (1 - as); if (kk > 0) p.add(sx, sy, L[6], kk); }
+          continue;
+        }
+      }
+      let col;
+      if (edge < 1 && u > 0.05) col = RAMP[clamp(Math.round((s < 0 ? 0.6 : 1.6) - dim * 0.4 + heat * 2.5), 0, 6)];
+      else {
+        const lip = 1 - 0.4 * sm3(0.25, 0.95, u), inner = s > lip;
+        const flow = 0.35 * fsin(u * 8 - tf + ph + s * 1.3) * fsin(s * 2.4 + tg + ph);
+        let b = 1.6 + 2.1 * sm3(0, 0.45, u) - 1.2 * as * as * Math.sqrt(as) + 0.6 * (1 - as) * sm3(0.3, 0.7, u) + flow - dim * 1.2 + heat * 2.8;
+        if (inner) b = 4.9 - 0.5 * sm3(0.5, 1, u) - dim * 0.6 + heat;
+        else if (s > lip - 0.14 && u > 0.3) b -= 1.1;
+        if (!inner && u > 0.1 && u < 0.86) {
+          const xv = (s / lip) * 1.5, dd = xv - Math.round(xv);
+          if (dd < VEINW && dd > -VEINW) b -= 0.6;
+        }
+        col = tone(b, lx, ly);
+        if (u > 0.2) {
+          const kk = 0.06 * (1 - as);
+          if (kk > 0) {
+            if (direct) {
+              const k = kk * lightK;
+              if (k > 0.004) {
+                const i = rowI + sx, d = LT[i], c = L[6];
+                const r = Math.min(255, (d & 255) + (c & 255) * k) | 0, g = Math.min(255, ((d >>> 8) & 255) + ((c >>> 8) & 255) * k) | 0, bl = Math.min(255, ((d >>> 16) & 255) + ((c >>> 16) & 255) * k) | 0;
+                LT[i] = (255 << 24) | (bl << 16) | (g << 8) | r;
+                C[i] = col; continue;
+              }
+            } else { p.put(sx, sy, col, 1); p.add(sx, sy, L[6], kk); continue; }
+          }
+        }
+      }
+      if (direct) C[rowI + sx] = col; else p.put(sx, sy, col, 1);
     }
   }
 }
@@ -158,7 +201,7 @@ const RINGS = [
  * o: open (0..1 bloom), crush (0..1 closes & whitens, for the devouring), k (fire strength 0..1.5), seed.
  */
 export function holyLotus(p, cx, cy, s, t, o = {}) {
-  const { open = 1, crush = 0, k = 1, seed = 0 } = o;
+  const { open = 1, crush = 0, k = 1, seed = 0, occ = null } = o;
   if (s <= 0.05) return;
   const breathe = 1 + 0.04 * Math.sin(t * 3.1 + seed) + 0.025 * Math.sin(t * 7.7);
   RINGS.forEach((R, ri) => {
@@ -171,7 +214,7 @@ export function holyLotus(p, cx, cy, s, t, o = {}) {
       const ang = a * (1 + R.droop * Math.abs(q) * 0.6);
       const tx = bx + Math.sin(ang) * len, ty = by - Math.cos(ang) * len * (0.85 + 0.15 * (1 - R.droop)) + R.droop * Math.abs(Math.sin(ang)) * len * 0.35;
       const W = R.W * s * (1 - 0.3 * crush);
-      petalPx(p, bx, by, tx, ty, W, t, seed + ri * 7 + j * 3.1, { dim: R.dim, side: a >= 0 ? 1 : -1, wisp: 0.9 + 0.3 * k, heat: crush, sway: -Math.sin(a) * 4 * s });
+      petalPx(p, bx, by, tx, ty, W, t, seed + ri * 7 + j * 3.1, { dim: R.dim, side: a >= 0 ? 1 : -1, wisp: 0.9 + 0.3 * k, heat: crush, sway: -Math.sin(a) * 4 * s, occ });
       petalFire(p, bx, by, tx, ty, W, t, seed + ri * 13 + j * 5.7, k * (1 - 0.5 * crush) * Math.min(1, s * 1.1));
     }
   });

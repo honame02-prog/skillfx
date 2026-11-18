@@ -38,7 +38,7 @@ export const act = {
   ],
 };
 
-const lotusFn = (p, x, y, s, t) => holyLotus(p, x, y + 2 * s, s * 1.05, t, { open: lotusOpen(t), crush: lotusCrush(t), k: 1.2, seed: 5 });
+const lotusFn = (p, x, y, s, t, dv, open, occ) => holyLotus(p, x, y + 2 * s, s * 1.05, t, { open: lotusOpen(t), crush: lotusCrush(t), k: 1.2, seed: 5, occ });
 function fox(p, t, layer) {
   const dv = devourAt(t);
   if (dv >= 1) return null;
