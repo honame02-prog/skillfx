@@ -2,17 +2,7 @@
 import { effects } from "../src/fx/index.js";
 import { createFrame, clearFrame, createAct, actBounds, composite, backdrop } from "../src/core/index.js";
 
-const GROUPS = [
-  ["Bộ Dị Hoả", [
-    ["di-hoa/thanh-lien", "Thanh Liên Địa Tâm Hoả", "Dị Hoả 1 · lục lam, đánh vùng mặt đất"],
-    ["di-hoa/cot-linh", "Cốt Linh Lãnh Hoả", "Dị Hoả 2 · trắng xương / lam băng, khống chế"],
-    ["di-hoa/van-lac", "Vẫn Lạc Tâm Viêm", "Dị Hoả 3 · gần vô sắc, lõi đỏ hồng, đốt dần"],
-    ["di-hoa/tam-thien", "Tam Thiên Diễm Viêm Hoả", "Dị Hoả 4 · tím đen, mưa sao lửa"],
-    ["di-hoa/tinh-lien", "Tịnh Liên Yêu Hoả", "Dị Hoả 5 · trắng tinh viền vàng nhạt, hoá hư vô"],
-  ]],
-  ["Tuyệt chiêu", [["ultimate/phat-no-hoa-lien", "Phật Nộ Hoả Liên", "Tuyệt chiêu v3 · đổi 5 màu theo 5 dị hoả"]]],
-  ["Đại Hoang Tù Thiên Chỉ", [["ultimate/tu-thien-chi", "Tù Thiên Chỉ", "Đại Hoang · mực đen và vàng kim, nặng, khối"]]],
-];
+import { GROUPS, SKILLS } from "./skills.js";
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, kids = []) => { const e = Object.assign(document.createElement(tag), props); for (const k of [].concat(kids)) e.append(k); return e; };
 const fmt = (n) => n.toFixed(1).replace(".", ",");
@@ -84,6 +74,8 @@ function build() {
         el("div", { className: "btns" }, [b("Phát lại", () => { r.restart(); r.playing = true; btnPause.textContent = "Tạm dừng"; }), btnPause, b("Phóng to", () => openZoom(id, name))]),
       ]);
       Object.assign(r, { btnPause, card, stage });
+      stage.style.cursor = "pointer"; stage.title = "Đưa lên sân khấu chính";
+      stage.onclick = () => { select(id); scrollTo({ top: 0, behavior: "smooth" }); };
       grid.append(card);
     }
   }
@@ -115,17 +107,65 @@ $("z-replay").onclick = () => { if (zr) { zr.restart(); zr.playing = true; $("z-
 $("z-pause").onclick = () => { if (zr) { zr.playing = !zr.playing; $("z-pause").textContent = zr.playing ? "Tạm dừng" : "Tiếp tục"; } };
 addEventListener("keydown", (e) => { if (e.key === "Escape") closeZoom(); });
 
+// ---- sân khấu chính
+let main = null, cur = -1;
+const tabs = new Map();
+function stageScale() {
+  const box = $("big").clientWidth - 12;
+  if (!main || box <= 0) return;
+  const s = box >= main.W * 3 ? 3 : box >= main.W * 2 ? 2 : 1;
+  main.canvas.style.width = main.W * s + "px";
+}
+function select(id, fromHash) {
+  const i = SKILLS.findIndex((k) => k.id === id);
+  if (i < 0) return;
+  cur = i;
+  const k = SKILLS[i];
+  main = new Runner($("big-cv"), id, effects[id]);
+  main.playing = true;
+  stageScale();
+  $("s-name").textContent = k.name; $("s-group").textContent = k.group; $("s-sub").textContent = k.sub.split(" · ").slice(1).join(" · ");
+  $("s-dur").textContent = fmt(main.meta.duration) + " s";
+  for (const [tid, b] of tabs) b.classList.toggle("on", tid === id);
+  if (!fromHash && location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id);
+}
+function step(d) { select(SKILLS[(cur + d + SKILLS.length) % SKILLS.length].id); }
+function buildPicker() {
+  const box = $("picker");
+  for (const [title, list] of GROUPS) {
+    const g = el("div", { className: "pg" }, [el("span", { textContent: title })]);
+    list.forEach(([id, name], n) => {
+      const b = el("button", { type: "button", textContent: (list.length > 1 ? (n + 1) + ". " : "") + name, onclick: () => select(id) });
+      tabs.set(id, b); g.append(b);
+    });
+    box.append(g);
+  }
+  $("prev").onclick = () => step(-1); $("next").onclick = () => step(1);
+  $("s-replay").onclick = () => { main.restart(); main.playing = true; };
+  addEventListener("keydown", (e) => {
+    if (!$("zoom").hidden || /^(SELECT|INPUT)$/.test(e.target.tagName)) return;
+    if (e.key === "ArrowLeft") { step(-1); e.preventDefault(); }
+    else if (e.key === "ArrowRight") { step(1); e.preventDefault(); }
+    else if (e.key === " " && e.target.tagName !== "BUTTON") { main.restart(); main.playing = true; e.preventDefault(); }
+  });
+  addEventListener("hashchange", () => select(location.hash.slice(1), true));
+  addEventListener("resize", stageScale);
+  select(SKILLS.some((k) => k.id === location.hash.slice(1)) ? location.hash.slice(1) : SKILLS[0].id, true);
+}
+
 const setAll = (on) => { for (const r of runners) { r.playing = on; r.btnPause.textContent = on ? "Tạm dừng" : "Tiếp tục"; } };
 $("all-play").onclick = () => setAll(true);
 $("all-stop").onclick = () => setAll(false);
 $("speed").onchange = (e) => { speed = +e.target.value; };
 
 build();
+buildPicker();
 let last = performance.now();
 function loop(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
   for (const r of runners) r.tick(dt);
   if (zr) zr.tick(dt);
+  if (main) { main.tick(dt); $("s-bar").style.width = Math.min(100, (main.inst.t / main.meta.duration) * 100) + "%"; }
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);

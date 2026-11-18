@@ -19,6 +19,13 @@
     <a href="battle.html">đấu skill</a>
   </div>
 </header>
+<section class="hero">
+  <div id="picker" class="picker"></div>
+  <div class="herobar"><button id="prev" type="button" aria-label="Skill trước">◀</button><button id="next" type="button" aria-label="Skill sau">▶</button><button id="s-replay" type="button">Phát lại</button><span class="hint">← → đổi skill · Space phát lại</span></div>
+  <div id="big" class="stage big"><canvas id="big-cv"></canvas></div>
+  <div class="prog"><i id="s-bar"></i></div>
+  <div class="info"><b id="s-name"></b><span id="s-group"></span><span id="s-sub"></span><em id="s-dur"></em></div>
+</section>
 <main id="main"></main>
 <div id="zoom" class="zoom" hidden>
   <div class="zbar"><b id="z-name"></b><button id="z-replay" type="button">Phát lại</button><button id="z-pause" type="button">Tạm dừng</button><button id="z-close" type="button">Đóng</button></div>

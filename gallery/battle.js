@@ -1,11 +1,13 @@
 // Đấu skill: hai bên luân phiên ra chiêu. Bên trái dùng Tù Thiên Chỉ, bên phải lao tới phản đòn bằng Phật Nộ Hoả Liên.
 // Mỗi chiêu chạy đúng act của nó (tư thế, khựng hình, rung màn hình); người bị đánh do trang này vẽ và phản ứng theo hits.
 import { createFrame, clearFrame, createAct, composite, backdrop, posed, SKINS, READY, Rng, mix } from "../src/core/index.js";
-import * as TTC from "../src/fx/ultimate/tu-thien-chi.js";
-import * as HL from "../src/fx/ultimate/phat-no-hoa-lien.js";
+import { effects } from "../src/fx/index.js";
+import { SKILLS } from "./skills.js";
 
 const W = 480, H = 430, G = 400, STEP = 1 / 30;
-const XA = 44, B_FAR = XA + TTC.act.target.x, B_NEAR = XA + HL.act.target.x;
+const XA = 44;
+let TTC = effects["ultimate/tu-thien-chi"], HL = effects["ultimate/phat-no-hoa-lien"];   // skill của bên trái / bên phải
+let B_FAR = XA + TTC.act.target.x, B_NEAR = XA + HL.act.target.x;
 const IDLE = { ...READY }, HURT = { ...READY, lean: -6, crouch: 4, fx: -6, fy: -30, bx: 8, by: -28 };
 const KO = { ...READY, crouch: 11, lean: -9, fx: -8, fy: -12, bx: 6, by: -12 };
 const DASH = { ...READY, lean: 7, crouch: 3, fx: 14, fy: -22, bx: -8, by: -24 };
@@ -85,6 +87,7 @@ function cast(who, mod, target, power) {
 function restart() {
   R = new Rng((Date.now() & 0xffff) + 1);
   A = new Fighter("Kim Chỉ Tôn", XA, false); B = new Fighter("Liên Hoả Tăng", B_FAR, true);
+  $("nameA").textContent = SKILLS.find((k) => effects[k.id] === TTC).name; $("nameB").textContent = SKILLS.find((k) => effects[k.id] === HL).name;
   act = null; round = 0; $("log").textContent = ""; $("banner").classList.remove("on");
   hud(); setPhase("intro");
 }
@@ -140,6 +143,17 @@ function loop(now) {
 }
 $("play").onclick = () => { playing = !playing; $("play").textContent = playing ? "Tạm dừng" : "Tiếp tục"; };
 $("restart").onclick = restart;
+// chọn skill cho mỗi bên; đổi skill thì bắt đầu trận mới
+for (const [sel, side] of [[$("pickA"), "A"], [$("pickB"), "B"]]) {
+  for (const k of SKILLS) sel.append(new Option(k.name, k.id));
+  sel.value = side === "A" ? "ultimate/tu-thien-chi" : "ultimate/phat-no-hoa-lien";
+  sel.onchange = () => {
+    const mod = effects[$("pickA").value], mod2 = effects[$("pickB").value];
+    TTC = mod; HL = mod2;
+    B_FAR = XA + TTC.act.target.x; B_NEAR = XA + HL.act.target.x;
+    restart();
+  };
+}
 $("speed").onchange = (e) => { speed = +e.target.value; };
 restart();
 requestAnimationFrame(loop);

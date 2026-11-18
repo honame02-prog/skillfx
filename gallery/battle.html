@@ -40,13 +40,13 @@
 <body>
 <div class="wrap">
   <div class="top">
-    <h1>Đấu skill: Tù Thiên Chỉ đấu Phật Nộ Hoả Liên</h1>
+    <h1>Đấu skill</h1>
     <a href="./">← về gallery</a>
   </div>
   <div class="hud">
-    <div class="side l"><div class="name">Kim Chỉ Tôn <small>Tù Thiên Chỉ</small></div><div class="bar"><b id="trailA"></b><i id="hpA"></i></div></div>
+    <div class="side l"><div class="name">Kim Chỉ Tôn <small id="nameA">Tù Thiên Chỉ</small></div><div class="bar"><b id="trailA"></b><i id="hpA"></i></div></div>
     <div class="vs" id="turn">chuẩn bị</div>
-    <div class="side r"><div class="name"><small>Phật Nộ Hoả Liên</small> Liên Hoả Tăng</div><div class="bar"><b id="trailB"></b><i id="hpB"></i></div></div>
+    <div class="side r"><div class="name"><small id="nameB">Phật Nộ Hoả Liên</small> Liên Hoả Tăng</div><div class="bar"><b id="trailB"></b><i id="hpB"></i></div></div>
   </div>
   <div class="stage" id="stage">
     <canvas id="cv"></canvas>
@@ -55,6 +55,8 @@
   <div class="ctl">
     <button id="play">Tạm dừng</button>
     <button id="restart">Đấu lại</button>
+    <label>Bên trái <select id="pickA"></select></label>
+    <label>Bên phải <select id="pickB"></select></label>
     <label>Tốc độ <select id="speed"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="1.5">1,5×</option></select></label>
   </div>
   <div class="log" id="log"></div>
