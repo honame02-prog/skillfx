@@ -1,127 +1,265 @@
-// v4 ending, "Nhan Tang Lien": the eye's light finds the lotus burning inside the dust, the eye breathes everything in
-// up a twisting column, snaps shut, ash falls like snow and a lotus is left burnt into the ground, cooling to nothing.
+// Nhan Tang Lien: light reveals the lotus in the dust, then the eye draws both into its pupil.
 import { smooth, clamp, TAU, hex } from '../../core/index.js';
-import { L, DUST, TX, EC, EH, GHOST, INHALE, SHUT, ASH, END, hsh } from './_tinhlien-common.js';
-import { reveal } from './_tinhlien-blast.js';
+import { L, DUST, TX, EC, GHOST, INHALE, SHUT, ASH, END, hsh } from './_tinhlien-common.js';
 
-const RED = ['#c0300c', '#7a1a08', '#3a0c06'].map(hex);
-const lightLine = (p, x0, y0, x1, y1, c, k) => {
-  const n = Math.max(1, Math.ceil(Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0))));
-  for (let j = 0; j <= n; j++) { const u = j / n, x = x0 + (x1 - x0) * u, y = y0 + (y1 - y0) * u; p.add(p.cellX(x, y), p.cellY(x, y), c, k); }
-};
-const inh = (t) => smooth(INHALE[0], INHALE[1], t);
+const [EYE_X, EYE_Y] = EC;
+const LOTUS_Y = -63;
+const PETAL_W = 116, PETAL_H = 78, PETAL_X = -58, PETAL_Y = -45;
+const PETALS = [
+  // Root, tip and width, from the outer ring to the forward petals.
+  [-13, 23, -53, 2, 17], [13, 23, 53, 2, 17],
+  [-9, 24, -46, -18, 18], [9, 24, 46, -18, 18],
+  [-6, 22, -25, -35, 19], [6, 22, 25, -35, 19],
+  [-9, 27, -39, 10, 17], [9, 27, 39, 10, 17],
+  [-5, 26, -24, -21, 18], [5, 26, 24, -21, 18], [0, 25, 0, -40, 21],
+  [-5, 29, -20, 0, 13], [5, 29, 20, 0, 13], [0, 30, 0, -11, 15],
+];
 
-// ---- the lotus of light inside the dust: drawn only as light added over the billows (no flat fill)
-const PET = Array.from({ length: 9 }, (_, i) => ({ a: (i - 4) * 0.3, len: 0.75 + 0.25 * Math.cos((i - 4) * 0.35), w: 0.2 }));
-function lightLotus(p, t) {
-  const g = reveal(t) + smooth(INHALE[0], INHALE[0] + 0.2, t) * (1 - smooth(INHALE[0] + 0.7, INHALE[0] + 0.9, t));
-  if (g <= 0.02) return;
-  const e = inh(t) ** 1.5, size = 48 * (1 - 0.85 * e), cx = TX + Math.sin(t * 6) * 6 * e, by = -36 + (EC[1] + 30 + 36) * e;
-  const flick = 0.85 + 0.15 * Math.sin(t * 23);
-  p.shade(cx - size, by - size * 1.1, cx + size, by + 4, (x, y, o) => {
-    const dx = x - cx, dy = by - y, r = Math.hypot(dx, dy) / size;
-    if (r > 1 || dy < -3) return;
-    const ang = Math.atan2(dx, Math.max(0.1, dy));
-    let best = 9;
-    for (const P of PET) {
-      const w = P.w * Math.sin(Math.PI * Math.min(1, r / P.len) ** 0.8) * (1 + 0.15 * Math.sin(t * 9 + P.a * 7)), d = Math.abs(ang - P.a) - w;
-      if (r < P.len && d < best) best = d;
+function lotusLightMask() {
+  const owner = new Uint8Array(PETAL_W * PETAL_H);
+  const light = new Uint8Array(owner.length);
+  for (const [i, [bx, by, tx, ty, width]] of PETALS.entries()) {
+    const dx = tx - bx, dy = ty - by, len = Math.hypot(dx, dy);
+    for (let row = 0; row < PETAL_H; row++) {
+      const y = PETAL_Y + row + 0.5 - by;
+      for (let col = 0; col < PETAL_W; col++) {
+        const x = PETAL_X + col + 0.5 - bx;
+        const u = (x * dx + y * dy) / (len * len);
+        if (u <= 0 || u >= 1) continue;
+        const half = Math.sin(Math.PI * u ** 0.82) * width * 0.5;
+        const side = Math.abs((x * dy - y * dx) / len) / half;
+        if (side > 1) continue;
+        const q = row * PETAL_W + col;
+        owner[q] = i + 1;
+        light[q] = 1 + Math.floor(5 * (1 - side) * Math.sin(Math.PI * u));
+      }
     }
-    if (best > 0.03) return;
-    o.l = best > -0.03 ? L[6] : L[4];
-    o.k = (best > -0.03 ? 0.85 : 0.3 * (1 - r)) * g * flick;
+  }
+  for (let i = 0; i < owner.length; i++) {
+    const id = owner[i];
+    if (!id) continue;
+    // Trace the visible inside edge of each petal including overlaps in the front rings.
+    if (owner[i + 1] < id || owner[i - 1] < id || owner[i + PETAL_W] < id || owner[i - PETAL_W] < id) {
+      light[i] = id <= 6 ? 7 : id <= 11 ? 8 : 9;
+    }
+  }
+  return light;
+}
+
+const LOTUS_LIGHT = lotusLightMask();
+const LIGHT_COLOR = [0, L[3], L[3], L[3], L[4], L[4], L[4], L[4], L[5], L[6]];
+const LIGHT_GAIN = [0, 0.07, 0.11, 0.16, 0.21, 0.26, 0.31, 0.63, 0.74, 0.86];
+// Keep the shader's bounds tight at the thin crown and at the bottom of the bloom.
+const LIGHT_BANDS = [];
+for (let top = 0; top < PETAL_H; top += 8) {
+  const bottom = Math.min(top + 8, PETAL_H);
+  let left = PETAL_W, right = 0;
+  for (let row = top; row < bottom; row++) {
+    for (let col = 0; col < PETAL_W; col++) {
+      if (!LOTUS_LIGHT[row * PETAL_W + col]) continue;
+      left = Math.min(left, col);
+      right = Math.max(right, col + 1);
+    }
+  }
+  if (left < right) LIGHT_BANDS.push({ top, bottom, left, right });
+}
+
+function lightLotus(p, t) {
+  const lit = smooth(GHOST[0], GHOST[0] + 0.21, t) * (1 - smooth(5.22, 5.72, t));
+  if (lit <= 0) return;
+  const lift = smooth(INHALE[0], 5.71, t);
+  const width = (1 - 0.91 * lift) * (1 + 0.025 * Math.sin(t * 18));
+  const height = 1 + 0.9 * smooth(INHALE[0], 5.22, t) - 1.63 * smooth(5.22, 5.72, t);
+  const cx = TX + 11 * lift * (1 - lift) * Math.sin(t * 13);
+  const cy = LOTUS_Y + (EYE_Y - LOTUS_Y) * lift;
+  const curl = 16 * lift * (1 - lift) / 45;
+  const invWidth = 1 / width, invHeight = 1 / height;
+  const gain = lit * (0.94 + 0.06 * Math.sin(t * 27));
+  for (const { top, bottom, left, right } of LIGHT_BANDS) {
+    const y0 = PETAL_Y + top, y1 = PETAL_Y + bottom;
+    p.shade(cx + (PETAL_X + left) * width + y0 * curl, cy + y0 * height,
+      cx + (PETAL_X + right) * width + y1 * curl, cy + y1 * height, (x, y, o) => {
+        const yy = (y - cy) * invHeight;
+        const row = Math.floor(yy - PETAL_Y);
+        if (row < top || row >= bottom) return;
+        const col = Math.floor((x - cx - curl * yy) * invWidth - PETAL_X);
+        if (col < left || col >= right) return;
+        const band = LOTUS_LIGHT[row * PETAL_W + col];
+        if (band === 0) return;
+        o.l = LIGHT_COLOR[band];
+        o.k = LIGHT_GAIN[band] * gain;
+      });
+  }
+}
+
+function shaft(p, t) {
+  const gain = smooth(GHOST[0], GHOST[0] + 0.24, t) * (1 - smooth(INHALE[0], 5.08, t));
+  if (gain <= 0) return;
+  const bottom = LOTUS_Y + 21, span = bottom - EYE_Y, sway = Math.sin(t * 7) * 2;
+  p.shade(EYE_X - 17, EYE_Y, EYE_X + 17, bottom, (x, y, o) => {
+    const u = (y - EYE_Y) / span;
+    if (u < 0 || u >= 1) return;
+    const d = Math.abs(x - EYE_X - u * sway) / (2.5 + 12 * u);
+    if (d >= 1) return;
+    const falloff = Math.min(1, (1 - u) * 3.5);
+    o.l = d < 0.13 ? L[5] : L[3];
+    o.k = (d < 0.13 ? 0.29 : 0.17 * (1 - d)) * gain * falloff;
   });
 }
-// ---- the eye's light pierces the dust down to the lotus
-function shaft(p, t) {
-  const g = reveal(t) + (inh(t) > 0 ? 1 - smooth(SHUT[0] - 0.1, SHUT[0], t) : 0);
-  if (g <= 0.02) return;
-  const y0 = EC[1] + EH * 0.8, y1 = -40, w = 5 + 3 * Math.sin(t * 7);
-  for (let j = -Math.ceil(w); j <= Math.ceil(w); j++) {
-    const e = Math.abs(j) / w;
-    if (e > 1) continue;
-    lightLine(p, TX + j, y0, TX + j * 1.6, y1, e < 0.3 ? L[6] : L[4], (e < 0.3 ? 0.55 : 0.25 * (1 - e)) * Math.min(1, g));
-  }
-}
-// ---- the inhale: a twisting column of dust and light from the ground to the pupil
-const STRANDS = Array.from({ length: 12 }, (_, i) => ({ ph: i / 12 * TAU, c: i % 3, light: i % 4 === 0 }));
+
+const TWIST = 2.6 * TAU;
+const PULL = Array.from({ length: 84 }, (_, i) => ({
+  phase: hsh(i, 1), speed: 0.68 + 0.65 * hsh(i, 2), angle: 2.3 * (hsh(i, 3) - 0.5),
+  drift: 0.75 + 0.65 * hsh(i, 4), spark: i % 3 === 0, hot: hsh(i, 5) > 0.46,
+}));
+
 function column(p, t) {
-  const g = smooth(INHALE[0], INHALE[0] + 0.25, t) * (1 - smooth(SHUT[0] - 0.08, SHUT[0] + 0.05, t));
-  if (g <= 0) return;
-  // a solid pixel twister: per row a band of diagonal stripes in stepped dust colours, a dark rim, a lit core;
-  // it grows up from the ground and is cut away from the bottom as the eye takes the last of it
-  const top = EC[1] + EH * 0.6, yTop = -2 + (top + 2) * g, cut = -2 + (top + 2) * smooth(INHALE[1] - 0.35, SHUT[0], t);
-  for (let y = Math.ceil(yTop); y < Math.min(-1, cut); y++) {
-    const v = (y - top) / -top, w = 4 + 26 * v * v, cx = TX + Math.sin(y * 0.045 + t * 6) * 5 * v, sy = p.cellY(cx, y + 0.5);
-    for (let x = Math.floor(cx - w); x <= Math.ceil(cx + w); x++) {
-      const q = (x + 0.5 - cx) / w, e = Math.abs(q);
-      if (e > 1) continue;
-      const stripe = ((Math.floor(q * 3 + y * 0.22 - t * 14) % 3) + 3) % 3;
-      const c = e > 0.88 ? DUST[0] : e < 0.18 ? L[4] : DUST[2 + stripe];
-      p.put(p.cellX(x + 0.5, y + 0.5), sy, c, 1);
-    }
+  const age = t - INHALE[0];
+  if (age <= 0 || t >= INHALE[1]) return;
+  const neck = smooth(INHALE[0], INHALE[0] + 0.24, t);
+  const rise = smooth(INHALE[0] + 0.24, INHALE[1], t);
+  const top = -103 + (EYE_Y + 103) * neck;
+  const foot = -89 + 86 * neck + (EYE_Y + 3) * rise;
+  const spin = age * 2.2 * TAU;
+  for (let y = Math.ceil(top); y <= foot; y++) {
+    const v = (y - EYE_Y) / (-3 - EYE_Y);
+    const radius = 1.5 + 30 * v * (0.45 + 0.55 * v);
+    const phase = v * TWIST + spin;
+    const side = Math.sin(phase), face = Math.cos(phase);
+    const x = EYE_X + radius * side * 0.76;
+    const half = (1.3 + 7.5 * v) * (0.72 + 0.28 * Math.abs(face));
+    const brown = v > 0.55;
+    const shadow = brown ? DUST[0] : DUST[1];
+    const body = brown ? DUST[1] : DUST[2];
+    const rim = brown ? DUST[3] : DUST[4];
+    const winding = EYE_X - radius * side * 0.67;
+    const edge = (0.6 + 3.1 * v) * (0.55 + 0.45 * Math.abs(face));
+    if (face < 0) p.line(winding - edge, y, winding + edge, y, DUST[1]);
+    p.line(x - half, y, x + half, y, shadow);
+    p.line(x - half * 0.76, y, x + half * 0.7, y, body);
+    const glint = x + half * face * 0.52;
+    p.line(glint - edge * 0.7, y, glint + edge * 0.7, y, rim);
+    if (face >= 0) p.line(winding - edge, y, winding + edge, y, DUST[2]);
   }
-  for (const S of STRANDS) if (S.light) {   // two bright filaments winding round it
-    let px = 0, py = 0;
-    for (let y = -2; y > yTop; y -= 3) {
-      const v = (y - top) / -top, x = TX + Math.sin(y * 0.09 + t * 12 + S.ph) * (4 + 26 * v * v);
-      if (y < -2 && y < cut) lightLine(p, px, py, x, y, L[6], 0.6 * g);
-      px = x; py = y;
+  for (const mote of PULL) {
+    const v = 1 - (mote.phase + age * mote.speed) % 1;
+    const y = EYE_Y + v * (-3 - EYE_Y);
+    if (y < top || y > foot) continue;
+    const phase = v * TWIST + spin + mote.angle;
+    const radius = (2 + 38 * v * (0.45 + 0.55 * v)) * mote.drift;
+    const x = EYE_X + Math.sin(phase) * radius;
+    if (mote.spark && mote.hot) {
+      p.line(x, y, x + Math.cos(phase) * v * 2, y - 1 - v, L[3]);
+      p.dot(x, y, L[6]);
+    } else {
+      p.dot(x, y, mote.spark ? L[5] : y < -90 ? DUST[4] : DUST[2]);
     }
-  }
-  for (let i = 0; i < 40; i++) {   // motes spiralling up
-    const ph = (t * (0.9 + 0.5 * hsh(i, 1)) + hsh(i, 2)) % 1, y = -2 + (top + 2) * ph, v = (y - top) / -top;
-    const x = TX + Math.sin(y * 0.06 + t * 9 + hsh(i, 3) * TAU) * (8 + 34 * v * v);
-    if (ph < g) p.dot(x, y, i % 3 ? DUST[4] : L[5], 1);
   }
 }
-// ---- the gulp: a flat shock ring from the eye as it snaps shut
+
+function ellipse(rx, ry, n) {
+  return Array.from({ length: n + 1 }, (_, i) => {
+    const a = i * TAU / n;
+    return [Math.cos(a) * rx, Math.sin(a) * ry];
+  });
+}
+
+const RIPPLE = ellipse(1, 1, 24);
+const SNAP = SHUT[0] + 0.04;
 function gulp(p, t) {
-  const a = t - SHUT[1];
-  if (a < 0 || a > 0.3) return;
-  const u = a / 0.3, rx = 60 + 190 * u, ry = 10 + 22 * u, pts = [];
-  for (let i = 0; i <= 48; i++) { const q = i / 48 * TAU; pts.push([EC[0] + Math.cos(q) * rx, EC[1] + Math.sin(q) * ry]); }
-  p.polyline(pts, u < 0.4 ? L[6] : u < 0.7 ? L[4] : L[2], 1);
+  const a = t - SNAP;
+  if (a < 0 || t >= SHUT[1]) return;
+  if (a < 0.1) {
+    const u = a / 0.1;
+    const reach = 39 + 51 * Math.sin(Math.PI * u ** 0.62);
+    p.line(EYE_X - reach, EYE_Y, EYE_X + reach, EYE_Y, L[3]);
+    p.line(EYE_X - reach * 0.8, EYE_Y, EYE_X + reach * 0.8, EYE_Y, L[6]);
+  }
+  const u = a / (SHUT[1] - SNAP);
+  const rx = 10 + 24 * u, ry = 2 + 4 * u;
+  p.polyline(RIPPLE.map(([x, y]) => [EYE_X + x * rx, EYE_Y + y * ry]), u < 0.36 ? L[5] : u < 0.72 ? L[3] : L[1]);
 }
-// ---- ash like snow
-const FLAKES = Array.from({ length: 80 }, (_, i) => ({ x: -55 + 350 * hsh(i, 10), d: 0.9 * hsh(i, 11), v: 26 + 26 * hsh(i, 12), y0: -235 - 60 * hsh(i, 13), end: ASH[1] - 0.7 * hsh(i, 14), s: hsh(i, 15) > 0.7 ? 2 : 1, c: i % 3 }));
+
+const FLAKES = Array.from({ length: 70 }, (_, i) => ({
+  x: -59 + (i % 10 + hsh(i, 10)) * 35.7,
+  y: -234 + (Math.floor(i / 10) + hsh(i, 11)) * 32.4,
+  phase: hsh(i, 12) * TAU, speed: 11 + 15 * hsh(i, 13),
+  start: hsh(i, 14) * 0.16, end: ASH[1] - 1.03 * hsh(i, 15) ** 1.7,
+  shape: i % 5, color: L[i % 11 === 0 ? 3 : i % 3 === 0 ? 4 : 5],
+}));
+
 function ash(p, t) {
-  if (t < ASH[0] || t > ASH[1]) return;
-  for (const F of FLAKES) {
-    const b = t - ASH[0] - F.d;
-    if (b < 0 || t > F.end) continue;
-    const y = F.y0 + b * F.v, x = F.x + Math.sin(b * 2.2 + F.x) * 4;
-    if (y < -234 || y > -1) continue;
-    const c = F.c === 0 ? L[5] : F.c === 1 ? L[4] : DUST[4];
-    p.dot(x, y, c, 1);
-    if (F.s === 2) p.dot(x + 1, y, c, 1);
+  if (t < ASH[0] || t >= ASH[1]) return;
+  for (const f of FLAKES) {
+    const age = t - ASH[0] - f.start;
+    if (age < 0 || t >= f.end) continue;
+    const x = f.x + Math.sin(f.phase + age * 3) * 3.2;
+    const y = f.y + age * f.speed;
+    if (x < -59 || x >= 298 || y >= 11) continue;
+    p.dot(x, y, f.color);
+    if (f.shape === 0) p.dot(x + 1, y, f.color);
+    if (f.shape === 1) p.dot(x, y + 1, f.color);
   }
 }
-// ---- the lotus burnt into the ground, seen flat, cooling white -> gold -> red -> gone
-const BURN0 = INHALE[0] + 0.45, BURN1 = END - 0.25;
-const SCORCH = Array.from({ length: 8 }, (_, i) => {
-  const al = i / 8 * TAU + 0.2, len = 40 + 8 * hsh(i, 20), w = 13, pts = [];
-  for (let j = 0; j <= 6; j++) { const u = j / 6, h = Math.sin(Math.PI * u ** 0.8) * w * 0.5; pts.push([u * len, -h]); }
-  for (let j = 6; j >= 0; j--) { const u = j / 6, h = Math.sin(Math.PI * u ** 0.8) * w * 0.5; pts.push([u * len, h]); }
-  return { al, len, pts };
+
+const BURN_START = 6.0;
+const COOL = [L[5], L[3], ...['#d87932', '#a13b1d', '#622318', '#371a15'].map(hex)];
+const OUTER_RING = ellipse(45, 9, 48);
+const SEED_RING = ellipse(8, 1.75, 18);
+const BURN_PETALS = Array.from({ length: 8 }, (_, i) => {
+  const angle = i * TAU / 8;
+  const side = [[13, 0], [19, 0.19], [26, 0.29], [32, 0.21], [39, 0]];
+  const points = [...side, ...side.slice(0, -1).reverse().map(([r, w]) => [r, -w])].map(([r, w]) => [
+    TX + Math.cos(angle + w) * r, Math.sin(angle + w) * r * 0.2, r,
+  ]);
+  return { points, cool: i > 4 ? 0.06 : 0 };
 });
-function scorch(p, t) {
-  if (t < BURN0 || t > BURN1) return;
-  const age = (t - BURN0) / (BURN1 - BURN0), grow = clamp((t - BURN0) / 0.35);
-  const c = age < 0.12 ? L[6] : age < 0.3 ? L[5] : age < 0.48 ? L[3] : age < 0.66 ? RED[0] : age < 0.84 ? RED[1] : RED[2];
-  const proj = (al, u, v) => { const x = u * Math.cos(al) - v * Math.sin(al), z = u * Math.sin(al) + v * Math.cos(al); return [TX + x, -1 + z * 0.2]; };
-  for (const S of SCORCH) {
-    const pts = S.pts.map(([u, v]) => proj(S.al, u * grow, v * grow));
-    p.polyline(pts, c, 1);
-    p.line(...proj(S.al, 4, 0), ...proj(S.al, S.len * grow * 0.8, 0), age < 0.3 ? L[4] : c, 1);
-  }
-  const rr = 10 * grow;   // the seed-pod ring at the centre
-  const ring = Array.from({ length: 21 }, (_, i) => { const q = i / 20 * TAU; return [TX + Math.cos(q) * rr, -1 + Math.sin(q) * rr * 0.2]; });
-  p.polyline(ring, c, 1);
-  if (age < 0.35) p.glow(TX, -2, 30, L[4], 0.25 * (1 - age / 0.35));
+
+function heatColor(age) {
+  return age < 1 ? COOL[Math.min(COOL.length - 1, Math.floor(Math.max(0, age) * COOL.length))] : 0;
 }
+
+function groundRing(p, pts, c) {
+  if (c) p.polyline(pts.map(([x, y]) => [TX + x, y]), c);
+}
+
+function scorch(p, t) {
+  if (t < BURN_START || t >= END) return;
+  const age = (t - BURN_START) / (END - BURN_START);
+  groundRing(p, OUTER_RING, heatColor(age * 1.2 + 0.04));
+  for (const { points, cool } of BURN_PETALS) {
+    for (let i = 1; i < points.length; i++) {
+      const [x0, y0, r0] = points[i - 1], [x1, y1, r1] = points[i];
+      const color = heatColor(age * (0.94 + (r0 + r1) * 0.0022) + cool);
+      if (color) p.line(x0, y0, x1, y1, color);
+    }
+  }
+  const core = heatColor(age * 1.09 - 0.09);
+  groundRing(p, SEED_RING, core);
+  if (core) p.dot(TX, 0, core);
+
+  // Three short curls from different points on the hot mark.
+  const smoke = 1 - smooth(6.65, 7.59, t);
+  if (smoke <= 0) return;
+  for (let i = 0; i < 3; i++) {
+    const u = ((t - BURN_START) * (0.63 + i * 0.08) + i * 0.29) % 1;
+    const gain = 0.33 * smoke * Math.sin(Math.PI * u);
+    for (let j = 0; j < 13; j++) {
+      const v = j / 13;
+      const x = TX + (i - 1) * 22 + Math.sin(u * 5 + v * 4 + i) * (1 + 3 * v);
+      const y = 1 - u * 19 - j;
+      p.light(x, y, DUST[4], gain * (1 - v));
+    }
+  }
+}
+
 export function ending(p, t, layer) {
-  if (layer === 'back') { scorch(p, t); shaft(p, t); return; }
+  if (t <= GHOST[0] || t >= END) return;
+  if (layer === 'back') {
+    scorch(p, t);
+    return;
+  }
+  shaft(p, t);
   column(p, t);
   lightLotus(p, t);
   gulp(p, t);

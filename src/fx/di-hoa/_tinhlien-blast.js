@@ -1,129 +1,296 @@
-// BOOM..INHALE: a V plume of outlined pixel billows (size hierarchy, creases, specks, a rolling crown, earth below and
-// ash above), lit from inside when the eye looks through it, then drawn up in a spiral into the eye. Ballistic rubble.
-import { smooth, clamp, TAU, hex } from '../../core/index.js';
+// BOOM..INHALE: rolling earth and ash, pulled back up into the eye.
+import { smooth, clamp, TAU, hex, mix } from '../../core/index.js';
 import { L, DUST, TX, BOOM, GHOST, INHALE, LC, EC, out3, hsh } from './_tinhlien-common.js';
 
-// palettes: [rim, shadow, body, light, glint]
-const EARTH = ['#21170f', '#3b2a1c', '#5a412c', '#7c5e41', '#a07e5a'].map(hex);
-const ASHP = ['#252327', '#3f3b40', '#5d5859', '#827b77', '#a8a097'].map(hex);
-const WARM = ['#3a2a1c', '#6a4c2a', '#9c773e', '#c9a35c', '#ecd59a'].map(hex);
-const HOT = ['#5a4024', '#a07a3c', '#d2ac62', '#efd79a', '#fff4d0'].map(hex);
+const EARTH = [DUST[0], DUST[1], DUST[2], hex('#907456')];
+const ASH = [hex('#3b3437'), hex('#555052'), DUST[3], DUST[4]];
+const WARM = ['#584337', '#75543d', '#9e7852', '#c09a69'].map(hex);
+const DUST_TONES = Array.from({ length: 9 }, (_, ash) =>
+  Array.from({ length: 9 }, (_, light) =>
+    EARTH.map((color, band) => mix(mix(color, ASH[band], ash / 8), WARM[band], light / 8))));
 const EMBER = ['#572b23', '#883c28', '#b75b2e'].map(hex);
-const ROCKS = Array.from({ length: 34 }, (_, i) => {
-  const vy = -90 - 260 * hsh(i, 9), land = (-vy + Math.sqrt(vy * vy + 4160)) / 520;
-  return { vx: (hsh(i, 8) - 0.5) * 180, vy, land, bounce: 0.15 + 0.12 * hsh(i, 12), s: 1.4 + Math.floor(hsh(i, 10) * 3), c: Math.floor(hsh(i, 11) * 3), spin: (hsh(i, 13) - 0.5) * 12 };
-});
-// The plume: a few huge billows give the shape, mid billows fill, small ones fray the edges.
-const PUFFS = [];
-for (let i = 0; i < 8; i++) PUFFS.push({ s: 0.8 + 0.2 * hsh(i, 1), u: (i / 7 * 2 - 1) * 0.9 + (hsh(i, 2) - 0.5) * 0.15, r: 20 + 9 * hsh(i, 3), big: 1 });
-for (let i = 0; i < 30; i++) { const s = 0.15 + 0.8 * hsh(i, 4); PUFFS.push({ s, u: (hsh(i, 5) * 2 - 1) * 0.85, r: 7 + 4 * s + 5 * hsh(i, 6) }); }
-for (let i = 0; i < 24; i++) { const s = 0.1 + 0.95 * hsh(i, 7); PUFFS.push({ s, u: (i % 2 ? 1 : -1) * (0.85 + 0.25 * hsh(i, 8)), r: 3 + 4 * hsh(i, 9) }); }
-PUFFS.forEach((P, i) => { P.phase = hsh(i, 34) * TAU; P.d = 0.28 * (1 - P.s) + 0.15 * hsh(i, 35); });
-const SURGE = Array.from({ length: 26 }, (_, i) => ({
-  vx: (i % 2 ? 1 : -1) * (55 + 225 * hsh(i, 1)), r: 4 + 7 * hsh(i, 3), delay: 0.04 + 0.12 * hsh(i, 4), phase: hsh(i, 6) * TAU, d: 0.05 + 0.3 * hsh(i, 5)
-}));
-// Pre-rasterized opaque cells: 0 rim, 1 shadow, 2 body, 3 light, 4 glint, 5 crease, 6 speck.
-const PUFF_PIXELS = Array.from({ length: 33 }, (_, r) => {
-  const cells = [];
-  for (let y = -r - 1; y <= r + 1; y++) for (let x = -r - 1; x <= r + 1; x++) {
-    const d = x * x + y * y;
-    if (d > (r + 1) ** 2) continue;
-    let band = 0;
-    if (d <= r * r) {
-      band = x * 0.45 + y > r * 0.38 ? 1 : 2;
-      if ((x + r * 0.2) ** 2 + (y + r * 0.5) ** 2 < (r * 0.62) ** 2) band = 3;
-      if (r >= 12 && (x + r * 0.35) ** 2 + (y + r * 0.62) ** 2 < (r * 0.2) ** 2) band = 4;
-      if (r >= 10 && band <= 2) {   // a fold: an inner arc that splits the billow into lobes
-        const c = Math.hypot(x - r * 0.3, y - r * 0.05) - r * (0.55 + 0.1 * hsh(r, 7));
-        if (Math.abs(c) < 0.6 && y < r * 0.55 && x < r * 0.5) band = 5;
-      }
-      if (r >= 7 && band <= 2 && hsh(x * 31 + y * 17 + r * 7, 5) > 0.965) band = 6;   // grit in the dust
-    }
-    cells.push([x, y, band]);
-  }
-  return cells;
-});
-function puff(p, x, y, radius, P, cool, rim) {
-  const r = Math.min(32, Math.round(radius));
-  if (r < 1) return;
-  x = Math.round(x); y = Math.round(y);
-  for (const [dx, dy, band] of PUFF_PIXELS[r]) {
-    if (rim ? false : band === 0) continue;
-    const xx = x + dx, yy = y + dy;
-    if (xx < -59 || xx > 298 || yy > 0 || yy < -234) continue;
-    const c = rim ? P[0] : band >= 5 ? P[band === 5 ? 0 : 1] : P[cool ? Math.max(1, band - 1) : band];
-    p.put(p.cellX(xx, yy), p.cellY(xx, yy), c, 1);
-  }
+const FPS = 24;
+const LEFT = -59, RIGHT = 298, TOP = -184, WIDTH = RIGHT - LEFT + 1;
+const FRAME_COUNT = Math.ceil((INHALE[1] - BOOM) * FPS);
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+const ordered = (x, y) => BAYER[((y & 3) << 2) | (x & 3)] / 16;
+
+const CROWN = [
+  [-65, 126, 26], [-40, 143, 29], [-12, 128, 32], [22, 138, 28],
+  [56, 136, 31], [-44, 106, 24], [37, 104, 25],
+];
+const BILLOWS = CROWN.map(([x, h, r]) => ({ x, h, r, crown: true }));
+for (let i = 0; i < 18; i++) {
+  const h = 36 + hsh(i, 4) * 105;
+  const x = (hsh(i, 5) * 2 - 1) * h * 0.42;
+  BILLOWS.push({ x, h, r: 7 + hsh(i, 6) * 9 });
 }
-// the lit lotus inside the dust: how close a point is to it (0..1), used to warm the billows it shines through
+for (let i = 0; i < 16; i++) {
+  const h = 26 + hsh(i, 7) * 127;
+  const x = (i % 2 ? 1 : -1) * h * (0.44 + hsh(i, 8) * 0.14);
+  BILLOWS.push({ x, h, r: 3 + hsh(i, 9) * 5 });
+}
+BILLOWS.forEach((B, i) => {
+  B.phase = hsh(i, 34) * TAU;
+  B.delay = (1 - B.h / 172) * 0.33 + 0.08 * hsh(i, 35);
+  B.aspect = 0.69 + 0.27 * hsh(i, 36);
+});
+
+// Retain the v4 internal light envelope, also consumed by the ending.
 export const reveal = (t) => smooth(GHOST[0], GHOST[0] + 0.35, t) * (1 - smooth(INHALE[0] + 0.25, INHALE[0] + 0.6, t));
-const litAt = (x, y, g) => g <= 0 ? 0 : g * Math.max(0, 1 - Math.hypot((x - TX) / 46, (y + 68) / 44));
-// Each billow is pulled up a twisting column into the eye: higher ones first. Returns null once swallowed.
-function inhale(t, x, y, r, phase, d) {
-  const k = clamp((t - INHALE[0] - d) / 0.5);
+
+function inhale(t, x, y, r, phase, delay) {
+  const k = clamp((t - INHALE[0] - delay) / 0.67);
   if (k <= 0) return [x, y, r];
   if (k >= 1) return null;
-  const e = k * k, top = EC[1] + 26, f = Math.sin(phase + e * 7) * 16 * (1 - e) * Math.min(1, k * 4);
-  return [x + (TX - x) * Math.min(1, e * 1.6) + f, y + (top - y) * e, r * (1 - 0.8 * e)];
+  const e = k * k, a = phase + k * 9 + y * 0.025;
+  const orbit = Math.sin(a) * (12 + 0.13 * Math.abs(x - TX)) * Math.sin(Math.PI * k);
+  return [x + (EC[0] - x) * out3(k) + orbit, y + (EC[1] - y) * e, r * (1 - e * 0.88)];
 }
-const RAYS = Array.from({ length: 9 }, (_, i) => { const q = i * TAU / 9; return [Math.cos(q), Math.sin(q), 28 + 18 * hsh(i, 30)]; });
-const SHAPE = [[-1, -0.35], [-0.25, -1], [0.8, -0.65], [1, 0.4], [-0.5, 0.8]];
-const STREAK = Array.from({ length: 7 }, (_, i) => ({ x: (i - 3) * 4.5 + (hsh(i, 50) - 0.5) * 3, h: 0.5 + 0.4 * hsh(i, 51), c: i % 2 ? 1 : 3 }));
 
-function plume(p, t) {
-  const raw = t - BOOM;
-  if (raw < 0.02 || t > INHALE[1] + 0.1) return;
-  const tq = BOOM + Math.floor(raw * 15) / 15, a = tq - BOOM;   // 15 fps poses: pixel animation, no alpha fade
-  const rise = out3(clamp(a / 0.6)), H = 10 + 100 * rise, g = reveal(tq);
-  const poses = [];
-  for (const P of PUFFS) {
-    let x = TX + P.u * (6 + H * P.s * 0.66) + Math.sin(a * 1.3 + P.phase) * (1 + 2 * P.s);
-    let y = -H * P.s - Math.min(a, 1.5) * 3 * P.s, r = P.r * (0.35 + 0.65 * rise) * (1 + 0.08 * Math.min(a, 1.5));
-    if (P.s > 0.72) {   // the crown rolls: out, over and down
-      const th = a * 1.9 + P.phase, side = Math.sign(P.u) || 1;
-      x += side * (Math.cos(th) * 4 + Math.min(a, 1.4) * 9 * P.s); y += Math.sin(th) * 3.5 + Math.min(a, 1.4) * 5 * Math.max(0, Math.abs(P.u) - 0.5);
+function dustColor(x, y, tone, g) {
+  const light = g * Math.max(0, 1 - ((x - TX) / 55) ** 2 - ((y + 57) / 56) ** 2);
+  const ash = clamp((-y - 41) / 76);
+  return DUST_TONES[Math.round(ash * 8)][Math.round(light * 8)][tone];
+}
+
+function billowPose(B, t, a, rise) {
+  const side = Math.sign(B.x), roll = a * (B.crown ? 2.8 : 1.6);
+  const x = TX + B.x * (0.19 + 0.81 * rise);
+  const y = -B.h * rise;
+  // The outer crown turns outwards and then down. Inner billows travel shorter arcs.
+  const turn = B.crown ? 6 : 2.5;
+  const q = inhale(t,
+    x + side * turn * (Math.sin(roll - 0.8) + 0.6) * rise + Math.sin(roll + B.phase) * 2,
+    y + (turn * (1 - Math.cos(roll - 0.8)) * 0.66 + Math.cos(roll + B.phase) * 2) * rise,
+    B.r * (0.2 + 0.8 * rise), B.phase, B.delay);
+  return q && { B, x: q[0], y: q[1], r: q[2] };
+}
+
+function stampBillow(pixels, pose, a, g) {
+  const { B, x, y, r } = pose;
+  const ry = r * B.aspect, skew = Math.sin(a * 1.9 + B.phase) * 0.24;
+  for (let py = Math.max(TOP + 1, Math.floor(y - ry * 1.2)); py <= Math.min(-1, y + ry * 1.2); py++) {
+    const v = (py - y) / ry;
+    const offset = (py - TOP) * WIDTH - LEFT;
+    for (let px = Math.max(LEFT + 1, Math.floor(x - r * 1.35)); px <= Math.min(RIGHT - 1, x + r * 1.35); px++) {
+      const u = (px - x) / r - v * skew, d = u * u + v * v;
+      if (d > 1.35) continue;
+      const angle = Math.atan2(v, u);
+      const edge = 0.98 + 0.13 * Math.sin(angle * 3 + B.phase) + 0.07 * Math.sin(angle * 7 - B.phase);
+      if (d > edge) continue;
+      const fold = (u + 0.29) ** 2 + (v + 0.53) ** 2;
+      const contour = v + u * 0.58 + 0.14 * Math.sin(u * 6 + B.phase);
+      let tone = contour > 0.29 ? 1 : 2;
+      if (fold < 0.72 && contour < -0.21) tone = 3;
+      if (r > 9 && u > -0.64 && fold > 0.70 && fold < 0.82 && contour > -0.23) tone = 1;
+      // Grit appears in small clumps on the lee side of each fold.
+      if (r > 12 && tone < 3 && (px & 3) < 2 && (py & 3) < 2 &&
+          hsh((px >> 2) * 57 + (py >> 2) * 113, B.h) > 0.94) tone = (px & 1) ? 0 : 2;
+      pixels[offset + px] = dustColor(px, py, tone, g);
     }
-    const q = inhale(tq, x, y, r, P.phase, P.d);
-    if (q) poses.push({ x: q[0], y: q[1], r: q[2], lift: tq > INHALE[0] + P.d });
-  }
-  poses.sort((a, b) => a.y - b.y);
-  const pal = (P) => { const w = litAt(P.x, P.y, g); return w > 0.55 ? HOT : w > 0.15 ? WARM : P.y < -H * 0.55 || P.lift ? ASHP : EARTH; };
-  for (const P of poses) puff(p, P.x, P.y, P.r, pal(P), false, 1);
-  for (const P of poses) puff(p, P.x, P.y, P.r, pal(P), false, 0);
-  // earth jets straight up the stem in the first beat
-  if (a < 1.0) for (const S of STREAK) {
-    const len = H * S.h * (a < 0.6 ? 1 : 1 - (a - 0.6) / 0.4);
-    if (len > 2) p.line(TX + S.x, -3, TX + S.x * 1.4, -3 - len, EARTH[S.c], 1);
-  }
-  // grains fraying off the edges
-  if (a < INHALE[0] - BOOM) for (let i = 0; i < 40; i++) {
-    const P = poses[(i * 7) % poses.length];
-    if (!P || P.r < 6) continue;
-    const ph = (a * 1.2 + hsh(i, 60)) % 1, ang = hsh(i, 61) * TAU;
-    const x = P.x + Math.cos(ang) * (P.r + 1 + ph * 9), y = P.y + Math.sin(ang) * (P.r + 1 + ph * 9) + ph * 4;
-    if (ph < 0.8 && y < -1) p.dot(x, y, (litAt(x, y, g) > 0.3 ? WARM : ASHP)[ph < 0.4 ? 3 : 2], 1);
   }
 }
-function groundDust(p, t) {
-  const tq = BOOM + Math.floor((t - BOOM) * 15) / 15, a = tq - BOOM;
-  const poses = [];
-  for (const P of SURGE) {
-    const b = a - P.delay;
-    if (b < 0) continue;
-    const r = P.r * (0.5 + 0.5 * out3(clamp(b / 0.35)));
-    const x = TX + P.vx * (1 - Math.exp(-1.7 * b)) / 1.7, y = -r - 1 - (1 + Math.sin(b * 3 + P.phase)) * 1.5;
-    const q = inhale(tq, x, y, r, P.phase, P.d);
-    if (q) poses.push({ x: q[0], y: q[1], r: q[2] });
+
+function stem(pixels, a, rise, g) {
+  const gather = smooth(INHALE[0] - BOOM, INHALE[0] - BOOM + 0.43, a);
+  const height = 148 * rise;
+  for (let y = -1 - Math.floor(78 * gather); y >= -height; y--) {
+    const v = -y / height;
+    const mid = TX + Math.sin(v * 5 + a * 2) * v * 5;
+    const w = (6 + 64 * v ** 1.1) * (0.34 + 0.66 * rise) * (1 - gather * 0.78);
+    const offset = (y - TOP) * WIDTH - LEFT;
+    for (let x = Math.ceil(mid - w); x < mid + w; x++) {
+      const u = (x - mid) / w;
+      const flutes = Math.sin(u * 17 + v * 3 + Math.sin(v * 11 - a * 5) * 0.5);
+      const tone = flutes > 0.64 && u < 0.45 ? 3 : flutes < -0.6 || u > 0.67 ? 1 : 2;
+      pixels[offset + x] = dustColor(x, y, tone, g);
+    }
   }
-  poses.sort((a, b) => a.y - b.y);
-  for (const P of poses) puff(p, P.x, P.y, P.r, EARTH, false, 1);
-  for (const P of poses) puff(p, P.x, P.y, P.r, EARTH, false, 0);
 }
+
+function groundDust(pixels, t, a) {
+  const b = a - 0.055;
+  if (b <= 0) return;
+  const pull = smooth(INHALE[0], INHALE[0] + 0.5, t);
+  const spread = out3(clamp(b / 0.82));
+  const width = (15 + 182 * spread) * (1 - pull);
+  if (width < 2) return;
+  const height = (8 + 45 * smooth(0, 0.42, b)) * (1 - 0.87 * smooth(0.54, 1.23, b));
+  for (let x = Math.max(LEFT + 1, Math.ceil(TX - width)); x <= Math.min(RIGHT - 1, TX + width); x++) {
+    const u = Math.abs(x - TX) / width, dir = x < TX ? -1 : 1;
+    const phase = u * 14 - b * 10 + dir * 0.7 + Math.sin(u * 6 + dir);
+    const wave = Math.sin(phase);
+    const cap = 0.64 + 0.19 * wave + 0.09 * Math.sin(phase * 1.7 + dir);
+    const reach = clamp((1 - u) * 7);
+    const h = height * cap * reach * (1 - pull);
+    const lift = pull * (18 + (1 - u) * 36);
+    for (let y = Math.ceil(-h - lift); y <= Math.min(0, -lift + 1); y++) {
+      const v = (-y - lift) / Math.max(1, h);
+      const curl = Math.sin(phase + 4 * v + Math.sin(v * 5) * 0.65);
+      const ridge = v + 0.23 * curl;
+      if (v > 0.66 && curl < -0.57 - v * 0.32) continue;
+      if ((v < 0.09 || reach < 0.35) && ordered(x, y) > 0.54 + ridge * 2) continue;
+      const tone = ridge > 0.76 && curl > -0.25 ? 3 : ridge < 0.18 || curl < -0.39 ? 1 : 2;
+      pixels[(y - TOP) * WIDTH + x - LEFT] = EARTH[tone];
+    }
+  }
+}
+
+function vortex(pixels, t) {
+  const draw = smooth(INHALE[0], INHALE[0] + 0.26, t);
+  const clear = smooth(INHALE[1] - 0.38, INHALE[1] - 0.02, t);
+  if (draw <= 0 || clear >= 1) return;
+  const top = EC[1] + 13;
+  const edge = 1 - smooth(INHALE[1] - 0.22, INHALE[1], t);
+  const foot = top * clear;
+  for (let y = Math.ceil(top * draw); y < Math.min(-1, foot + 12); y++) {
+    const v = 1 - y / top;
+    const turn = y * 0.076 - (t - INHALE[0]) * 17;
+    const mid = EC[0] + Math.sin(turn) * (4 + 14 * v) * draw;
+    const w = (11 + 46 * v ** 0.8) * draw * edge;
+    const offset = (y - TOP) * WIDTH - LEFT;
+    for (let x = Math.ceil(mid - w); x < mid + w; x++) {
+      const u = (x - mid) / w, d = Math.abs(u);
+      const fold = Math.sin(turn + u * 4.7);
+      const boundary = 0.86 + 0.12 * Math.sin(turn - Math.sign(u));
+      const tail = foot + 8 * fold - 18 * d * clear;
+      if (y > tail && ordered(x, y) > clamp(1 - (y - tail) / 4)) continue;
+      if (d > boundary && ordered(x, y) > (1 - d) * 4) continue;
+      if (d > 0.55 && fold < -0.68 && Math.sin(y * 0.17 + u * 7 - t * 11) > 0.2) continue;
+      const tone = d > boundary ? 0 : fold > 0.38 ? 3 : fold < -0.44 ? 1 : 2;
+      pixels[offset + x] = dustColor(x, y, tone, 0);
+    }
+  }
+}
+
+function dustFrame(t) {
+  const a = t - BOOM, rise = out3(clamp(a / 0.6)), g = reveal(t);
+  const pixels = new Uint32Array(WIDTH * (1 - TOP));
+  const poses = BILLOWS.map(B => billowPose(B, t, a, rise)).filter(P => P && P.r >= 1);
+  stem(pixels, a, rise, g);
+  poses.sort((a, b) => a.y - b.y);
+  for (const P of poses) stampBillow(pixels, P, a, g);
+  groundDust(pixels, t, a);
+  vortex(pixels, t);
+
+  // Outline the union. Only trace outside the combined silhouette, with breakup along exposed edges.
+  const rows = [];
+  for (let y = TOP; y <= 0; y++) {
+    const row = new Uint32Array(WIDTH);
+    const offset = (y - TOP) * WIDTH;
+    let first = WIDTH, last = -1;
+    for (let i = 1; i < WIDTH - 1; i++) {
+      const j = offset + i;
+      let color = pixels[j];
+      if (!color) {
+        const topEdge = pixels[j + WIDTH];
+        const sideEdge = pixels[j + 1] || pixels[j - 1];
+        if (topEdge || sideEdge || pixels[j - WIDTH]) {
+          const threshold = ordered(i, y);
+          if (threshold < 0.88) color = dustColor(i + LEFT, y, topEdge ? 1 : 0, g);
+        } else if (((i + y) & 3) === 0 && (pixels[j + WIDTH * 2] || pixels[j + 2] || pixels[j - 2])) {
+          color = dustColor(i + LEFT, y, 1, 0);
+        }
+      }
+      if (!color) continue;
+      row[i] = color;
+      first = Math.min(first, i);
+      last = i;
+    }
+    if (last >= 0) rows.push({ x: LEFT + first, y, colors: row.slice(first, last + 1) });
+  }
+  return rows;
+}
+
+// Pose data depends only on time. Rasterize once, so playback only writes visible dust pixels.
+const DUST_FRAMES = Array.from({ length: FRAME_COUNT }, (_, i) => dustFrame(BOOM + (i + 0.5) / FPS));
+
+function drawDust(p, a) {
+  const rows = DUST_FRAMES[Math.floor(a * FPS)];
+  if (!rows) return;
+  if (p.sn === 0 && p.cs === 1) {
+    for (const { x, y, colors } of rows) {
+      const sx = p.cellX(x, y), sy = p.cellY(x, y);
+      for (let i = 0; i < colors.length; i++) p.put(sx + i * p.fx, sy, colors[i]);
+    }
+    return;
+  }
+  for (const { x, y, colors } of rows) {
+    for (let i = 0; i < colors.length; i++) {
+      if (colors[i]) p.dot(x + i, y, colors[i]);
+    }
+  }
+}
+
+const ROCKS = Array.from({ length: 18 }, (_, i) => {
+  const vy = -78 - 230 * hsh(i, 9), base = -1 - 6 * hsh(i, 15), gravity = 310;
+  const land = (-vy + Math.sqrt(vy * vy + 16 * gravity)) / (2 * gravity);
+  return {
+    vx: (i % 2 ? 1 : -1) * (22 + 125 * hsh(i, 8)), vy, base, land, gravity,
+    bounce: 0.11 + 0.14 * hsh(i, 12), size: 1 + 2 * hsh(i, 10),
+    tone: i % 2, spin: (hsh(i, 13) - 0.5) * 16, phase: hsh(i, 16) * TAU,
+    delay: 0.24 + 0.25 * hsh(i, 14),
+  };
+});
+const SHAPE = [[-1, -0.35], [-0.45, -1], [0.6, -0.7], [0.95, 0.15], [0.1, 0.9], [-0.74, 0.62]];
+
+function rubble(p, t, a) {
+  for (const R of ROCKS) {
+    const b = Math.min(a, R.land), after = Math.max(0, a - R.land);
+    const hop = Math.min(after, R.bounce);
+    const x = TX + R.vx * (b + hop * 0.32);
+    const y = R.base - 4 + R.vy * b + R.gravity * b * b - R.gravity * hop * (R.bounce - hop);
+    const q = inhale(t, x, y, R.size, R.phase, R.delay);
+    if (!q || q[2] < 0.65) continue;
+    const [cx, ground, size] = q, cy = ground - size;
+    const angle = R.phase + R.spin * (b + hop) + Math.max(0, t - INHALE[0] - R.delay) * 9;
+    const cs = Math.cos(angle), sn = Math.sin(angle);
+    const pts = SHAPE.map(([u, v]) => [cx + (u * cs - v * sn) * size, cy + (u * sn + v * cs) * size]);
+    if (size >= 1.7 && a < R.land && a < 0.48) {
+      const speed = R.vy + 2 * R.gravity * b;
+      p.line(cx - R.vx * 0.045, cy - speed * 0.045, cx - R.vx * 0.019, cy - speed * 0.019, DUST[2]);
+    }
+    if (after > 0 && after < 0.23) {
+      const hitX = TX + R.vx * R.land, d = 2 + after * 24;
+      const lift = after * 18, side = Math.sign(R.vx);
+      p.poly([[hitX - d, R.base - lift], [hitX + side * d * 0.4, R.base - lift - 3],
+        [hitX + d, R.base - lift - 1], [hitX + d * 0.3, R.base - lift + 1]], DUST[2]);
+      p.dot(hitX + side * d * 0.7, R.base - 2 - lift, DUST[3]);
+    }
+    p.poly(pts, DUST[R.tone + 1]);
+    const light = Math.floor(((angle + TAU * 4) / TAU % 1) * pts.length);
+    p.poly([pts[light], pts[(light + 1) % 6], pts[(light + 2) % 6], [cx, cy]], DUST[R.tone + 3]);
+  }
+}
+
+const SPARKS = Array.from({ length: 27 }, (_, i) => ({
+  phase: hsh(i, 64), rad: 18 + 39 * hsh(i, 65), speed: 0.9 + 0.7 * hsh(i, 66), color: i % 5 ? EMBER[2] : L[2],
+}));
+
+function embers(p, t) {
+  if (t < INHALE[0] || t >= INHALE[1]) return;
+  const a = t - INHALE[0], clear = smooth(INHALE[0] + 0.46, INHALE[1], t);
+  for (const S of SPARKS) {
+    const k = (S.phase + a * S.speed) % 1;
+    if (k < clear || k > a * 5) continue;
+    const y = EC[1] * k, phase = k * 13 - a * 13 + S.phase * TAU;
+    const x = EC[0] + Math.sin(phase) * S.rad * (1 - 0.9 * k);
+    p.dot(x, y, S.color);
+    if (S.color === L[2]) p.dot(x - Math.cos(phase), y + 2, EMBER[1]);
+  }
+}
+
+const RAYS = Array.from({ length: 9 }, (_, i) => {
+  const q = i * TAU / 9;
+  return [Math.cos(q), Math.sin(q), 28 + 18 * hsh(i, 30)];
+});
+const RING = Array.from({ length: 41 }, (_, i) => [Math.cos(i * TAU / 40), Math.sin(i * TAU / 40)]);
 
 export function blast(p, t, layer) {
   const a = t - BOOM;
   if (a < 0 || t > INHALE[1] + 0.6) return;
-  if (layer === 'back') {   // the crater: a hot core cooling under a dark rim
+  if (layer === 'back') {
     const k = 1 - smooth(INHALE[1] - 0.2, INHALE[1] + 0.5, t), hot = 1 - smooth(0.2, 1.8, a);
     if (k <= 0) return;
     const rx = 34 * k, ry = 3.5 * k;
@@ -134,44 +301,25 @@ export function blast(p, t, layer) {
     });
     return;
   }
-  if (a > 0.12 && t < INHALE[0] + 0.5) {   // ground veil, pulled away with the rest
-    const k = 1 - smooth(INHALE[0], INHALE[0] + 0.5, t), r = (35 + 85 * out3(clamp(a))) * k;
-    p.shade(TX - r, -6 * k, TX + r, 1, (x, y, o) => {
-      if (Math.abs(x - TX) < 29 * k && y > -4 * k) return;
-      if (((x - TX) / r) ** 2 + ((y + 1) / (4 * k + 0.1)) ** 2 < 1) o.c = y < -2 ? DUST[2] : DUST[1];
-    });
-  }
   if (a < 0.25) {
     const f = 1 - a / 0.25;
     p.glow(LC[0], LC[1], 44, L[6], 0.35 * f);
     p.disc(LC[0], LC[1], 16 * f, L[6], 1);
     for (let ring = 0; ring < 2; ring++) {
-      const r = 14 + (ring ? 108 : 132) * out3(clamp(a / 0.25)), pts = [];
-      for (let i = 0; i <= 40; i++) { const q = i * TAU / 40; pts.push([TX + Math.cos(q) * r, -2 + Math.sin(q) * r * 0.1]); }
+      const r = 14 + (ring ? 108 : 132) * out3(clamp(a / 0.25));
+      const pts = RING.map(([x, y]) => [TX + x * r, -2 + y * r * 0.1]);
       p.polyline(pts, ring ? L[3] : L[5]);
       if (!ring && a < 0.15) p.polyline(pts.map(([x, y]) => [x, y - 1]), L[4]);
     }
   }
-  plume(p, t);
-  groundDust(p, t);
-  if (a < 0.095) for (const [dx, dy, len] of RAYS) {
-    const r = len * (0.75 + a * 3);
-    p.poly([[TX + dx * 10 - dy * 2, LC[1] + dy * 10 + dx * 2], [TX + dx * r, LC[1] + dy * r], [TX + dx * 10 + dy * 2, LC[1] + dy * 10 - dx * 2]], L[5]);
-  }
-  if (a < 0.095) p.disc(LC[0], LC[1], 12 * (1 - a / 0.095), L[6], 1);
-  for (const [i, R] of ROCKS.entries()) {
-    const b = Math.min(a, R.land), after = Math.max(0, a - R.land), hop = Math.min(after, R.bounce);
-    let x = TX + R.vx * (b + hop * 0.25), y = a < R.land ? -4 + R.vy * b + 260 * b * b : -260 * hop * (R.bounce - hop);
-    const q = inhale(t, x, y, R.s, i, 0.1 + 0.3 * hsh(i, 14));   // the rubble goes up too
-    if (!q) continue;
-    x = q[0]; y = q[1];
-    const s = q[2], angle = R.spin * (b + hop) + Math.max(0, t - INHALE[0]) * 9, cs = Math.cos(angle), sn = Math.sin(angle);
-    const pts = SHAPE.map(([u, v]) => [x + (u * cs - v * sn) * s, y - s + (u * sn + v * cs) * s]);
-    if (s > 3 && a < R.land) {
-      const vy = R.vy + 520 * b;
-      p.line(x - R.vx * 0.055, y - s - vy * 0.055, x - R.vx * 0.015, y - s - vy * 0.015, DUST[2]);
+  drawDust(p, a);
+  if (a < 0.095) {
+    for (const [dx, dy, len] of RAYS) {
+      const r = len * (0.75 + a * 3);
+      p.poly([[TX + dx * 10 - dy * 2, LC[1] + dy * 10 + dx * 2], [TX + dx * r, LC[1] + dy * r], [TX + dx * 10 + dy * 2, LC[1] + dy * 10 - dx * 2]], L[5]);
     }
-    p.poly(pts, DUST[R.c]);
-    p.poly([pts[0], pts[1], pts[2], [x, y - s]], DUST[R.c + 1]);
+    p.disc(LC[0], LC[1], 12 * (1 - a / 0.095), L[6], 1);
   }
+  rubble(p, t, a);
+  embers(p, t);
 }

@@ -1,127 +1,152 @@
-// Flame lotus: opaque stepped petals, detached tongues and staggered dust echoes.
-import { smooth, clamp } from '../../core/index.js';
-import { L, TX, APPEAR, OPENS, LOCK, BOOM, GHOST, LC, sm, out3, hsh } from './_tinhlien-common.js';
+// Three tiers of white flame, viewed slightly from above.
+import { clamp, smooth } from '../../core/index.js';
+import { L, APPEAR, OPENS, LOCK, BOOM, LC, out3, hsh } from './_tinhlien-common.js';
 
-const RINGS = [
-  { n: 6, len: 30, w: 17, spread: 1.25 },
-  { n: 5, len: 27, w: 15, spread: 0.8 },
-  { n: 3, len: 21, w: 12, spread: 0.3 },
+// Root x/y, open tip x/y, full width, phase. The outer ring straddles the other tiers.
+const OUTER_BACK = [
+  [-7, 4, -34, -15, 15, 0.3], [1, 4, 27, -29, 16, 4.4], [7, 5, 35, -15, 15, 5.6],
 ];
-const PROFILE = Array.from({ length: 9 }, (_, i) => Math.sin(Math.PI * (i / 8) ** 0.75) * 0.5);
-const SEEDS = Array.from({ length: 8 }, (_, i) => [hsh(i, 6), hsh(i, 7)]);
+const MIDDLE = [
+  [-5, 4, -27, -28, 13, 2], [4, 3, 16, -36, 14, 6.6], [-1, 4, 0, -40, 15, 3.7],
+  [-3, 4, -15, -36, 14, 1.7], [5, 5, 27, -24, 13, 8.2],
+];
+const BUD = [
+  [-3, 4, -10, -25, 11, 4.9], [4, 4, 12, -25, 11, 7.3], [0, 4, 3, -32, 12, 2.8],
+];
+const OUTER_FRONT = [
+  [-7, 8, -32, -8, 17, 1.2], [7, 8, 33, -7, 17, 3.3], [0, 9, -3, -13, 15, 5.1],
+];
 
-// Scan transformed polygon rows once, rather than testing every edge at every pixel.
-// The axial coordinate supplies solid gold/cream/white bands without extra fills.
-function fillPetal(p, pts, bx, by, c, s, len, white, echo, seed) {
-  const q = pts.map(([x, y]) => [p.toX(x, y), p.toY(x, y)]);
-  const ox = p.toX(bx, by), oy = p.toY(bx, by);
-  const dx = p.toX(bx + c, by + s) - ox, dy = p.toY(bx + c, by + s) - oy;
-  let lo = Infinity, hi = -Infinity;
-  for (const a of q) { lo = Math.min(lo, a[1]); hi = Math.max(hi, a[1]); }
-  const base = echo ? L[1] : L[white > 0.35 ? 4 : 3];
-  const body = echo ? L[2] : L[white > 0.7 ? 6 : white > 0.25 ? 5 : 4];
-  const rim = echo ? L[3 + (seed % 2)] : L[white > 0.45 ? 6 : 5];
-  for (let y = Math.max(p.oy, Math.floor(lo)); y <= Math.min(p.oy + p.h - 1, Math.ceil(hi)); y++) {
-    const hits = [], yy = y + 0.5;
-    for (let i = 0, j = q.length - 1; i < q.length; j = i++) {
-      const a = q[j], b = q[i];
-      if ((a[1] > yy) !== (b[1] > yy)) hits.push(a[0] + (yy - a[1]) * (b[0] - a[0]) / (b[1] - a[1]));
+// Local axial positions and half-widths. The last crown points form continuous forks.
+const PROFILE = [[0, 0.09], [0.19, 0.32], [0.39, 0.51], [0.58, 0.47], [0.73, 0.31]];
+const EMBERS = Array.from({ length: 6 }, (_, i) => [hsh(i, 6), hsh(i, 7)]);
+const SPARKS = Array.from({ length: 7 }, (_, i) => {
+  const a = -Math.PI / 2 + (i - 3) * 0.49 + (hsh(i, 15) - 0.5) * 0.2;
+  return [Math.cos(a), Math.sin(a), i / 7, hsh(i, 16)];
+});
+
+function fillPetal(p, points, ox, oy, ax, ay, veinWidth, rim, body, base, vein) {
+  const edges = [], screen = points.map(([x, y]) => [p.toX(x, y), p.toY(x, y)]);
+  let low = Infinity, high = -Infinity;
+  for (let i = 0, j = screen.length - 1; i < screen.length; j = i++) {
+    let [x0, y0] = screen[j], [x1, y1] = screen[i];
+    if (y1 < y0) { [x0, x1] = [x1, x0]; [y0, y1] = [y1, y0]; }
+    if (y1 === y0) continue;
+    edges.push([x0, y0, y1, (x1 - x0) / (y1 - y0)]);
+    low = Math.min(low, y0);
+    high = Math.max(high, y1);
+  }
+  const hits = [], xEnd = p.ox + p.w - 1;
+  for (let y = Math.max(p.oy, Math.ceil(low - 0.5)); y <= Math.min(p.oy + p.h - 1, Math.floor(high - 0.5)); y++) {
+    const yy = y + 0.5;
+    hits.length = 0;
+    for (const edge of edges) {
+      if (yy >= edge[1] && yy < edge[2]) hits.push(edge[0] + (yy - edge[1]) * edge[3]);
     }
-    hits.sort((a, b) => a - b);
-    for (let i = 0; i + 1 < hits.length; i += 2) {
-      const left = Math.max(p.ox, Math.ceil(hits[i] - 0.5)), right = Math.min(p.ox + p.w - 1, Math.floor(hits[i + 1] - 0.5));
-      let u = ((left + 0.5 - ox) * dx + (yy - oy) * dy) / len;
-      for (let x = left; x <= right; x++, u += dx / len) {
-        p.put(x, y, x === left || x === right || u > 0.86 ? rim : u < 0.3 ? base : body);
+    if (hits.length === 2 && hits[0] > hits[1]) [hits[0], hits[1]] = [hits[1], hits[0]];
+    if (hits.length > 2) hits.sort((a, b) => a - b);
+    for (let j = 0; j + 1 < hits.length; j += 2) {
+      const left = Math.ceil(hits[j] - 0.5), right = Math.floor(hits[j + 1] - 0.5);
+      const dy = yy - oy;
+      const end = Math.min(right, xEnd);
+      for (let x = Math.max(left, p.ox); x <= end; x++) {
+        const dx = x + 0.5 - ox, u = dx * ax + dy * ay;
+        // The curled vein ends before the fork, leaving the tips white.
+        const v = dy * ax - dx * ay + 0.052 * u * u;
+        const pigment = u < 0.22 ? base : u < 0.76 && Math.abs(v) < veinWidth ? vein : body;
+        p.put(x, y, pigment);
       }
     }
   }
-}
-
-function flamePetal(p, bx, by, ang, len, w, t, seed, white, echo) {
-  if (len < 0.6) return;
-  const c = Math.cos(ang), s = Math.sin(ang), left = [], right = [];
-  const bend = 2.2 * Math.sin(t * 6 + seed * 3), phase = t * 11 + seed * 5;
-  const point = (a, b) => [bx + a * c - b * s, by + a * s + b * c];
-  for (let i = 0; i <= 8; i++) {
-    const u = i / 8;
-    const half = w * PROFILE[i] * (1 + 0.25 * Math.sin(phase + u * 6) + 0.12 * Math.sin(t * 23 + seed + u * 11));
-    const b = bend * u * u;
-    left.push(point(u * len, -half + b)); right.push(point(u * len, half + b));
-  }
-  const tip = point(len * (1.04 + 0.07 * Math.sin(t * 17 + seed * 7)), bend);
-  fillPetal(p, [...left, tip, ...right.reverse()], bx, by, c, s, len, white, echo, seed);
-  const a = point(len * 0.12, 0), b = point(len * 0.69, bend * 0.48);
-  p.line(...a, ...b, echo ? L[3] : L[white > 0.65 ? 5 : 3]);
-  if (echo || white > 0.8) return;
-  // Each tongue leaves a real gap, rises vertically and shrinks away, then respawns.
-  for (let j = 0; j < 2; j++) {
-    const age = (t * (1.6 + (seed % 3) * 0.13) + seed * 0.137 + j * 0.47) % 1;
-    if (age > 0.78) continue;
-    const x = tip[0] + (j ? 1 : -1) * w * 0.1 + Math.sin(t * 18 + seed) * age * 2;
-    const y = tip[1] - 1.5 - age * 9, h = (1 - age) * Math.min(4, len * 0.16);
-    p.line(x, y, x + Math.sin(seed + t * 9), y - h, L[j ? 5 : 6]);
+  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+    p.line(points[j][0], points[j][1], points[i][0], points[i][1], rim);
   }
 }
 
-function lotusShape(p, t, layer, cx, cy, size, crush, echo = 0) {
-  const sway = 0.12 * Math.sin(t * 3.1) + 0.05 * Math.sin(t * 8.3) + crush * 0.32 * Math.sin(t * 10);
-  const ring = (R, ri) => {
-    for (let j = 0; j < R.n; j++) {
-      const seed = ri * 10 + j, f = j / (R.n - 1) - 0.5;
-      let reveal = 1;
-      if (echo) {
-        reveal = smooth(GHOST[0] + (seed % 7) * 0.032, GHOST[0] + 0.22 + (seed % 7) * 0.032, t)
-          * (1 - smooth(GHOST[1] - 0.28 - (seed % 5) * 0.025, GHOST[1], t));
-        if (Math.sin(t * (16 + j * 0.5) + seed * 2.3) < -0.78 || reveal < 0.13) continue;
-      }
-      const ang = -Math.PI / 2 + sway + f * 2 * R.spread * (1 - 0.86 * crush);
-      flamePetal(p, cx + f * 6 * size, cy + 6 * size, ang, R.len * size * reveal, R.w * size * reveal,
-        t, seed, crush, echo);
-    }
+function petal(p, design, cx, cy, sx, sy, sway, t, crush, rim, body) {
+  const [rootX, rootY, tipX, tipY, width, phase] = design;
+  const bx = cx + rootX * sx, by = cy + rootY * sy;
+  const flicker = t * 13 + phase;
+  const dx = ((tipX - rootX) * (1 - 0.73 * crush) + sway * (rootY - tipY) + 1.55 * Math.sin(flicker)) * sx;
+  const dy = (tipY - rootY + 1.5 * Math.sin(t * 11 + phase)) * sy;
+  const length = Math.hypot(dx, dy);
+  const nx = -dy / length, ny = dx / length, w = width * sx;
+  const bend = w * (0.11 * Math.sin(t * 8 + phase) - 0.06);
+  const point = (u, v) => {
+    const offset = v * w + bend * u * u;
+    const x = bx + dx * u + nx * offset, y = by + dy * u + ny * offset;
+    return [x, y];
   };
-  if (layer === 'back') { ring(RINGS[0], 0); return; }
-  ring(RINGS[1], 1); ring(RINGS[2], 2);
-  // Shallow golden receptacle, with a bright elliptical lip and seven lotus seeds.
-  const cupSize = size * (echo ? smooth(GHOST[0] + 0.08, GHOST[0] + 0.35, t)
-    * (1 - smooth(GHOST[1] - 0.3, GHOST[1], t)) : 1);
-  const y = cy + 1.5 * size, w = 7 * cupSize, h = 3 * cupSize;
-  if (cupSize < 0.12) return;
-  const cup = [[cx - w, y], [cx - w * 0.65, y + h], [cx, y + h * 1.3], [cx + w * 0.65, y + h], [cx + w, y]];
-  p.poly(cup, L[echo ? 1 : crush > 0.6 ? 5 : 2]);
-  p.poly([[cx - w, y], [cx - w * 0.5, y - h * 0.6], [cx + w * 0.5, y - h * 0.6], [cx + w, y], [cx, y + h * 0.45]], L[echo ? 2 : crush > 0.4 ? 6 : 3]);
-  for (let i = 0; i < 7; i++) p.dot(cx + ((i % 4) - (i < 4 ? 1.5 : 1)) * 2.7 * cupSize, y + (i < 4 ? -0.7 : 0.6) * cupSize, L[echo ? 4 : 6]);
+
+  const left = [], right = [];
+  for (const [u, half] of PROFILE) {
+    left.push(point(u, -half * (1 + 0.15 * Math.sin(flicker - u * 10))));
+    right.push(point(u, half * (1 + 0.15 * Math.sin(flicker + 1.2 - u * 10))));
+  }
+  const leftTip = 0.82 + 0.06 * Math.sin(flicker + 0.5);
+  const rightTip = 0.86 + 0.07 * Math.sin(flicker - 0.9);
+  const crown = [
+    point(leftTip, -0.24), point(0.8, -0.09),
+    point(1.01 + 0.04 * Math.sin(flicker + 2), 0.025 * Math.cos(flicker)),
+    point(0.82, 0.1), point(rightTip, 0.22),
+  ];
+  const ox = p.toX(bx, by), oy = p.toY(bx, by);
+  const ax = (p.toX(bx + dx, by + dy) - ox) / (length * length);
+  const ay = (p.toY(bx + dx, by + dy) - oy) / (length * length);
+  const heat = clamp(crush + 0.13 * Math.sin(flicker * 0.76));
+  fillPetal(p, [...left, ...crown, ...right.reverse()], ox, oy, ax, ay, 0.54 / length,
+    L[heat > 0.92 ? 5 : heat > 0.55 ? 4 : rim],
+    L[heat > 0.47 ? 6 : body],
+    L[heat > 0.78 ? 5 : heat > 0.48 ? 4 : 2],
+    L[heat > 0.65 ? 5 : 3]);
 }
 
-function liveLotus(p, t, layer) {
+function embers(p, t, cx, cy, sx, sy, born, crush) {
+  for (let i = 0; i < EMBERS.length; i++) {
+    const [seed, drift] = EMBERS[i];
+    const age = (t * 1.5 + i / EMBERS.length) % 1;
+    const size = born * smooth(0, 0.1, age) * (1 - smooth(0.54, 1, age)) * (1 - crush);
+    if (size < 0.42) continue;
+    const side = i % 2 ? 1 : -1;
+    const x = cx + side * (16 + 14 * seed - age * 5) * sx + Math.sin(t * 6 + i) * age * 3;
+    const y = cy - (10 + 9 * drift + age * 30) * sy;
+    const h = (4.5 + seed * 3) * size, w = (1.2 + drift * 0.7) * size;
+    p.poly([[x, y], [x - w, y - h * 0.35], [x + side * w * 0.7, y - h],
+      [x + w, y - h * 0.42], [x + w * 0.65, y - h * 0.12]], L[4]);
+    p.line(x, y - h * 0.25, x + side * w * 0.55, y - h * 0.71, L[6]);
+  }
+}
+
+export function lotus(p, t, layer) {
   if (t < APPEAR - 0.05 || t > BOOM + 0.02) return;
-  const born = out3(clamp((t - APPEAR + 0.05) / 0.25)), crush = sm(clamp((t - LOCK) / (BOOM - LOCK))), stare = smooth(OPENS[2], LOCK, t);
-  const breathe = 1 + (0.08 + 0.08 * stare) * Math.sin(t * (7 + 6 * stare)) + 0.04 * Math.sin(t * 17);
-  const size = born * breathe * (1 - 0.7 * crush) * (1 + 0.1 * Math.sin(t * 40) * crush);
-  const cx = LC[0] + crush * Math.sin(t * 113) * 1.3, cy = LC[1] + crush * Math.sin(t * 137);
-  if (layer === 'back') p.glow(cx, cy - 7 * size, 17 * size, L[4], 0.12 * breathe);
-  lotusShape(p, t, layer, cx, cy, size, crush);
-  if (layer !== 'front') return;
-  if (crush > 0.3) {
-    p.glow(cx, cy, 8 + 20 * crush, L[6], 0.3 * crush);
-    const ball = smooth(0.5, 0.94, crush);
-    if (ball > 0) p.disc(cx, cy - 2, 7 * ball, L[6], 0.95 * ball);
+  const born = out3(clamp((t - APPEAR + 0.05) / 0.25));
+  if (born < 0.08) return;
+  const crush = smooth(LOCK, BOOM, t), stare = smooth(OPENS[2], LOCK, t);
+  const breath = (0.06 + 0.05 * stare) * Math.sin(t * 8.4) + 0.025 * Math.sin(t * 15);
+  const size = born * (1 - 0.5 * crush);
+  const sx = size * (1 + breath), sy = size * (1 - 0.58 * breath);
+  const sway = 0.07 * Math.sin(t * 4.3) + 0.035 * Math.sin(t * 9.1);
+  // The loose bloom rests on the chest. During compression its crown meets the ray at LC.
+  const cx = LC[0] + 1.7 * Math.sin(t * 5) * (1 - crush);
+  const cy = LC[1] + 0.85 * Math.sin(t * 8.4) + 8 * crush;
+  if (layer === 'back') {
+    p.glow(cx, cy - 10 * sy, 24 * size, L[3], 0.075 + 0.1 * crush);
+    for (const shape of OUTER_BACK) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 4, 5);
+    return;
   }
-  for (let i = 0; i < 8; i++) {
-    const age = (t * 1.3 + SEEDS[i][0]) % 1;
-    if (age > 0.8) continue;
-    const x = cx + (SEEDS[i][1] - 0.5) * 35 * size + Math.sin(t * 6 + i) * age * 2;
-    const y = cy - (10 + 27 * age) * size;
-    p.line(x, y, x, y - (age < 0.4 ? 1.5 : 0), L[6]);
-  }
-}
+  for (const shape of MIDDLE) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 3, 5);
+  for (const shape of BUD) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 3, 6);
+  for (const shape of OUTER_FRONT) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 3, 5);
+  embers(p, t, cx, cy, sx, sy, born, crush);
 
-function ghost(p, t) {
-  if (t <= GHOST[0] || t >= GHOST[1]) return;
-  const g = smooth(GHOST[0], GHOST[0] + 0.3, t) * (1 - smooth(GHOST[1] - 0.4, GHOST[1], t));
-  const size = 2.1 * (1 + 0.035 * Math.sin(t * 13));
-  lotusShape(p, t, 'back', TX, -62, size, 0, 1);
-  lotusShape(p, t, 'front', TX, -62, size, 0, 1);
-  p.glow(TX, -68, 35, L[4], 0.16 * g);
+  const flare = smooth(0.2, 1, crush);
+  if (flare <= 0) return;
+  p.glow(LC[0], LC[1], 7 + 8 * flare, L[5], 0.36 * flare);
+  for (const [dx, dy, phase, seed] of SPARKS) {
+    const age = ((t - LOCK) * 5 + phase) % 1;
+    if (age > 0.45 + 0.37 * flare) continue;
+    const r = 1 + age * (11 + 13 * flare), length = 1 + (1 - age) * (2 + seed * 2) * flare;
+    p.line(LC[0] + dx * r, LC[1] + dy * r,
+      LC[0] + dx * (r + length), LC[1] + dy * (r + length), L[age < 0.3 ? 6 : 4]);
+  }
 }
-export function lotus(p, t, layer) { liveLotus(p, t, layer); }   // v4: the ghost lotus is now light inside the dust (_tinhlien-end.js)
