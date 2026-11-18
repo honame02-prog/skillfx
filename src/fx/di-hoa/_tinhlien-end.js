@@ -253,7 +253,7 @@ function gulp(p, t) {
 
 const FLAKES = Array.from({ length: 70 }, (_, i) => ({
   x: -59 + (i % 10 + hsh(i, 10)) * 35.7,
-  y: -234 + (Math.floor(i / 10) + hsh(i, 11)) * 32.4,
+  y: -294 + (Math.floor(i / 10) + hsh(i, 11)) * 32.4,
   phase: hsh(i, 12) * TAU, speed: 11 + 15 * hsh(i, 13),
   start: hsh(i, 14) * 0.16, end: ASH[1] - 1.03 * hsh(i, 15) ** 1.7,
   shape: i % 5, color: L[i % 11 === 0 ? 3 : i % 3 === 0 ? 4 : 5],

@@ -5,7 +5,7 @@ import { dustMass } from './_tinhlien-dust-lib.js';
 
 const EMBER = ['#572b23', '#883c28', '#b75b2e'].map(hex);
 const FPS = 24;
-const LEFT = -59, RIGHT = 298, TOP = -184, WIDTH = RIGHT - LEFT + 1;
+const LEFT = -59, RIGHT = 298, TOP = -244, WIDTH = RIGHT - LEFT + 1;
 const FRAME_COUNT = Math.ceil((INHALE[1] - BOOM) * FPS);
 
 // The large crown billows roll out over the sloping sides of the cone.

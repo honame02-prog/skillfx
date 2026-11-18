@@ -11,7 +11,7 @@ export const meta = {
   name: 'Tinh Lien Yeu Hoa',
   desc: 'A beast eye parts the clouds and its pale sunbeam gaze burns a white flame-lotus on the target, which explodes into a towering cone of dust with a ghost lotus inside.',
   tags: ['di-hoa', 'fire', 'eye', 'light', 'explosion', 'one-shot'],
-  size: [360, 260], origin: [60, 235], duration: END, loop: false, fps: 30, bg: 'ground', actor: 2,
+  size: [360, 320], origin: [60, 295], duration: END, loop: false, fps: 30, bg: 'ground', actor: 2,
   options: { seed: 5 },
 };
 const ticks = [];

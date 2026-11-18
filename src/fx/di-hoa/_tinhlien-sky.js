@@ -3,7 +3,7 @@ import { smooth, hex, mix } from '../../core/index.js';
 import { L, LID, IRIS, PUPIL, VEIN, CLOUD, TX, GATHER, APPEAR, OPENS, LEVEL, LOCK, BOOM, SHUT, INHALE, EC, EW, EH, hsh, openAt, eyeK, lockAt, pupilW, grid } from './_tinhlien-common.js';
 import { lidFlames, shutBand, veil } from './_tinhlien-eye-lib.js';
 
-const LEFT = -60, RIGHT = 300, CEILING = -235;
+const LEFT = -60, RIGHT = 300, CEILING = -295;
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
 const FIRE = ['#50182a', '#ad3b16', '#ec7a20', '#ffc344', '#fff0ab'].map(hex);
 const VOID = hex('#030106'), WALL = hex('#110a15'), WHITE = hex('#fffaf0');
@@ -36,7 +36,7 @@ function veilPixels(level) {
   const raster = { dot(x, y, c) { pixels[(y - CEILING) * VEIL_WIDTH + x - LEFT] = c; } };
   veil(raster, LEFT, CEILING, RIGHT, VEIL_BOTTOM, (x, y) => {
     const away = Math.max(0, -x, x - TX);
-    const distance = 0.76 * (1 - smooth(-210, -16, y)) + 0.47 * smooth(0, 145, away);
+    const distance = 0.76 * (1 - smooth(-266, -16, y)) + 0.47 * smooth(0, 145, away);
     const noise = 0.07 * Math.sin(x * 0.026 + y * 0.033) + 0.055 * Math.sin(x * 0.053 - y * 0.021);
     const sky = 1 - smooth(-58, VEIL_BOTTOM - 6, y);
     return level * sky * clamp01(distance + noise);
@@ -77,12 +77,12 @@ function drawVeil(p, t, op, solid) {
 
 // A 10 fps spiral with bilinear noise on a coarse grid. Only the visible
 // cloud rows are rasterized and stored as same-color runs.
-const CLOUD_BOTTOM = -94;
+const CLOUD_BOTTOM = -150;
 const CLOUD_MEMO = [];
 const CLOUD_DIM = [hex('#100c17'), hex('#191322'), hex('#231929'), hex('#2c1f31'), hex('#342839'), hex('#423244')];
 const CLOUD_LIT = [CLOUD[0], CLOUD[1], CLOUD[2], hex('#392f40'), CLOUD[3], hex('#584451')];
 const CLOUD_GLOW = [hex('#432820'), hex('#684027'), hex('#9b612c')];
-const CLOUD_ROLLS = [[-37, -211, 38, 26, 0.4], [0, -193, 32, 23, 2.6]];
+const CLOUD_ROLLS = [[-37, -267, 38, 26, 0.4], [0, -249, 32, 23, 2.6]];
 function cloudRuns(step) {
   if (CLOUD_MEMO[step]) return CLOUD_MEMO[step];
   const t = step / 10, op = openAt(Math.min(t, SHUT[0]));
@@ -113,8 +113,8 @@ function cloudRuns(step) {
   const runs = [], pal = pull >= 0.55 ? CLOUD_DIM : CLOUD_LIT;
   const cutoff = 0.12 + (1 - fade) * 1.12;
   for (let y = CEILING; y < CLOUD_BOTTOM; y++) {
-    const lower = smooth(-175, CLOUD_BOTTOM, y) * 0.89;
-    const glow = pull > 0.16 && y < -129;
+    const lower = smooth(-231, CLOUD_BOTTOM, y) * 0.89;
+    const glow = pull > 0.16 && y < -185;
     const glowCutoff = flash ? 0.64 : 0.75;
     let previous = 0, start = LEFT;
     for (let x = LEFT; x < RIGHT; x++) {

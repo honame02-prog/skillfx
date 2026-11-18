@@ -9,7 +9,7 @@ export const DUST = ['#2e2722', '#4a3f36', '#6b5d50', '#8f7f6e', '#b3a490'].map(
 export const CLOUD = ['#16121c', '#221c2a', '#302838', '#43384a'].map(hex);
 export const TX = 150, END = 7.8, GATHER = 0.0, APPEAR = 0.6, OPENS = [1.0, 1.6, 2.2], LEVEL = [0.25, 0.6, 1], LOCK = 3.0, BOOM = 3.4;
 export const SHUT = [5.72, 5.9], GHOST = [3.8, 4.8], INHALE = [4.75, 5.8], ASH = [5.9, 7.55];   // v4 ending: reveal, inhale, snap shut, ash
-export const LC = [TX, -24], EC = [TX, -176], EW = 100, EH = 30, IR = 30;   // v4: a bigger eye in a tear of the sky
+export const LC = [TX, -24], EC = [TX, -232], EW = 100, EH = 30, IR = 30;   // v4: a bigger eye in a tear of the sky
 export const sm = (u) => u * u * (3 - 2 * u), out3 = (u) => 1 - (1 - u) ** 3;
 export const hsh = (i, s = 0) => { const h = Math.sin(i * 91.7 + s * 47.3) * 43758.5453; return h - Math.floor(h); };
 
