@@ -246,21 +246,6 @@ const SNAP = SHUT[0] + 0.06;
 function gulp(p, t) {
   const a = t - SNAP;
   if (a < 0 || t >= SHUT[1]) return;
-  if (a < 0.1) {
-    const crest = Math.sin(Math.PI * a / 0.1);
-    const reach = EW * (0.94 + 0.06 * crest);
-    const left = EYE_X - 1.55 * reach, right = EYE_X + 1.37 * reach;
-    for (let x = Math.ceil(left); x <= right; x++) {
-      // The shutter follows the eye's seam, including its raised outer corner.
-      const u = (x - left) / (right - left), edge = Math.abs(2 * u - 1);
-      const y = EYE_Y + 4 - 8 * u - 17 * u ** 6 + 2 * Math.sin(Math.PI * u);
-      const color = L[edge < 0.62 ? 6 : edge < 0.82 ? 5 : edge < 0.94 ? 4 : 3];
-      const glow = (0.35 + 0.48 * crest) * (1 - edge);
-      p.dot(x, y, color);
-      p.light(x, y - 1, L[5], glow);
-      p.light(x, y + 1, L[4], glow * 0.72);
-    }
-  }
   const u = a / (SHUT[1] - SNAP);
   const rx = 10 + 24 * u, ry = 2 + 4 * u;
   p.polyline(RIPPLE.map(([x, y]) => [EYE_X + x * rx, EYE_Y + y * ry]), u < 0.36 ? L[5] : u < 0.72 ? L[3] : L[1]);

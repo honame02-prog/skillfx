@@ -1,6 +1,7 @@
 // Tinh Lien sky: cloud spiral, burning rifts and a hooded beast eye.
 import { smooth, hex, mix } from '../../core/index.js';
-import { L, LID, IRIS, PUPIL, VEIN, CLOUD, GATHER, APPEAR, OPENS, LOCK, BOOM, SHUT, INHALE, EC, EW, EH, hsh, openAt, lockAt, pupilW, grid } from './_tinhlien-common.js';
+import { L, LID, IRIS, PUPIL, VEIN, CLOUD, TX, GATHER, APPEAR, OPENS, LEVEL, LOCK, BOOM, SHUT, INHALE, EC, EW, EH, hsh, openAt, eyeK, lockAt, pupilW, grid } from './_tinhlien-common.js';
+import { lidFlames, shutBand, veil } from './_tinhlien-eye-lib.js';
 
 const LEFT = -60, RIGHT = 300, CEILING = -235;
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
@@ -9,23 +10,11 @@ const VOID = hex('#030106'), WALL = hex('#110a15'), WHITE = hex('#fffaf0');
 const WET = hex('#976570'), BLOOD = hex('#b32c0d'), WATERLINE = hex('#ae795e');
 const LID_COLORS = [LID[0], LID[1], hex('#2d1928'), LID[2], hex('#543041'), hex('#704050')];
 
-// Opaque spans can go straight into the painter's clipped color buffer on an
-// unrotated frame. The general path preserves rotation and painter fade.
-function span(p, x0, x1, y, c, solid) {
-  if (!solid) {
-    for (let x = x0; x < x1; x++) p.dot(x, y, c);
-    return;
-  }
-  const sy = p.cellY(0, y) - p.oy;
-  if (sy < 0 || sy >= p.h) return;
-  const a = p.cellX(x0, y) - p.ox, b = p.cellX(x1 - 1, y) - p.ox;
-  const lo = Math.max(0, Math.min(a, b)), hi = Math.min(p.w - 1, Math.max(a, b));
-  if (lo <= hi) p.C.fill(c, sy * p.w + lo, sy * p.w + hi + 1);
-}
-
 function drawRuns(p, runs, solid) {
   if (!solid) {
-    for (let i = 0; i < runs.length; i += 4) span(p, runs[i + 1], runs[i + 2], runs[i], runs[i + 3], false);
+    for (let i = 0; i < runs.length; i += 4) {
+      for (let x = runs[i + 1]; x < runs[i + 2]; x++) p.dot(x, runs[i], runs[i + 3]);
+    }
     return;
   }
   const ox = p.cellX(0, 0) - p.ox, oy = p.cellY(0, 0) - p.oy, flip = p.fx < 0;
@@ -39,42 +28,51 @@ function drawRuns(p, runs, solid) {
 }
 
 const DARK = Array.from({ length: 16 }, (_, i) => mix(hex('#14121c'), hex('#060408'), i / 15));
-const EDGE_DITHER = [0.125, 0.625, 0.375, 0.875, 0.25, 0.75, 0, 0.5];
+const VEIL_BOTTOM = -3, VEIL_WIDTH = RIGHT - LEFT, VEIL_HEIGHT = VEIL_BOTTOM - CEILING;
 const DARK_MEMO = [];
-function darkRuns(level) {
+function veilPixels(level) {
   if (DARK_MEMO[level]) return DARK_MEMO[level];
-  const runs = [], radius = 1.69 - 0.97 * level / 16;
-  const cx = EC[0] - 29, cy = EC[1] + 80;
-  for (let y = CEILING; y < -3; y++) {
-    const dy = (y + 0.5 - cy) / 119;
-    const shelter = 0.22 * smooth(-62, -3, y);
-    let left = LEFT, right = RIGHT;
-    // Keep neighboring steps a shade apart and stagger their subpixel edges.
-    for (let i = DARK.length - 1; i >= 0; i--) {
-      const r = radius + i * 0.355 / (DARK.length - 1) + shelter, dx2 = r * r - dy * dy;
-      if (dx2 <= 0) {
-        if (left < right) runs.push(y, left, right, DARK[i]);
-        break;
-      }
-      const dx = 172 * Math.sqrt(dx2), stagger = EDGE_DITHER[(y + 3 * i) & 7];
-      const lo = Math.min(right, Math.max(left, Math.floor(cx - dx + stagger)));
-      const hi = Math.max(lo, Math.min(right, Math.floor(cx + dx + 1 - stagger)));
-      if (lo > left) runs.push(y, left, lo, DARK[i]);
-      if (hi < right) runs.push(y, hi, right, DARK[i]);
-      left = lo;
-      right = hi;
-    }
-  }
-  const out = Int32Array.from(runs);
-  DARK_MEMO[level] = out;
-  return out;
+  const pixels = new Uint32Array(VEIL_WIDTH * VEIL_HEIGHT);
+  const raster = { dot(x, y, c) { pixels[(y - CEILING) * VEIL_WIDTH + x - LEFT] = c; } };
+  veil(raster, LEFT, CEILING, RIGHT, VEIL_BOTTOM, (x, y) => {
+    const away = Math.max(0, -x, x - TX);
+    const distance = 0.76 * (1 - smooth(-210, -16, y)) + 0.47 * smooth(0, 145, away);
+    const noise = 0.07 * Math.sin(x * 0.026 + y * 0.033) + 0.055 * Math.sin(x * 0.053 - y * 0.021);
+    const sky = 1 - smooth(-58, VEIL_BOTTOM - 6, y);
+    return level * sky * clamp01(distance + noise);
+  }, DARK);
+  DARK_MEMO[level] = pixels;
+  return pixels;
 }
 
-function darkness(p, t, op, solid) {
+function drawVeil(p, t, op, solid) {
   const release = 1 - smooth(SHUT[1] + 0.2, SHUT[1] + 0.91, t);
   const strength = 0.08 * smooth(APPEAR, OPENS[0], t) + op * 0.69 + 0.13 * lockAt(t) + 0.1 * smooth(BOOM, BOOM + 0.5, t);
-  const level = Math.round(16 * strength * release);
-  if (level) drawRuns(p, darkRuns(level), solid);
+  const level = Math.round(DARK.length * strength * release);
+  if (!level) return;
+  const pixels = veilPixels(level);
+  if (!solid) {
+    for (let y = 0; y < VEIL_HEIGHT; y++) {
+      for (let x = 0; x < VEIL_WIDTH; x++) {
+        const color = pixels[y * VEIL_WIDTH + x];
+        if (color) p.dot(LEFT + x, CEILING + y, color);
+      }
+    }
+    return;
+  }
+
+  // Blit the library's dithered pixels, preserving the untouched parts of the frame.
+  const ox = p.cellX(LEFT, CEILING) - p.ox, oy = p.cellY(LEFT, CEILING) - p.oy, flip = p.fx < 0;
+  const x0 = Math.max(0, flip ? ox - p.w + 1 : -ox);
+  const x1 = Math.min(VEIL_WIDTH, flip ? ox + 1 : p.w - ox);
+  const y1 = Math.min(VEIL_HEIGHT, p.h - oy);
+  for (let y = Math.max(0, -oy); y < y1; y++) {
+    const src = y * VEIL_WIDTH, dst = (oy + y) * p.w + ox;
+    for (let x = x0; x < x1; x++) {
+      const color = pixels[src + x];
+      if (color) p.C[dst + x * p.fx] = color;
+    }
+  }
 }
 
 // A 10 fps spiral with bilinear noise on a coarse grid. Only the visible
@@ -233,18 +231,10 @@ const CORNEA = Array.from({ length: 4 }, (_, mode) => Array.from({ length: 3 }, 
   return colors;
 }));
 
-const FLAME_MARGIN = 12;
-const FLAME_BANKS = [
-  { side: -1, pitch: 6, body: 9.2, rise: 22, corners: 11, overlap: 6 },
-  { side: 1, pitch: 7, body: 4.4, rise: 8.5, corners: 4, overlap: 1.4 },
-].map((bank) => {
-  const count = Math.ceil(PROFILE_END / bank.pitch) + 2 * FLAME_MARGIN + 1;
-  const tongues = Array.from({ length: count }, (_, i) => ({
-    phase: hsh(i, 52 + bank.side) * 7,
-    speed: 6 + 5 * hsh(i, 53 + bank.side),
-    size: 0.72 + 0.45 * hsh(i, 54 + bank.side),
-  }));
-  return { ...bank, tongues, heights: new Float32Array(count) };
+const LID_START = EC[0] + EYE_LEFT, LID_END = EC[0] + EYE_RIGHT;
+const CROWN = Float32Array.from(PROFILE, (_, i) => {
+  const u = 2 * i / PROFILE_END - 1;
+  return 28 * (1 - u * u) ** 0.6 * (1 + 0.35 * u);
 });
 const EMBERS = Array.from({ length: 56 }, (_, i) => ({
   period: 0.55 + hsh(i, 70) * 0.95,
@@ -252,72 +242,20 @@ const EMBERS = Array.from({ length: 56 }, (_, i) => ({
   stretch: 0.62 + hsh(i, 73) * 0.6,
 }));
 
-// Sample across the curved banks, as in v4. Adjacent tongues overlap above a
-// solid bed of fire. A depth-dependent shear pulls their tips toward the iris.
-function flames(p, t, amount, heat, pull, solid) {
-  if (amount < 0.08) return;
-  const ox = solid ? p.cellX(0, 0) - p.ox : 0, oy = solid ? p.cellY(0, 0) - p.oy : 0;
-  for (const { side, pitch, body, rise, corners, overlap, tongues, heights } of FLAME_BANKS) {
-    const bank = side < 0 ? BROW : LIP, heatScale = amount * (1 + 0.1 * heat);
-    for (let i = 0; i < tongues.length; i++) {
-      const { phase, speed, size } = tongues[i];
-      heights[i] = size * (0.61 + 0.39 * Math.abs(Math.sin(t * speed + phase)));
-    }
-    for (let i = 0; i < bank.length; i++) {
-      const dx = EYE_LEFT + i, x = EC[0] + dx, sx = ox + x * p.fx;
-      if (solid && (sx < 0 || sx >= p.w)) continue;
-      const { arch, scales } = PROFILE[i];
-      const base = bank[i] - side * Math.round(overlap * arch * amount);
-      const slope = Math.max(Math.abs(bank[i] - (bank[i - 1] ?? bank[i])), Math.abs(bank[i] - (bank[i + 1] ?? bank[i])));
-      const wave = Math.sin(i * 0.19 - t * 12 + scales * 0.65);
-      const roll = Math.sin(i * 0.091 + t * 5.2 + 0.9 * Math.sin(i * 0.04 - t * 2));
-      const outer = smooth(32, 122, Math.abs(dx)) * (dx > 0 ? 1 : 0.75);
-      const rim = Math.max(1, slope, (body + wave * 1.1 + roll * 0.9) * heatScale * (0.48 + 0.52 * arch));
-      const crown = (rise + corners * outer) * heatScale * (0.7 + 0.3 * arch);
-      const room = side < 0 ? base - CEILING : Infinity;
-      const height = Math.min(crown, room * 0.98) * (0.94 + 0.12 * roll);
-      const limit = Math.min(room, Math.max(rim, height * 1.17));
-      const lean = Math.max(-1, Math.min(1, dx / 43)) * pull * (side < 0 ? 1 : 0.69);
-      for (let d = 1; d <= limit; d++) {
-        const f = d / height;
-        const sample = i / pitch + FLAME_MARGIN + d * (lean * (0.42 + f * 0.63) + wave * 0.075) / pitch;
-        const cell = Math.floor(sample), u = sample - cell;
-        const a = heights[cell] * (1 - 0.76 * u), b = heights[cell + 1] * (0.24 + 0.76 * u);
-        const tip = Math.max(rim, height * Math.max(a, b));
-        if (d > tip) continue;
-        const y = base + side * d;
-        const hot = d / tip;
-        const color = d === 1 ? FIRE[wave < -0.3 ? 0 : 1] : hot < 0.24 ? FIRE[2]
-          : hot < 0.4 ? (wave > 0.25 ? FIRE[3] : L[2]) : hot < 0.7 ? (roll > 0.4 ? L[3] : FIRE[3])
-            : hot < 0.88 ? FIRE[4] : L[tip > rim + 1 && wave > 0.2 ? 5 : 4];
-        if (solid) {
-          const sy = oy + y;
-          if (sy >= 0 && sy < p.h) p.C[sy * p.w + sx] = color;
-        } else p.dot(x, y, color);
-      }
-    }
-  }
-}
-
 const TOP = new Int16Array(PROFILE.length), BOTTOM = new Int16Array(PROFILE.length);
 const BROW = new Int16Array(PROFILE.length), LIP = new Int16Array(PROFILE.length);
 const PUPIL_HALF = new Float32Array(DIAMETER);
 
 function eye(p, t, op, shut, solid) {
-  if (t < APPEAR || t >= SHUT[1] + 0.36) return;
-  const birth = smooth(APPEAR, APPEAR + 0.105, t), lock = lockAt(t);
-  const inhale = smooth(INHALE[0], INHALE[0] + 0.65, t);
+  if (t < APPEAR) return;
   if (shut === 1) {
-    const age = t - SHUT[1], reach = 1 - smooth(0.055, 0.36, age);
-    const start = Math.floor(PROFILE_END * (1 - reach) / 2), end = PROFILE_END - start;
-    const left = EC[0] + EYE_LEFT + start, right = EC[0] + EYE_LEFT + end;
-    if (age < 0.095) {
-      span(p, left + 9, right - 8, EC[1], L[5], solid);
-      span(p, left + 9, right - 8, EC[1] + 2, L[5], solid);
-    }
-    span(p, left, right + 1, EC[1] + 1, age < 0.095 ? L[6] : age < 0.22 ? FIRE[3] : FIRE[1], solid);
+    const contact = SHUT[0] + 0.1;
+    const k = 1 - smooth(contact, contact + 0.5, t);
+    shutBand(p, EC[0], EC[1], PROFILE_END / 2, t, { k });
     return;
   }
+  const birth = smooth(APPEAR, APPEAR + 0.105, t), lock = lockAt(t);
+  const inhale = smooth(INHALE[0], INHALE[0] + 0.65, t);
 
   let tremor = 0, flash = 0;
   for (const at of OPENS) {
@@ -374,7 +312,7 @@ function eye(p, t, op, shut, solid) {
         const d = y - bottom;
         color = d === 1 ? (sc > 0.32 ? WATERLINE : WET) : d === 2 ? LID_COLORS[4] : y === to ? LID[0] : LID_COLORS[3];
       } else if (bottom - top < 2) {
-        color = sc > -0.2 ? FIRE[2] : FIRE[1];
+        color = LID[0];
       } else {
         const j = y - EC[1] - yIris + RY;
         const depth = y - top, shadow = depth < shadowEdge ? 2 : depth < shadowEdge + 2 ? 1 : 0;
@@ -387,8 +325,13 @@ function eye(p, t, op, shut, solid) {
     }
   }
 
-  const fire = birth * (0.45 + 0.55 * smooth(0, 0.55, op)) * live ** 0.65;
-  flames(p, t, fire, lock + flash + inhale, 0.54 + lock * 0.22 + inhale * 0.26, solid);
+  const k = eyeK(t) * Math.min(1, op / LEVEL[1]) * live ** 0.65;
+  const cx = EC[0] + xIris, heat = 0.65 * lock + 0.2 * flash + 0.15 * inhale;
+  const pull = 0.7 + 0.12 * lock + 0.12 * inhale;
+  lidFlames(p, LID_START, LID_END, (x) => TOP[x - LID_START], -1,
+    (x) => CROWN[x - LID_START], t, { k, cx, heat, pull });
+  lidFlames(p, LID_START, LID_END, (x) => BOTTOM[x - LID_START], 1,
+    (x) => 0.32 * CROWN[x - LID_START], t, { k, cx, heat, pull: pull - 0.2, seed: 3 });
 
   if (op > 0.2 && live > 0.62) {
     const x = EC[0] + xIris - 27, i = x - EC[0] - EYE_LEFT;
@@ -430,7 +373,7 @@ export function sky(p, t, layer) {
   const op = Math.min(1, openAt(Math.min(t, SHUT[0])));
   // The lids snap shut midway through the shared release, before the seam fades.
   const shut = t > SHUT[0] ? clamp01((1 - openAt(t) / op) / 0.52) : 0;
-  darkness(p, t, op, solid);
+  drawVeil(p, t, op, solid);
   if (t > GATHER && t < 7) drawRuns(p, cloudRuns(Math.floor(t * 10)), solid);
   if (t >= APPEAR && t < SHUT[1] + 0.48) rift(p, t, op);
   eye(p, t, op, shut, solid);
