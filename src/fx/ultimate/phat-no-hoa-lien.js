@@ -9,15 +9,13 @@ import { FLAMES, lotus, orbitEmbers, drawColored } from './_lotus-lib.js';
 import { createGroundBlast } from './_blast.js';
 import { STONE } from './_lib.js';
 
-const GOLD5 = ['#2a1805', '#6e4a08', '#b8860f', '#e9c12c', '#ffe27a', '#fff5c4', '#ffffff'];
-// the five strange fires (Di Hoa 1-5): Thanh Lien teal, Cot Linh cold blue, Van Lac rose, Tam Thien black-violet, Tinh Lien white-gold
-const ALL5 = [
-  FLAMES[0],
-  ['#0b1224', '#1d3557', '#3f6f9e', '#7fb2d9', '#c4e1f0', '#efece2', '#ffffff'],
-  ['#140c12', '#4a1428', '#a8204a', '#ff4f7a', '#ffb3c6', '#efe9ee', '#ffffff'],
-  ['#0a0610', '#1e0f2e', '#5a2a8c', '#9b4dd6', '#e07af0', '#f6d6ff', '#ffffff'],
-  ['#3a2e1c', '#8a6a2a', '#c9a24a', '#e9cf8a', '#efe6cf', '#fbf8f0', '#ffffff'],
-];
+// the five strange fires (Di Hoa 1-5), ramps copied verbatim from the finished moves (dark -> white, 7 steps each)
+const THANH = FLAMES[0];                                                                      // 1 Thanh Lien: teal-green; same ramp as di-hoa/thanh-lien.js:12 (RAMP = FLAMES[0])
+const COT = ['#0b1224', '#1d3557', '#3f6f9e', '#7fb2d9', '#c4e1f0', '#efece2', '#ffffff'];    // 2 Cot Linh: bone white / ice blue; di-hoa/_cold-lib.js:9 (COLD)
+const VAN = ['#140c12', '#4a1428', '#a8204a', '#ff4f7a', '#ffb3c6', '#efe9ee', '#ffffff'];    // 3 Van Lac: near colourless, rose-red core; di-hoa/_vanlac-common.js:4 (C)
+const TAM = ['#0a0610', '#1e0f2e', '#5a2a8c', '#9b4dd6', '#e07af0', '#f6d6ff', '#ffffff'];    // 4 Tam Thien: black-violet; di-hoa/_tamthien-common.js:5 (C)
+const TINH = ['#3a2e1c', '#8a6a2a', '#c9a24a', '#e9cf8a', '#efe6cf', '#fbf8f0', '#ffffff'];   // 5 Tinh Lien: pure white, pale gold rim; di-hoa/_tinhlien-common.js:5 (L)
+const ALL5 = [THANH, COT, VAN, TAM, TINH];
 const G1 = 1.55, B0 = 1.3, B1 = 2.1, R1 = 2.95, H1 = 3.2, TI = 3.4, AFTER = 3.6;
 const HEAD = [0, -64], APEX = [36, -262], TX = 168;
 const sm = (u) => u * u * (3 - 2 * u);
@@ -176,9 +174,9 @@ const impact = {
       blazes = new Blazes(ps);
       return { ps, blazes };
     });
-    const ground = createGroundBlast({ seed: o.seed, scale: 1.15, hot: GOLD5, dirt: STONE, haze: '#3d3346',
+    const ground = createGroundBlast({ seed: o.seed, scale: 1.15, hot: TINH, dirt: STONE, haze: '#3d3346',
       halfWidth: 250, outward: 1, jet: 0.45, duration: AFTER, bounds: [-268, -360, 236, 40] });
-    const shockRamps = C.map(r => [mix(r[0], SMK[4], 0.35), mix(r[2], SMK[2], 0.45), mix(r[4], SMK[0], 0.3), hex('#fff1bd')]);
+    const shockRamps = C.map(r => [mix(r[0], SMK[4], 0.35), mix(r[2], SMK[2], 0.45), mix(r[4], SMK[0], 0.3), r[5]]);
     let t = 0, boom = false;
     const acc = C.map(() => 0);
     // pillar geometry, shared by emission and drawing
