@@ -1,0 +1,9 @@
+goal: Vòng 3 MẮT (`src/fx/di-hoa/_tinhlien-sky.js`, trạng thái hiện tại commit 72e9fb4): phục hồi VƯƠNG MIỆN LỬA DÀY ĐẶC trên mí như v4 và sửa thời điểm sập mắt. Giữ nguyên mọi thứ khác (khe vồng, tròng hướng tâm, vết rách, mây, bóng tối).
+Opus đã tự so ảnh v4 vs hiện tại (D:/SkillFX_TuThienChi_HoaLien/skillfx/records/gate/compare/pair.png: hàng trên v4, hàng dưới hiện tại; ô 2.3, 3.2, 4.3, 5.5, 5.85):
+1. MẤT CHÍNH: v4 có một dải lửa liền, DÀY ĐẶC, cao (~14–22 px ở giữa mí trên, thấp dần về hai khoé), hàng chục lưỡi sát nhau chồng lên nhau, đầu lửa vàng-trắng L[4..5], thân cam/vàng L[2..3], chân đỏ sẫm; mí dưới có dải lửa mỏng hơn (~5–8 px) cũng liền. Hiện tại: các lưỡi thưa, nhọn, tách rời như gai, nhìn thấy nền tối giữa các lưỡi. Mẫu code: `git show bce32db:src/fx/di-hoa/_tinhlien-sky.js` hàm flame() (khoảng dòng 128–143) và chỗ eye() gọi nó — port cách tô dày đặc đó vào mí mới (bám đường mí TOP/BOTTOM hiện tại), giữ đặc tính mới: hút ngược vào mắt, to hơn ở khoé ngoài, bập bùng. Không để khe nền lộ ra giữa các lưỡi ở mí trên.
+2. Sập mắt: ở t=5.85 v4 đã khép thành dải lửa ngang; hiện tại vẫn hé thấy tròng. Mí phải khép kín trước 5.82 (đường mí gặp nhau), còn lại đường lửa mảnh rồi tắt; dùng chính openAt() từ common (SHUT 5.72–5.9) — nếu code mới có đường cong riêng thì làm nó khép sớm hơn/đúng.
+3. Nhỏ: ở 0.65 bù mảng mây bên trái (hai cuộn CLOUD[1..3]); bóng tối có vân vòng đồng tâm lộ rõ ở rìa trái — làm mềm (ít bậc lộ hơn).
+hiệu năng: sky() trung vị ≤ 2,5 ms, p95 ≤ 5 ms; gate cả chiêu PASS.
+write_scope: src/fx/di-hoa/_tinhlien-sky.js
+done_when: `node tools/gate.mjs di-hoa/tinh-lien --at 0.65,1.1,1.7,2.3,2.9,3.2,3.42,3.8,4.3,4.9,5.5,5.85,6.3,7.0,7.6` GATE PASS; tự đặt strip cạnh D:/SkillFX_TuThienChi_HoaLien/skillfx/records/gate/compare/v4.png: dải lửa mí trên ở các ô 1.7–5.5 phải dày đặc ít nhất như v4; ô 5.85 mắt đã khép. Thời gian ≤ 12 phút: làm điểm 1 và 2 trước.
+Đọc: .agents/briefs/TL7-common.md, TL6-common.md.
