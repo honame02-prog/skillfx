@@ -5,71 +5,91 @@ import { L, IRIS, DUST, TX, OPENS, LOCK, BOOM, LC, EC, sm, hsh, openAt, eyeK, lo
 const HEAT = Array.from({ length: 8 }, (_, i) => [(i + 0.3 * hsh(i, 4)) / 8, (hsh(i, 5) - 0.5) * 1.37, hsh(i, 12) * TAU]);
 
 function sunlight(p, t, op, lock, fade) {
-  const top = EC[1] + 5, end = LC[1] * lock, travel = -top;
-  const topWidth = 3.2 + 4.8 * op, bottomWidth = 8 + 33 * op;
+  const top = EC[1] + 5, travel = -top;
+  const end = lock > 0.5 ? Math.floor(LC[1] + 4 * lock) + 1 : 1;
+  const topWidth = (3 + 6 * op) * (1 - 0.6 * lock);
+  const bottomWidth = (10 + 34 * op) * (1 - 0.92 * lock) + 1;
   const strength = (0.34 + 0.3 * op + 0.09 * pulses(t)) * fade;
   const pinch = 1 - lock;
-  const wave = OPENS.map(at => (t - at) / 0.25).find(u => u > 0 && u < 1);
-  const waveStrength = wave === undefined ? 0 : 0.28 * smooth(0, 0.1, wave) * (1 - smooth(0.9, 1, wave));
-  const widthAt = (v) => (topWidth + (bottomWidth - topWidth) * v) * pinch + 2.15 * lock;
+  const phase = OPENS.find(at => t >= at && t < at + 0.25);
+  const wave = phase === undefined ? 0 : (t - phase) / 0.25;
+  const waveStrength = 0.33 * fade * smooth(0, 0.12, wave) * (1 - smooth(0.89, 1, wave));
+  const widthAt = (v) => {
+    const foot = Math.max(0, (v - 0.88) / 0.12);
+    return topWidth + (bottomWidth - topWidth) * v + foot * foot * 4 * op * pinch;
+  };
   const rows = [];
-  for (let y = top; y <= end; y++) {
+  for (let y = top; y < end; y++) {
     const v = (y + 0.5 - top) / travel;
     const width = widthAt(v);
     const center = TX + 0.62 * Math.sin(t * 6 + v * 4) * pinch;
-    const pulse = waveStrength ? waveStrength * Math.max(0, 1 - Math.abs(wave - v) / 0.12) : 0;
-    const nearFlower = smooth(LC[1] - 51, LC[1] - 27, y);
-    // The long gold rays remain visible where the cream core falls onto the opaque flower.
-    const haze = strength * (0.52 - 0.24 * nearFlower * pinch);
-    const core = strength * (0.64 - 0.59 * nearFlower * pinch);
+    const pulse = waveStrength * smooth(wave - 0.16, wave - 0.035, v) * (1 - smooth(wave + 0.025, wave + 0.095, v));
+    const nearFlower = smooth(LC[1] - 48, LC[1] - 16, y);
+    const haze = strength * (0.46 - 0.09 * nearFlower) * (1 - 0.22 * lock);
+    const core = strength * (0.64 - 0.51 * nearFlower * pinch);
     const sway = t * 3.6 + v * 5;
-    const left = center + (-0.64 + 0.075 * Math.sin(sway)) * width;
-    const right = center + (0.61 + 0.069 * Math.sin(sway + 2.4)) * width;
-    const inner = center + (0.31 + 0.041 * Math.cos(sway + 1.3)) * width;
-    rows.push({ center, edge: 1 / width, coreWidth: 1 / (0.78 + 0.11 * width), pulse, haze, core, left, right, inner });
+    const left = center + (-0.76 + 0.075 * Math.sin(sway)) * width;
+    const right = center + (0.72 + 0.069 * Math.sin(sway + 2.4)) * width;
+    const inner = center + (0.38 + 0.041 * Math.cos(sway + 1.3)) * width;
+    rows.push({ center, invWidth: 1 / width, invCore: 1 / (0.78 + 0.11 * width), pulse, haze, core, left, right, inner });
   }
   const leftK = strength * pinch * (0.33 + 0.055 * Math.sin(t * 6));
   const rightK = strength * pinch * (0.26 + 0.05 * Math.sin(t * 6 + 2.5));
   const innerK = strength * pinch * (0.18 + 0.04 * Math.sin(t * 6 + 3.9));
-  const focusK = fade * 1.45 * lock;
+  const focusK = fade * lock;
+  const focusX = TX + Math.round(Math.sin(t * 53)) * lock;
   // Shade short sections to bound the scan to the widening cone.
-  for (let from = top; from < end; from += 24) {
-    const to = Math.min(from + 24, end), width = widthAt((to - top) / travel) + 1;
+  for (let from = top; from < end; from += 16) {
+    const to = Math.min(from + 16, end);
+    const width = 1.5 * Math.max(widthAt((from - top) / travel), widthAt((to - top) / travel)) + 1;
     p.shade(TX - width, from, TX + width, to, (x, y, o) => {
       if (y < from || y >= to) return;
       const row = rows[Math.floor(y) - top];
-      const dx = Math.abs(x - row.center), edge = dx * row.edge;
-      if (edge >= 1) return;
+      const edge = Math.abs(x - TX) * row.invWidth;
+      if (edge >= 1.5) return;
       const shaft = x < row.center ? leftK * Math.max(0, 1 - Math.abs(x - row.left) / 1.34)
         : rightK * Math.max(0, 1 - Math.abs(x - row.right) / 1.34)
           + innerK * Math.max(0, 1 - Math.abs(x - row.inner) / 1.1);
-      const core = Math.max(0, 1 - dx * row.coreWidth);
-      const falloff = 1 - edge;
-      o.l = core > 0.27 || (lock > 0.55 && edge < 0.43) ? L[5] : edge < 0.34 ? L[3] : L[2];
-      o.k = row.haze * falloff * falloff + row.core * core + shaft + (row.pulse + focusK) * falloff;
+      const core = Math.max(0, 1 - Math.abs(x - row.center) * row.invCore);
+      const feather = 1.5 - edge;
+      const haze = row.haze * (edge < 1 ? 1 - 0.57 * edge * edge : 0.86 * feather);
+      const focus = Math.abs(x - focusX);
+      o.l = focusK > 0.3 && focus < 1 ? L[6] : core > 0.27 ? L[5] : edge < 0.48 ? L[4] : edge < 1.18 ? L[3] : L[2];
+      o.k = haze + row.core * core + shaft + row.pulse * Math.min(1, feather * 2)
+        + focusK * (focus < 1 ? 1 : Math.max(0, 1 - focus / 2.5));
     });
   }
-  if (lock > 0.25) p.glow(LC[0], LC[1], 7, L[4], 0.56 * lock * fade);
+  if (lock > 0.25) p.glow(focusX, LC[1] + 4 * lock, 7, L[4], 0.85 * lock * fade);
 
   for (let i = 0; i < HEAT.length; i++) {
     const [start, lane, phase] = HEAT[i];
     if ((i + 1) / HEAT.length > (0.47 + 0.53 * op) * pinch * fade) continue;
     const age = (t * (0.36 + (i % 3) * 0.038) + start) % 1;
     const v = 0.92 - 0.72 * age, y = Math.floor(top + travel * v);
-    const x = TX + lane * (topWidth + (bottomWidth - topWidth) * v) * pinch + 1.3 * Math.sin(t * 4 + phase);
+    const x = TX + lane * widthAt(v) + 1.3 * Math.sin(t * 4 + phase);
     p.line(x, y, x, y - 1, L[4]);
+  }
+  // Four soft heat ripples rise above the ground iris.
+  for (let i = 0; i < 4 && pinch > 0.08; i++) {
+    const rise = (t * 0.55 + i * 0.27) % 1;
+    const x = TX + (i - 1.5) * bottomWidth * 0.36, y = -3 - rise * 36;
+    const k = (1 - rise) * op * fade * pinch * 0.35;
+    for (let j = 0; j < 8; j++) {
+      p.light(x + 1.3 * Math.sin(t * 4 + i + j * 0.8), y - j, L[4], k * (1 - j / 8));
+    }
   }
 }
 
 function groundIris(p, t, op, lock, fade) {
-  const rx = 12 + 35 * op, ry = 3.4 + 5.1 * op, cy = -1;
+  const rx = Math.max(12 + 35 * op, (10 + 34 * op) * 1.15 * (1 + 0.2 * lock));
+  const ry = 3.4 + 5.1 * op, cy = -1;
   const strength = (0.22 + 0.46 * op) * (1 - 0.68 * lock) * fade;
   p.shade(TX - rx, cy - ry, TX + rx, cy + ry, (x, y, o) => {
     const e = ((x - TX) / rx) ** 2 + ((y - cy) / ry) ** 2;
     if (e >= 1) return;
     const lip = Math.max(0, 1 - Math.abs(e - 0.83) / 0.15);
-    o.l = e < 0.59 ? L[4] : L[2];
-    o.k = strength * (0.66 * (1 - e) + lip * (0.52 + lock * 0.24));
+    o.l = e < 0.59 ? L[4] : L[3];
+    o.k = strength * (0.66 * (1 - e) + lip * 0.52) + lock * fade * lip * 0.42;
   });
 
   const visibility = smooth(0.11, 0.48, op) * (1 - 0.32 * lock) * fade;

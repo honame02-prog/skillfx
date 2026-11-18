@@ -1,6 +1,6 @@
 // Nhan Tang Lien: light reveals the lotus in the dust, then the eye draws both into its pupil.
-import { smooth, clamp, TAU, hex } from '../../core/index.js';
-import { L, DUST, TX, EC, GHOST, INHALE, SHUT, ASH, END, hsh } from './_tinhlien-common.js';
+import { smooth, TAU, hex } from '../../core/index.js';
+import { L, DUST, TX, EC, EW, GHOST, INHALE, SHUT, ASH, END, hsh } from './_tinhlien-common.js';
 
 const [EYE_X, EYE_Y] = EC;
 const LOTUS_Y = -63;
@@ -31,24 +31,28 @@ function lotusLightMask() {
         if (side > 1) continue;
         const q = row * PETAL_W + col;
         owner[q] = i + 1;
-        light[q] = 1 + Math.floor(5 * (1 - side) * Math.sin(Math.PI * u));
+        light[q] = 1 + Math.floor(7 * (1 - u) * (1 - 0.38 * side));
       }
     }
   }
-  for (let i = 0; i < owner.length; i++) {
-    const id = owner[i];
-    if (!id) continue;
-    // Trace the visible inside edge of each petal including overlaps in the front rings.
-    if (owner[i + 1] < id || owner[i - 1] < id || owner[i + PETAL_W] < id || owner[i - PETAL_W] < id) {
-      light[i] = id <= 6 ? 7 : id <= 11 ? 8 : 9;
+  // Follow the exposed edges through overlaps. A cream shoulder backs the white front rims.
+  for (let row = 2; row < PETAL_H - 2; row++) {
+    for (let col = 2; col < PETAL_W - 2; col++) {
+      const i = row * PETAL_W + col, id = owner[i];
+      if (!id) continue;
+      if (owner[i + 1] < id || owner[i - 1] < id || owner[i + PETAL_W] < id || owner[i - PETAL_W] < id) {
+        light[i] = id <= 6 ? 9 : 10;
+      } else if (owner[i + 2] < id || owner[i - 2] < id || owner[i + 2 * PETAL_W] < id || owner[i - 2 * PETAL_W] < id) {
+        light[i] = 8;
+      }
     }
   }
   return light;
 }
 
 const LOTUS_LIGHT = lotusLightMask();
-const LIGHT_COLOR = [0, L[3], L[3], L[3], L[4], L[4], L[4], L[4], L[5], L[6]];
-const LIGHT_GAIN = [0, 0.07, 0.11, 0.16, 0.21, 0.26, 0.31, 0.63, 0.74, 0.86];
+const LIGHT_COLOR = [0, L[3], L[3], L[3], L[4], L[4], L[5], L[5], L[5], L[5], L[6]];
+const LIGHT_GAIN = [0, 0.18, 0.24, 0.31, 0.39, 0.46, 0.53, 0.59, 0.58, 0.79, 0.94];
 // Keep the shader's bounds tight at the thin crown and at the bottom of the bloom.
 const LIGHT_BANDS = [];
 for (let top = 0; top < PETAL_H; top += 8) {
@@ -75,6 +79,14 @@ function lightLotus(p, t) {
   const curl = 16 * lift * (1 - lift) / 45;
   const invWidth = 1 / width, invHeight = 1 / height;
   const gain = lit * (0.94 + 0.06 * Math.sin(t * 27));
+  const hx = 76 * width, hy = 59 * height, center = cy - 4 * height;
+  const haze = 0.24 * smooth(GHOST[0], GHOST[0] + 0.12, t) * (1 - smooth(5.22, 5.72, t));
+  p.shade(cx - hx, center - hy, cx + hx, center + hy, (x, y, o) => {
+    const falloff = 1 - ((x - cx) / hx) ** 2 - ((y - center) / hy) ** 2;
+    if (falloff <= 0) return;
+    o.l = L[3];
+    o.k = haze * falloff * (0.35 + 0.65 * falloff);
+  });
   for (const { top, bottom, left, right } of LIGHT_BANDS) {
     const y0 = PETAL_Y + top, y1 = PETAL_Y + bottom;
     p.shade(cx + (PETAL_X + left) * width + y0 * curl, cy + y0 * height,
@@ -102,16 +114,25 @@ function shaft(p, t) {
     const d = Math.abs(x - EYE_X - u * sway) / (2.5 + 12 * u);
     if (d >= 1) return;
     const falloff = Math.min(1, (1 - u) * 3.5);
-    o.l = d < 0.13 ? L[5] : L[3];
-    o.k = (d < 0.13 ? 0.29 : 0.17 * (1 - d)) * gain * falloff;
+    o.l = d < 0.13 ? L[5] : d < 0.37 ? L[4] : L[3];
+    o.k = (d < 0.13 ? 0.51 : 0.24 * (1 - d)) * gain * falloff;
   });
 }
 
 const TWIST = 2.6 * TAU;
 const PULL = Array.from({ length: 84 }, (_, i) => ({
-  phase: hsh(i, 1), speed: 0.68 + 0.65 * hsh(i, 2), angle: 2.3 * (hsh(i, 3) - 0.5),
+  phase: hsh(i, 1), speed: 0.68 + 0.65 * hsh(i, 2),
+  angle: i % 3 === 0 ? 0.62 + (i % 2) * Math.PI + 1.1 * (hsh(i, 3) - 0.5) : 2.3 * (hsh(i, 3) - 0.5),
   drift: 0.75 + 0.65 * hsh(i, 4), spark: i % 3 === 0, hot: hsh(i, 5) > 0.46,
 }));
+
+function ribbon(p, x, y, half, gain) {
+  for (let col = Math.round(x - half); col <= Math.round(x + half); col++) {
+    const d = Math.abs(col - x) / (half + 0.5);
+    const band = d < 0.2 ? 6 : d < 0.43 ? 5 : d < 0.69 ? 4 : 3;
+    p.light(col, y, L[band], gain * Math.max(0.12, 1 - 0.85 * d));
+  }
+}
 
 function column(p, t) {
   const age = t - INHALE[0];
@@ -121,6 +142,7 @@ function column(p, t) {
   const top = -103 + (EYE_Y + 103) * neck;
   const foot = -89 + 86 * neck + (EYE_Y + 3) * rise;
   const spin = age * 2.2 * TAU;
+  const lit = smooth(0, 0.11, age) * (1 - smooth(5.68, INHALE[1], t));
   for (let y = Math.ceil(top); y <= foot; y++) {
     const v = (y - EYE_Y) / (-3 - EYE_Y);
     const radius = 1.5 + 30 * v * (0.45 + 0.55 * v);
@@ -140,6 +162,27 @@ function column(p, t) {
     const glint = x + half * face * 0.52;
     p.line(glint - edge * 0.7, y, glint + edge * 0.7, y, rim);
     if (face >= 0) p.line(winding - edge, y, winding + edge, y, DUST[2]);
+
+    ribbon(p, glint, y, 0.6 + edge * 0.59, (0.20 + 0.16 * Math.max(0, face)) * lit);
+  }
+
+  // Match the broader dust vortex in blast so the light also follows its rising tail.
+  const dustTop = EYE_Y + 13;
+  const draw = smooth(INHALE[0], INHALE[0] + 0.26, t);
+  const dustFoot = dustTop * smooth(INHALE[1] - 0.38, INHALE[1] - 0.02, t);
+  const spread = draw * (1 - smooth(INHALE[1] - 0.22, INHALE[1], t));
+  for (let y = Math.ceil(dustTop * draw); y < dustFoot; y++) {
+    const v = 1 - y / dustTop;
+    const center = EYE_X + Math.sin(y * 0.076 - age * 17) * (4 + 14 * v) * draw;
+    const radius = (6 + 36 * v ** 0.8) * spread;
+    const phase = v * TWIST + spin + 0.62;
+    const face = Math.cos(phase);
+    const reach = radius * Math.sin(phase);
+    const half = 0.9 + 1.4 * v + radius * Math.abs(face) * TWIST / -dustTop * 0.55;
+    const glow = lit * smooth(0, 13, dustFoot - y);
+    ribbon(p, center, y, 1.2 + 3 * v, 0.34 * glow);
+    ribbon(p, center + reach, y, half, (0.37 + 0.59 * Math.max(0, face)) * glow);
+    ribbon(p, center - reach, y, half * 0.76, (0.22 + 0.52 * Math.max(0, -face)) * glow);
   }
   for (const mote of PULL) {
     const v = 1 - (mote.phase + age * mote.speed) % 1;
@@ -149,7 +192,7 @@ function column(p, t) {
     const radius = (2 + 38 * v * (0.45 + 0.55 * v)) * mote.drift;
     const x = EYE_X + Math.sin(phase) * radius;
     if (mote.spark && mote.hot) {
-      p.line(x, y, x + Math.cos(phase) * v * 2, y - 1 - v, L[3]);
+      p.line(x, y, x + Math.cos(phase) * v * 3, y + 1 + v, L[3]);
       p.dot(x, y, L[6]);
     } else {
       p.dot(x, y, mote.spark ? L[5] : y < -90 ? DUST[4] : DUST[2]);
@@ -165,15 +208,24 @@ function ellipse(rx, ry, n) {
 }
 
 const RIPPLE = ellipse(1, 1, 24);
-const SNAP = SHUT[0] + 0.04;
+const SNAP = SHUT[0] + 0.06;
 function gulp(p, t) {
   const a = t - SNAP;
   if (a < 0 || t >= SHUT[1]) return;
   if (a < 0.1) {
-    const u = a / 0.1;
-    const reach = 39 + 51 * Math.sin(Math.PI * u ** 0.62);
-    p.line(EYE_X - reach, EYE_Y, EYE_X + reach, EYE_Y, L[3]);
-    p.line(EYE_X - reach * 0.8, EYE_Y, EYE_X + reach * 0.8, EYE_Y, L[6]);
+    const crest = Math.sin(Math.PI * a / 0.1);
+    const reach = EW * (0.94 + 0.06 * crest);
+    const left = EYE_X - 1.55 * reach, right = EYE_X + 1.37 * reach;
+    for (let x = Math.ceil(left); x <= right; x++) {
+      // The shutter follows the eye's seam, including its raised outer corner.
+      const u = (x - left) / (right - left), edge = Math.abs(2 * u - 1);
+      const y = EYE_Y + 4 - 8 * u - 17 * u ** 6 + 2 * Math.sin(Math.PI * u);
+      const color = L[edge < 0.62 ? 6 : edge < 0.82 ? 5 : edge < 0.94 ? 4 : 3];
+      const glow = (0.35 + 0.48 * crest) * (1 - edge);
+      p.dot(x, y, color);
+      p.light(x, y - 1, L[5], glow);
+      p.light(x, y + 1, L[4], glow * 0.72);
+    }
   }
   const u = a / (SHUT[1] - SNAP);
   const rx = 10 + 24 * u, ry = 2 + 4 * u;
@@ -202,7 +254,7 @@ function ash(p, t) {
   }
 }
 
-const BURN_START = 6.0;
+const BURN_APPEAR = INHALE[0] + 0.45, BURN_START = 6.0;
 const COOL = [L[5], L[3], ...['#d87932', '#a13b1d', '#622318', '#371a15'].map(hex)];
 const OUTER_RING = ellipse(45, 9, 48);
 const SEED_RING = ellipse(8, 1.75, 18);
@@ -219,28 +271,29 @@ function heatColor(age) {
   return age < 1 ? COOL[Math.min(COOL.length - 1, Math.floor(Math.max(0, age) * COOL.length))] : 0;
 }
 
-function groundRing(p, pts, c) {
-  if (c) p.polyline(pts.map(([x, y]) => [TX + x, y]), c);
+function groundRing(p, pts, c, grow) {
+  if (c) p.polyline(pts.map(([x, y]) => [TX + x * grow, y * grow]), c);
 }
 
 function scorch(p, t) {
-  if (t < BURN_START || t >= END) return;
+  if (t <= BURN_APPEAR || t >= END) return;
   const age = (t - BURN_START) / (END - BURN_START);
-  groundRing(p, OUTER_RING, heatColor(age * 1.2 + 0.04));
+  const grow = smooth(BURN_APPEAR, BURN_APPEAR + 0.35, t);
+  groundRing(p, OUTER_RING, heatColor(age * 1.2 + 0.04), grow);
   for (const { points, cool } of BURN_PETALS) {
     for (let i = 1; i < points.length; i++) {
       const [x0, y0, r0] = points[i - 1], [x1, y1, r1] = points[i];
       const color = heatColor(age * (0.94 + (r0 + r1) * 0.0022) + cool);
-      if (color) p.line(x0, y0, x1, y1, color);
+      if (color) p.line(TX + (x0 - TX) * grow, y0 * grow, TX + (x1 - TX) * grow, y1 * grow, color);
     }
   }
   const core = heatColor(age * 1.09 - 0.09);
-  groundRing(p, SEED_RING, core);
+  groundRing(p, SEED_RING, core, grow);
   if (core) p.dot(TX, 0, core);
 
   // Three short curls from different points on the hot mark.
   const smoke = 1 - smooth(6.65, 7.59, t);
-  if (smoke <= 0) return;
+  if (t < BURN_START || smoke <= 0) return;
   for (let i = 0; i < 3; i++) {
     const u = ((t - BURN_START) * (0.63 + i * 0.08) + i * 0.29) % 1;
     const gain = 0.33 * smoke * Math.sin(Math.PI * u);

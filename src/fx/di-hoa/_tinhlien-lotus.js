@@ -25,7 +25,15 @@ const SPARKS = Array.from({ length: 7 }, (_, i) => {
   return [Math.cos(a), Math.sin(a), i / 7, hsh(i, 16)];
 });
 
-function fillPetal(p, points, ox, oy, ax, ay, veinWidth, rim, body, base, vein) {
+function fillPetal(p, points, bx, by, dx, dy, bend, width, rim, heat, bud) {
+  const ox = p.toX(bx, by), oy = p.toY(bx, by);
+  const length2 = dx * dx + dy * dy;
+  const ax = (p.toX(bx + dx, by + dy) - ox) / length2;
+  const ay = (p.toY(bx + dx, by + dy) - oy) / length2;
+  const crossX = (p.toX(bx - dy, by + dx) - ox) / (Math.sqrt(length2) * width);
+  const crossY = (p.toY(bx - dy, by + dx) - oy) / (Math.sqrt(length2) * width);
+  const curl = bend / width, midrib = 0.55 / width, rib = 0.48 / width;
+  const minTone = 2 + Math.floor(heat * 4);
   const edges = [], screen = points.map(([x, y]) => [p.toX(x, y), p.toY(x, y)]);
   let low = Infinity, high = -Infinity;
   for (let i = 0, j = screen.length - 1; i < screen.length; j = i++) {
@@ -51,10 +59,18 @@ function fillPetal(p, points, ox, oy, ax, ay, veinWidth, rim, body, base, vein) 
       const end = Math.min(right, xEnd);
       for (let x = Math.max(left, p.ox); x <= end; x++) {
         const dx = x + 0.5 - ox, u = dx * ax + dy * ay;
-        // The curled vein ends before the fork, leaving the tips white.
-        const v = dy * ax - dx * ay + 0.052 * u * u;
-        const pigment = u < 0.22 ? base : u < 0.76 && Math.abs(v) < veinWidth ? vein : body;
-        p.put(x, y, pigment);
+        const v = dx * crossX + dy * crossY - curl * u * u;
+        const side = Math.abs(v);
+        // Tones climb along the curled midrib and fall away toward the folds.
+        const rise = u - 0.38 * side + 0.14 * v + (bud ? 0.045 : 0);
+        let tone = rise < 0.14 ? 2 : rise < 0.31 ? 3 : rise < 0.57 ? 4 : rise < 0.76 ? 5 : 6;
+        if (u > 0.13 && u < 0.77 && side < midrib) {
+          tone = tone < 4 ? 4 : Math.max(3, tone - 1);
+        } else if (u > 0.24 && u < 0.72) {
+          const branch = 0.08 + u * (0.73 - 0.66 * u);
+          if (Math.abs(side - branch) < rib) tone += tone < 4 ? 1 : -1;
+        }
+        p.put(x, y, L[Math.max(minTone, tone)]);
       }
     }
   }
@@ -63,7 +79,7 @@ function fillPetal(p, points, ox, oy, ax, ay, veinWidth, rim, body, base, vein) 
   }
 }
 
-function petal(p, design, cx, cy, sx, sy, sway, t, crush, rim, body) {
+function petal(p, design, cx, cy, sx, sy, sway, t, crush, rim, bud = false) {
   const [rootX, rootY, tipX, tipY, width, phase] = design;
   const bx = cx + rootX * sx, by = cy + rootY * sy;
   const flicker = t * 13 + phase;
@@ -90,15 +106,9 @@ function petal(p, design, cx, cy, sx, sy, sway, t, crush, rim, body) {
     point(1.01 + 0.04 * Math.sin(flicker + 2), 0.025 * Math.cos(flicker)),
     point(0.82, 0.1), point(rightTip, 0.22),
   ];
-  const ox = p.toX(bx, by), oy = p.toY(bx, by);
-  const ax = (p.toX(bx + dx, by + dy) - ox) / (length * length);
-  const ay = (p.toY(bx + dx, by + dy) - oy) / (length * length);
   const heat = clamp(crush + 0.13 * Math.sin(flicker * 0.76));
-  fillPetal(p, [...left, ...crown, ...right.reverse()], ox, oy, ax, ay, 0.54 / length,
-    L[heat > 0.92 ? 5 : heat > 0.55 ? 4 : rim],
-    L[heat > 0.47 ? 6 : body],
-    L[heat > 0.78 ? 5 : heat > 0.48 ? 4 : 2],
-    L[heat > 0.65 ? 5 : 3]);
+  fillPetal(p, [...left, ...crown, ...right.reverse()], bx, by, dx, dy, bend, w,
+    L[heat > 0.92 ? 5 : heat > 0.55 ? 4 : rim], heat, bud);
 }
 
 function embers(p, t, cx, cy, sx, sy, born, crush) {
@@ -131,12 +141,12 @@ export function lotus(p, t, layer) {
   const cy = LC[1] + 0.85 * Math.sin(t * 8.4) + 8 * crush;
   if (layer === 'back') {
     p.glow(cx, cy - 10 * sy, 24 * size, L[3], 0.075 + 0.1 * crush);
-    for (const shape of OUTER_BACK) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 4, 5);
+    for (const shape of OUTER_BACK) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 4);
     return;
   }
-  for (const shape of MIDDLE) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 3, 5);
-  for (const shape of BUD) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 3, 6);
-  for (const shape of OUTER_FRONT) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 3, 5);
+  for (const shape of MIDDLE) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 3);
+  for (const shape of BUD) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 3, true);
+  for (const shape of OUTER_FRONT) petal(p, shape, cx, cy, sx, sy, sway, t, crush, 3);
   embers(p, t, cx, cy, sx, sy, born, crush);
 
   const flare = smooth(0.2, 1, crush);
