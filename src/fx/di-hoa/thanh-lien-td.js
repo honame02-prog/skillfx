@@ -332,23 +332,11 @@ function rays(p, t, layer) {
 function column(p, t, layer) {
   const d = t - ERUPT;
   if (d < 0 || d > 0.62) return;
-  const H = COLH * out3(inv(d / 0.07)), u = smooth(0.32, 0.6, d), white = d < 0.07;
-  const Ht = H * (1 - 0.35 * u);
-  // Apply the visibility rule to the whole front jet, including tongues that overlap its core.
-  const jet = { shade(x0, y0, x1, y1, fn) {
-    p.shade(x0, y0, x1, y1, (x, y, o) => {
-      // v6 (Opus): the body shows through rising flame streaks, not a checkerboard. Per-column phase
-      // (mirror-safe via mx), streaks climb with time; the centre is most open, the rim nearly solid.
-      if (layer === 'front' && d >= 0.12) {
-        const e = ((x - AX) / 15) ** 2 + ((y + 30) / 48) ** 2;
-        if (e < 1) {
-          const c = mx(x), wave = 0.5 + 0.5 * Math.sin((Math.floor(y) + d * 150) / 4.5 + hash(c, 0, 71) * 6.283);
-          if (wave < 0.78 * (1 - e) ** 0.6) return;
-        }
-      }
-      fn(x, y, o);
-    });
-  } };
+  // v7 (Opus): a broad, continuous jade jet. Rise 0-0.10 with a pointed white head (no cap), hold,
+  // then 0.33-0.62 the foot lifts off the ground and the jet thins as it flies up and dies.
+  const H = COLH * out3(inv(d / 0.10)), u = smooth(0.33, 0.62, d), white = d < 0.08;
+  const Ht = H, lift = COLH * 0.8 * u * u;
+  const jet = p;
   // Flame tongues have real floor anchors around the jet; their height never decides the layer.
   for (let i = 0; i < 12; i++) {
     const a = i * TAU / 12 + TAU / 24, [fx, fy] = onFloor(a, 9 * (1 - u));
@@ -357,19 +345,26 @@ function column(p, t, layer) {
     tipFlame(jet, fx * (1.2 + 0.2 * Math.sin(t * 19 + k)), fy - z, t, k,
       (7 + 6 * hash(k, 15)) * (1 - u));
   }
-  if (standingLayer(0) !== layer) return;   // the axial core always crosses in front of the target
-  jet.shade(AX - 24, -Ht - 4, AX + 24, 2, (x, y, o) => {
-    const h = -y, dx = Math.abs(x - AX);
-    let w = (8.5 + 2 * Math.sin(h * 0.17 - t * 31) + 1.2 * Math.sin(h * 0.41 + t * 23)) * (1 - 0.85 * u);
-    if (h < 16) w += 10 * (1 - h / 16) ** 2 * (1 - u);                  // flared foot where it bursts from the pod
-    // Taper into the crown, without the old wide, flat mushroom cap.
-    w *= 1 - 0.52 * smooth(Ht - 18, Ht + 2, h);
-    if (h < -1 || h > Ht + 2) return;
+  // v7: the jet is drawn in BOTH layers - solid behind the target, shell + rising streaks in front.
+  const front = layer === 'front';
+  jet.shade(AX - 28, -Ht - 4, AX + 28, 2, (x, y, o) => {
+    const h = -y, dx = mx(x) + 0.5;   // mirror-safe distance: pixel columns -1 and 0 are a pair
+    if (h < lift - 1 || h > Ht + 1) return;
+    const hn = h / Math.max(1, Ht);
+    // smooth taper 11 -> 7 half-width, flared foot, pointed head; edge tongues travel upward fast
+    let w = (11 - 4 * hn) * (1 - 0.55 * u);
+    if (h - lift < 14) w += 5 * (1 - (h - lift) / 14) ** 2 * (1 - u);
+    w += 1.4 * Math.sin((h + t * 130) * 0.33) * (0.6 + 0.4 * hn) + 0.8 * Math.sin((h + t * 95) * 0.71 + 1.3);
+    if (h > Ht - 14) w *= Math.sqrt(Math.max(0, (Ht + 1 - h) / 15));
+    if (h < lift + 6 && u > 0) w *= (h - lift + 1) / 7;                 // the lifted foot closes into a flame tail
     const r = dx / Math.max(0.6, w);
     if (r > 1) return;
-    const flow = 0.22 * Math.sin(h * 0.24 - t * 29 + dx * 0.8);
-    o.c = dx < (white ? 2.3 : 1.2) * (1 - u) ? C[6]
-      : tone(Math.min(5, 5.05 - r * r * 2.0 + flow - u * 2.1), x, y);
+    // bright streaks sliding up inside the jet (mirror-safe per column)
+    const streak = Math.sin((h - t * 170) / 3.2 + hash(mx(x), 0, 77) * 6.283) > (front ? 0.9 : 0.72);   // sparse over the body: no bars
+    // front layer: solid shell at the sides, only rising streaks across the body -> target stands inside the fire
+    if (front && !white && r < 0.62 && !(streak && dx >= 1)) return;
+    const core = dx < (white ? 3.5 : 2.2) * (1 - 0.6 * u);
+    o.c = core && !front ? C[6] : tone(Math.min(front && r < 0.62 ? 4.4 : 5.6, 5.25 - 2.7 * r * r + (streak ? 0.9 : 0) - 1.6 * u), x, y);
     o.a = 1;
   });
 }
@@ -377,14 +372,22 @@ function column(p, t, layer) {
 const CROWN = Array.from({ length: 8 }, (_, i) => i * TAU / 8 + TAU / 16);
 const CR_TOP = -COLH;
 function crown(p, t, layer) {
-  const d = t - ERUPT - 0.06;
+  // v7 (Opus): a real crown lotus, two rings, ~44 px wide, opening on the jet head after it arrives.
+  const d = t - ERUPT - 0.09;
   if (d < 0) return;
-  const open = sm(inv(d / 0.16)), melt = inv((d - 0.3) / MELT);
+  const open = sm(inv(d / 0.18)), melt = inv((d - 0.34) / (MELT * 0.5));   // quick burn: no lingering hole pattern
   if (melt >= 1) return;
-  for (const a of [...CROWN].sort((A, B) => Math.sin(A) - Math.sin(B))) {
+  const rings = [
+    { as: CROWN, L: 22, W: 15, th: 0.35 + 0.95 * open, r: 4, dim: 0.5 },
+    { as: [0, TAU / 4, TAU / 2, TAU * 3 / 4], L: 15, W: 12, th: 0.15 + 0.5 * open, r: 2, dim: 0 },
+  ];
+  for (const R of rings) for (const a of [...R.as].sort((A, B) => Math.sin(A) - Math.sin(B))) {
     if (standingLayer(Math.sin(a) * 3) !== layer) continue;
-    const th = 0.2 + 1.0 * open, L = 16 * (0.4 + 0.6 * open), [bx, by] = [AX + Math.cos(a) * 3, CR_TOP + Math.sin(a) * 1.5], hz = Math.sin(th) * L;
-    lotusPetal(p, bx, by, bx + Math.cos(a) * hz, by + Math.sin(a) * hz * SQ - Math.cos(th) * L, 11 * (0.7 + 0.3 * Math.abs(Math.cos(a))), t, 40 + (petalKey(a) % 11), { side: Math.cos(a) >= 0 ? 1 : -1, melt, dim: 0, face: open > 0.5 ? 'in' : 'out' });
+    const L = R.L * (0.45 + 0.55 * open), bx = AX + Math.cos(a) * R.r, by = CR_TOP + Math.sin(a) * R.r * SQ, hz = Math.sin(R.th) * L;
+    lotusPetal(p, bx, by, bx + Math.cos(a) * hz, by + Math.sin(a) * hz * SQP - Math.cos(R.th) * L,
+      R.W * (0.75 + 0.25 * open), t, 40 + (petalKey(a) % 11),
+      { side: Math.abs(Math.cos(a)) < 1e-6 ? 0 : Math.cos(a) >= 0 ? 1 : -1, melt, dim: R.dim, face: 'in' });
+    if (!melt && R.r > 3 && open > 0.6) tipFlame(p, bx + Math.cos(a) * hz, by + Math.sin(a) * hz * SQP - Math.cos(R.th) * L, t, petalKey(a), 5);
   }
 }
 
