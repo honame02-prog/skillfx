@@ -53,6 +53,8 @@ function beat(t) {
   return k;
 }
 const layerOf = (floorY) => (floorY > 1e-3 ? 'front' : 'back');   // sin(PI) = 1.2e-16 must not count as front
+// Standing elements exactly on the target's plane belong in front; retain the petal seam tolerance.
+const standingLayer = (floorY) => Math.abs(floorY) <= 1e-3 ? 'front' : layerOf(floorY);
 
 // ---------------------------------------------------------------- cupped Nelumbo petals, approved style B
 // Solid, curved colour fields do the modelling; ordered pixels are confined to a narrow colour seam.
@@ -63,6 +65,13 @@ function soft(v, x, y) {
   v = clamp(v, 0, 6);
   const i = Math.floor(v), f = clamp((v - i - 0.5) * 3 + 0.5);
   return C[Math.min(6, f > BAYER[(Math.floor(y) & 3) * 4 + (mx(x) & 3)] ? i + 1 : i)];
+}
+function burnField(x, y, seed) {
+  const X = mx(x) / 4, Y = y / 4, ix = Math.floor(X), iy = Math.floor(Y);
+  const u = sm(X - ix), v = sm(Y - iy);
+  const a = hash(ix, iy, seed) * (1 - u) + hash(ix + 1, iy, seed) * u;
+  const b = hash(ix, iy + 1, seed) * (1 - u) + hash(ix + 1, iy + 1, seed) * u;
+  return a * (1 - v) + b * v;
 }
 function lotusPetal(p, bx, by, tx, ty, W, t, seed, { dim = 0, melt = 0, face = 'in', side = 1, bud = false } = {}) {
   const dx = tx - bx, dy = ty - by, L = Math.hypot(dx, dy);
@@ -82,22 +91,22 @@ function lotusPetal(p, bx, by, tx, ty, W, t, seed, { dim = 0, melt = 0, face = '
     const s = (ex * nx + ey * ny - bow) / Math.max(0.5, w), as = Math.abs(s);
     if (as > 1) return;
     if (melt > 0) {   // same 0.14 s burn-through: stationary holes with white-hot margins
-      const n = hash(mx(x) >> 1, Math.floor(y / 2), seed) * 0.7 + (as * 0.5 + Math.abs(u - 0.5)) * 0.6;
+      const n = burnField(x, y, seed) * 0.7 + (as * 0.5 + Math.abs(u - 0.5)) * 0.6;
       if (n < melt * 1.3 - 0.05) return;
-      if (n < melt * 1.3 + 0.12) { o.c = C[6]; o.a = 1; return; }
+      if (n < melt * 1.3 + 0.025) { o.c = C[6]; o.a = 1; return; }
     }
     const long = smooth(0.12, 1, u), belly = Math.sin(Math.PI * u);
     // Broad curved value fields: the root is the light source, the rolled rim is the only pale strip.
     // v5 (Opus): every transition is a smooth field. Translucent glow from the root and the centre line,
     // edges and tip sink into deep jade; the rolled lip is a soft bright crescent with a soft fold beneath.
-    const shadow = false;
     let tn = 4.75 - 1.45 * long - 1.05 * as ** 2.2 - dim;
     tn += 0.55 * Math.exp(-((s / 0.30) ** 2)) * smooth(0.05, 0.5, u) * (1 - long * 0.6);   // inner glow along the midrib
     if (face === 'in') {
       const lip = 0.80 - 0.28 * belly;
       const lipPx = (s - lip) * w;
       const on = smooth(0.2, 0.34, u) * (1 - smooth(0.9, 0.98, u));
-      tn += 1.25 * Math.exp(-((lipPx / 1.0) ** 2)) * on;            // lip highlight
+      const rim = Math.exp(-((lipPx / 1.0) ** 2)) * on;
+      tn += (5.2 - dim * 0.35 - tn) * rim;                        // soft 1 px core-lit rim on both faces
       tn -= 1.05 * Math.exp(-(((lipPx + 1.9) / 1.2) ** 2)) * on;    // cupped hollow under the lip
     } else {
       tn += 0.75 * Math.exp(-(((s + 0.22) / 0.55) ** 2)) * belly;     // rounded back catches the core light
@@ -111,8 +120,8 @@ function lotusPetal(p, bx, by, tx, ty, W, t, seed, { dim = 0, melt = 0, face = '
     }
     tn += 0.14 * Math.sin(u * 9 - t * 9 + seed) * belly;             // slow heat shimmer flowing to the tip
     // sparse living sparkles inside the bright body (approved style B), mirror-safe
-    if (!bud && tn > 3.6 && hash(mx(x), Math.floor(y), (fr(t) >> 1) + seed) > 0.975) { o.c = C[6]; o.a = 1; return; }
-    o.c = shadow && !melt ? C[1] : soft(clamp(tn, 1.1, 5.8) + melt * 2, x, y); o.a = 1;
+    if (!bud && !melt && tn > 3.6 && hash(mx(x), Math.floor(y), (fr(t) >> 1) + seed) > 0.975) { o.c = C[6]; o.a = 1; return; }
+    o.c = soft(clamp(tn, 1.1, 5.8) + melt * 0.35, x, y); o.a = 1;
   });
 }
 function contactShadow(p, P, t) {
@@ -158,12 +167,12 @@ function tipFlame(p, x, y, t, seed, h = 7) {
   });
 }
 // Raised petals are less compressed than the floor. Roots share the pale receptacle; staggered rings
-// open outside-in. Front-facing petals narrow with their projected length, preserving an elliptic profile.
+// open outside-in. All petals use the same square-root projection normalisation, on both hemispheres.
 const SQP = 0.70;
 const RINGS = [
-  { n: 8, off: TAU / 16, r: 8, L: 40, W: 22, th: 1.10 },
-  { n: 8, off: 0, r: 5.5, L: 35, W: 20, th: 0.75 },
-  { n: 4, off: TAU / 8, r: 3, L: 30, W: 16.5, th: 0.40 },
+  { n: 8, off: TAU / 16, r: 8, L: 34, W: 22, th: 1.25 },
+  { n: 8, off: 0, r: 5.5, L: 28, W: 19, th: 0.95 },
+  { n: 4, off: TAU / 8, r: 3, L: 20, W: 15, th: 0.60 },
 ];
 export function layout(t) {
   const rise = sm(inv((t - BUD) / (OPEN - BUD - 0.05))), open = sm(inv((t - OPEN) / (FULL - OPEN)));
@@ -172,21 +181,18 @@ export function layout(t) {
     const ringOpen = sm(clamp(open * 1.5 - ring * 0.25)), sq = ring === 2 ? squeeze : 1;
     for (let i = 0; i < R.n; i++) {
       const a = i * TAU / R.n + R.off, ca = Math.round(Math.cos(a) * 1e9) / 1e9, sa = Math.round(Math.sin(a) * 1e9) / 1e9;
-      // Near shells hinge down after the second heartbeat, rather than being cut around the feet.
-      const near = sa > 1e-3, hinge = near ? smooth(BEATS[1], OPEN, t) : 0;
-      const o = near ? Math.max(ringOpen, hinge) : ringOpen;
+      const o = ringOpen;
       const th = (-0.06 + (R.th + 0.06) * o) * sq;
-      // v5: near shells that fold down get much shorter, the one aimed at the camera most (no flat cross).
-      const frontal = smooth(0.5, 1, sa);
-      const L = ([30, 35, 38][ring] * (1 - o) + R.L * o) * rise * (1 - hinge * ([0.12, 0.32, 0.4][ring] + 0.3 * frontal));
+      const L = ([30, 35, 38][ring] * (1 - o) + R.L * o) * rise;
       const [bx, by] = onFloor(a, R.r * (0.7 + 0.3 * rise));
-      const hz = Math.sin(th) * L, vx = ca * hz, vy = sa * hz * SQP - Math.cos(th) * L * (1 - 0.78 * hinge);
+      const hz = Math.sin(th) * L, vx = ca * hz, vy = sa * hz * SQP - Math.cos(th) * L;
       // A closed bud converges into an ovoid crown. At bloom, its petals have broad shoulders,
       // but the foreshortened near petals keep the same length/width proportion as the side petals.
       const projected = Math.hypot(vx, vy) / Math.max(1, L);
       const k = Math.sqrt(1 / Math.max(1e-6, projected));
       const W = R.W * (0.48 + 0.52 * rise) * (0.72 + 0.28 * o) * Math.min(1, projected * k);
-      list.push({ ring, a, th, bx, by, tx: bx + vx * k, ty: by + vy * k, W,
+      list.push({ ring, a, th, L, width3D: R.W, open: o, height3D: Math.cos(th) * L,
+        bx, by, tx: bx + vx * k, ty: by + vy * k, W,
         seed: ring * 13 + (petalKey(a) % 17) });
     }
   });
@@ -200,7 +206,8 @@ function lotus(p, t, layer) {
   const bud = t < OPEN + 0.14;
   for (const P of layout(t)) {
     if (layerOf(P.by) !== layer) continue;
-    const face = Math.sin(P.a) < -0.2 && !bud ? 'in' : 'out';
+    // Translucent jade: the core lights the rolled rim through either face, without a front/back switch.
+    const face = bud ? 'out' : 'in';
     contactShadow(p, P, t);
     lotusPetal(p, P.bx, P.by, P.tx, P.ty, P.W, t, P.seed, {
       dim: dim + [1.0, 0.45, 0][P.ring],
@@ -222,19 +229,22 @@ function pond(p, t, seed) {
   p.shade(AX - rx * 1.14 - 1, -ry * 1.14 - 1, AX + rx * 1.14 + 1, ry * 1.14 + 1, (x, y, o) => {
     const dx = x - AX, e = Math.hypot(dx / rx, y / ry);
     if (e > 1.13) return;
-    const n = hash(mx(x) >> 2, Math.floor(y / 2), seed);   // v5: erosion in 4x2 cells, not salt noise
-    if (n < erode * 1.02) { if (e < 1 && n > 0.88 && erode < 0.97) { o.c = C[0]; o.a = 1; } return; }
+    // Cooling and erosion follow broad warped plates, rather than isolated pixel cells.
+    const ax = mx(x), px = ax + 1.7 * Math.sin(y * 0.22), py = y + 1.5 * Math.sin(ax * 0.19);
+    const n = hash(Math.floor(px / 9), Math.floor((py + 40) / 6), seed);
+    if (n < erode * 1.02) return;
     if (e > 1) { if (n > 0.4) { o.c = C[0]; o.a = 1; } return; }       // scorched lip of dark rock
     if (e > 0.9) { o.c = cool > 0.5 ? C[1] : e > 0.96 ? C[2] : t >= FULL ? C[2] : C[4]; o.a = 1; return; }
-    const ax = mx(x);
     if (cool > 0) {   // cooling: dark crust plates split by glowing veins
-      const vein = Math.abs(Math.sin(ax * 0.55 + Math.sin(y * 1.3) * 1.4) * Math.sin(y * 1.05 + Math.sin(ax * 0.8)));
-      // v5: large crust plates (no checkerboard): plate id from a coarse cell, interior one flat dark tone
-      if (hash(Math.floor(ax / 7), Math.floor((y + 40) / 4), seed + 1) < cool * 1.1) { o.c = vein < 0.08 ? C[2 + (cool < 0.7 ? 1 : 0)] : C[1]; o.a = 1; return; }
+      const vein = Math.min(Math.abs(Math.sin(px * 0.24 + Math.sin(py * 0.18) * 0.6)),
+        Math.abs(Math.sin(py * 0.34 + Math.sin(px * 0.17) * 0.7)));
+      if (hash(Math.floor(px / 9), Math.floor((py + 40) / 6), seed + 1) < cool * 1.1) {
+        o.c = vein < 0.075 ? C[2 + (cool < 0.7 ? 1 : 0)] : C[1]; o.a = 1; return;
+      }
     }
     const flow = Math.sin(e * 15 - t * 9) * 0.55 + (hash(ax >> 1, Math.floor((y + t * 6) / 2), seed + 2) - 0.5) * 0.8;
     let tn = 2.3 - 1.6 * smooth(OPEN, FULL, t) + 1.7 * (1 - e) ** 0.7 + flow + glow * (1 - 0.65 * smooth(OPEN, FULL, t)) * (1 - e * 0.6);
-    if (ax > 2 && hash(ax, Math.floor(y / 2), seed + 3) > 0.96) tn = 1;  // floating crust specks (single pixels, none on the axis)
+    if (cool === 0 && ax > 2 && hash(ax, Math.floor(y / 2), seed + 3) > 0.96) tn = 1;
     o.c = tone(tn, x, y); o.a = 1;
   });
 }
@@ -287,7 +297,11 @@ function seed(p, t) {
   if (t < DROP || t >= LAND + 0.02) return;
   const u = inv((t - DROP) / (LAND - DROP)), y = -128 + 128 * u * u;
   for (let k = 1; k <= 22; k++) { const yy = y - k * (1 + 3 * u); if (yy < -meta.origin[1]) continue; dot(p, AX, yy, C[k < 5 ? 5 : k < 12 ? 4 : 3]); if (k < 8) { dot(p, AX - 1, yy, C[3]); dot(p, AX + 1, yy, C[3]); } }
-  p.poly([[AX, y - 4], [AX + 2, y - 1], [AX, y + 1], [AX - 2, y - 1]], C[6]);
+  // Analytic diamond avoids edge-tie bias in the polygon rasteriser on this tiny axial seed.
+  p.shade(AX - 2, y - 4, AX + 2, y + 1, (x, yy, o) => {
+    const v = yy - y + 4, w = v < 3 ? v * 2 / 3 : 5 - v;
+    if (v >= 0 && v <= 5 && Math.abs(x - AX) <= w) { o.c = C[6]; o.a = 1; }
+  });
 }
 const DROPS = Array.from({ length: 10 }, (_, j) => { const a = (j >> 1) * TAU / 5 * 0.5 + 0.35, sx = j & 1 ? -1 : 1; return { vx: sx * Math.cos(a) * (40 + 30 * hash(j >> 1, 7)), vy: -(60 + 40 * hash(j >> 1, 8)), fy: Math.sin(a) * 10 * (j >> 1 & 1 ? 1 : -1) }; });
 function splash(p, t, layer) {
@@ -309,30 +323,54 @@ function rays(p, t, layer) {
     if (u <= 0 || u >= 1) continue;
     const r0 = 96 * (1 - u * u) + 6, r1 = r0 + 10 + 10 * u;
     const [x0, y0] = onFloor(R.a, r0), [x1, y1] = onFloor(R.a, r1), z = 10 * (1 - u);
-    if (layerOf(y0) !== layer) continue;
+    if (standingLayer(y0) !== layer) continue;
     line(p, x1, y1 - z, x0, y0 - z, C[4]); dot(p, x0, y0 - z, C[6]);
   }
 }
 
 // ---------------------------------------------------------------- the earth-heart column
 function column(p, t, layer) {
-  if (layer === 'front') return;   // the standing jet is behind the target; the floor pod remains below its feet
   const d = t - ERUPT;
   if (d < 0 || d > 0.62) return;
   const H = COLH * out3(inv(d / 0.07)), u = smooth(0.32, 0.6, d), white = d < 0.07;
   const Ht = H * (1 - 0.35 * u);
-  p.shade(AX - 26, -Ht - 14, AX + 26, 2, (x, y, o) => {
+  // Apply the visibility rule to the whole front jet, including tongues that overlap its core.
+  const jet = { shade(x0, y0, x1, y1, fn) {
+    p.shade(x0, y0, x1, y1, (x, y, o) => {
+      // v6 (Opus): the body shows through rising flame streaks, not a checkerboard. Per-column phase
+      // (mirror-safe via mx), streaks climb with time; the centre is most open, the rim nearly solid.
+      if (layer === 'front' && d >= 0.12) {
+        const e = ((x - AX) / 15) ** 2 + ((y + 30) / 48) ** 2;
+        if (e < 1) {
+          const c = mx(x), wave = 0.5 + 0.5 * Math.sin((Math.floor(y) + d * 150) / 4.5 + hash(c, 0, 71) * 6.283);
+          if (wave < 0.78 * (1 - e) ** 0.6) return;
+        }
+      }
+      fn(x, y, o);
+    });
+  } };
+  // Flame tongues have real floor anchors around the jet; their height never decides the layer.
+  for (let i = 0; i < 12; i++) {
+    const a = i * TAU / 12 + TAU / 24, [fx, fy] = onFloor(a, 9 * (1 - u));
+    if (standingLayer(fy) !== layer) continue;
+    const k = petalKey(a), z = Ht * (0.3 + 0.55 * hash(k, 14));
+    tipFlame(jet, fx * (1.2 + 0.2 * Math.sin(t * 19 + k)), fy - z, t, k,
+      (7 + 6 * hash(k, 15)) * (1 - u));
+  }
+  if (standingLayer(0) !== layer) return;   // the axial core always crosses in front of the target
+  jet.shade(AX - 24, -Ht - 4, AX + 24, 2, (x, y, o) => {
     const h = -y, dx = Math.abs(x - AX);
     let w = (8.5 + 2 * Math.sin(h * 0.17 - t * 31) + 1.2 * Math.sin(h * 0.41 + t * 23)) * (1 - 0.85 * u);
     if (h < 16) w += 10 * (1 - h / 16) ** 2 * (1 - u);                  // flared foot where it bursts from the pod
-    if (h > Ht - 14) w *= 1 + 0.5 * Math.sin(Math.PI * clamp((h - Ht + 14) / 14));
-    if (h > Ht) { const c = (h - Ht) / Math.max(1, w * 0.8); if (c >= 1) return; w *= Math.sqrt(1 - c * c); }
-    if (h < -1) return;
-    const r = dx / Math.max(0.6, w), n = hash(mx(x), Math.floor((y + t * 150) / 3), 7);
-    if (r > 1) { if (r < 1.45 && n > 0.74 - 0.2 * (1 - u)) { o.c = C[3]; o.a = 1; } return; }
-    if (layer === 'front' && !white && r < 0.72 + 0.1 * Math.sin(h * 0.3 - t * 20)) return;   // the target shows burning inside
-    const tn = white ? 6 : 6.2 - r * r * 3.4 + (n - 0.5) * 1.3 - u * 2.4;
-    o.c = tone(tn, x, y); o.a = 1;
+    // Taper into the crown, without the old wide, flat mushroom cap.
+    w *= 1 - 0.52 * smooth(Ht - 18, Ht + 2, h);
+    if (h < -1 || h > Ht + 2) return;
+    const r = dx / Math.max(0.6, w);
+    if (r > 1) return;
+    const flow = 0.22 * Math.sin(h * 0.24 - t * 29 + dx * 0.8);
+    o.c = dx < (white ? 2.3 : 1.2) * (1 - u) ? C[6]
+      : tone(Math.min(5, 5.05 - r * r * 2.0 + flow - u * 2.1), x, y);
+    o.a = 1;
   });
 }
 // the lotus of flame that opens on the column top
@@ -344,22 +382,22 @@ function crown(p, t, layer) {
   const open = sm(inv(d / 0.16)), melt = inv((d - 0.3) / MELT);
   if (melt >= 1) return;
   for (const a of [...CROWN].sort((A, B) => Math.sin(A) - Math.sin(B))) {
-    if (layer !== 'back') continue;   // raised crown belongs behind the body
+    if (standingLayer(Math.sin(a) * 3) !== layer) continue;
     const th = 0.2 + 1.0 * open, L = 16 * (0.4 + 0.6 * open), [bx, by] = [AX + Math.cos(a) * 3, CR_TOP + Math.sin(a) * 1.5], hz = Math.sin(th) * L;
-    lotusPetal(p, bx, by, bx + Math.cos(a) * hz, by + Math.sin(a) * hz * SQ - Math.cos(th) * L, 11 * (0.7 + 0.3 * Math.abs(Math.cos(a))), t, 40 + (petalKey(a) % 11), { side: Math.cos(a) >= 0 ? 1 : -1, melt, dim: Math.sin(a) > 1e-3 ? -0.3 : 0.4, face: open > 0.5 ? 'in' : 'out' });
+    lotusPetal(p, bx, by, bx + Math.cos(a) * hz, by + Math.sin(a) * hz * SQ - Math.cos(th) * L, 11 * (0.7 + 0.3 * Math.abs(Math.cos(a))), t, 40 + (petalKey(a) % 11), { side: Math.cos(a) >= 0 ? 1 : -1, melt, dim: 0, face: open > 0.5 ? 'in' : 'out' });
   }
 }
 
 // ---------------------------------------------------------------- embers, splatter, petal sparks
 // screen-space ballistic sparks; all lists built as mirror pairs (even j = right, odd j = left, same numbers)
 const pair = (n, fn) => Array.from({ length: n }, (_, j) => fn(j >> 1, j & 1 ? -1 : 1, j));
-const RISE = pair(28, (k, sx) => ({ x: sx * (1 + 7 * hash(k, 31)), t0: ERUPT + 0.05 + 0.5 * hash(k, 32), v: 60 + 50 * hash(k, 33), ph: hash(k, 34) * 6, sx, front: k % 2 === 0 }));
+const RISE = pair(28, (k, sx) => ({ x: sx * (1 + 7 * hash(k, 31)), fy: (k % 2 ? -1 : 1) * (2 + 5 * hash(k, 36)), t0: ERUPT + 0.05 + 0.5 * hash(k, 32), v: 60 + 50 * hash(k, 33), ph: hash(k, 34) * 6, sx }));
 function rising(p, t, layer) {
   for (const S of RISE) {
-    if (layer !== 'back') continue;   // ascending sparks remain behind the body
+    if (standingLayer(S.fy) !== layer) continue;
     const d = t - S.t0;
     if (d < 0 || d > 0.55) continue;
-    const y = -20 - S.v * d - 30 * hash(Math.abs(S.x), 35), x = AX + S.x * (1 + d * 2.5) + S.sx * Math.sin(t * 7 + S.ph) * 1.5;
+    const y = S.fy - 20 - S.v * d - 30 * hash(Math.abs(S.x), 35), x = AX + S.x * (1 + d * 2.5) + S.sx * Math.sin(t * 7 + S.ph) * 1.5;
     if (y < -150) continue;
     dot(p, x, y, C[d < 0.3 ? 6 : 4]); dot(p, x, y + 1, C[3]);
   }
@@ -380,7 +418,7 @@ function splatter(p, t, layer) {
       if (landed && hash(B.k, 44) > erode) { line(p, X - 1, F, X + 1, F, cool > 0.5 ? C[1] : C[4]); dot(p, X, F - 1, cool > 0.5 ? C[0] : C[3]); }
       continue;
     }
-    if (landed || layer !== 'back') continue;
+    if (landed || standingLayer(F) !== layer) continue;
     dot(p, X, F - z, C[6]); dot(p, X + (B.vx > 0 ? 1 : -1), F - z, C[5]); dot(p, X, F - z + 1, C[4]);
   }
 }
@@ -388,10 +426,11 @@ function petalSparks(p, t, layer) {   // petals burst into sparks flying the way
   const d = t - ERUPT;
   if (d < 0 || d > 0.5) return;
   for (const P of layout(ERUPT - 0.001)) {
-    if (layer !== 'back') continue;
     for (let q = 0; q < 3; q++) {
       const s = 50 + 40 * hash(petalKey(P.a), q, P.ring), vz = 40 + 30 * hash(petalKey(P.a), q + 5, P.ring);
       const x = P.tx + Math.cos(P.a) * s * d, y = P.ty + Math.sin(P.a) * s * SQ * d - vz * d + 0.5 * GRAV * d * d;
+      const floorY = P.by + Math.sin(P.a) * (Math.sin(P.th) * P.L + s * d) * SQ;
+      if (standingLayer(floorY) !== layer) continue;
       if (hash(petalKey(P.a), q, fr(t)) < d * 2) continue;
       dot(p, x, y, C[d < 0.15 ? 6 : 5]);
     }
@@ -401,8 +440,8 @@ function crownRain(p, t, layer) {
   const d = t - ERUPT - 0.36;
   if (d < 0 || d > 0.5) return;
   for (const a of CROWN) for (let q = 0; q < 2; q++) {
-    if (layer !== 'back') continue;
     const s = 30 + 25 * hash(pk(a), q, 51), x = AX + Math.cos(a) * (12 + s * d), y = CR_TOP - 6 + Math.sin(a) * s * SQ * d + 0.5 * 220 * d * d - 20 * d;
+    if (standingLayer(Math.sin(a) * (12 + s * d) * SQ) !== layer) continue;
     if (hash(pk(a), q, fr(t)) < d * 1.8) continue;
     dot(p, x, y, C[d < 0.2 ? 6 : 4]); dot(p, x, y - 1, C[3]);
   }
