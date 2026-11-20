@@ -22,7 +22,7 @@ for (let i = 0; i < args.length; i++) {
   else flags[a.slice(2)] = args[++i];
 }
 if (ids.length !== 1 || !flags.out) {
-  console.error("usage: node tools/phaser-atlas.mjs <id> --out <dir> [--name key] [--fps 30] [--scale 1] [--palette file.gpl] [--no-snap]");
+  console.error("usage: node tools/phaser-atlas.mjs <id> --out <dir> [--name key] [--fps 30] [--scale 1] [--palette file.gpl] [--no-snap] [--impact x,y]");
   process.exit(1);
 }
 const id = ids[0], name = flags.name ?? id.split("/").pop(), outDir = resolve(flags.out), scale = Math.max(1, Math.round(+(flags.scale ?? 1)));
@@ -130,12 +130,14 @@ seq.forEach((u, i) => {
   };
 });
 const pivot = { x: fx.meta.origin[0] * scale, y: fx.meta.origin[1] * scale };
+// optional --impact x,y (source px, same space as origin): the hit point (e.g. punch burst) -> meta.impact, so a game cue can anchor the effect on the target body
+const impact = flags.impact ? (() => { const [x, y] = flags.impact.split(",").map(Number); return { x: x * scale, y: y * scale }; })() : null;
 const json = {
   frames,
   meta: {
     app: "skillfx/phaser-atlas", version: "1", image: `${name}.png`, format: "RGBA8888", size: { w: aw, h: ah }, scale: "1",
     frameTags: [{ name, from: 0, to: outN - 1, direction: "forward" }],
-    pivot, skillfx: { id, fps: targetFps, srcFps, loop: !!fx.meta.loop, frames: outN, unique: uniq.length, sourceSize: [W, H], palette: pal ? basename(palFile) : null },
+    pivot, ...(impact ? { impact } : {}), skillfx: { id, fps: targetFps, srcFps, loop: !!fx.meta.loop, frames: outN, unique: uniq.length, sourceSize: [W, H], palette: pal ? basename(palFile) : null },
   },
 };
 mkdirSync(outDir, { recursive: true });
