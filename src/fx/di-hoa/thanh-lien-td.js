@@ -360,11 +360,11 @@ function column(p, t, layer) {
     const r = dx / Math.max(0.6, w);
     if (r > 1) return;
     // bright streaks sliding up inside the jet (mirror-safe per column)
-    const streak = Math.sin((h - t * 170) / 3.2 + hash(mx(x), 0, 77) * 6.283) > (front ? 0.9 : 0.72);   // sparse over the body: no bars
+    const streak = Math.sin((h - t * 170) / 3.2 + hash(mx(x), 0, 77) * 6.283) > 0.72;
     // front layer: solid shell at the sides, only rising streaks across the body -> target stands inside the fire
-    if (front && !white && r < 0.62 && !(streak && dx >= 1)) return;
+    // v7b: the jet is SOLID in front of the target too (user: the skill must be in front, never hollow).
     const core = dx < (white ? 3.5 : 2.2) * (1 - 0.6 * u);
-    o.c = core && !front ? C[6] : tone(Math.min(front && r < 0.62 ? 4.4 : 5.6, 5.25 - 2.7 * r * r + (streak ? 0.9 : 0) - 1.6 * u), x, y);
+    o.c = core ? C[6] : tone(Math.min(5.6, 5.25 - 2.7 * r * r + (streak ? 0.9 : 0) - 1.6 * u), x, y);
     o.a = 1;
   });
 }
