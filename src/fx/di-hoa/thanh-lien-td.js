@@ -7,8 +7,10 @@
 import { clamp, smooth, TAU, fit } from '../../core/index.js';
 import { hash } from './_cold-lib.js';
 
-export const MOC_HEX = ['#1a413c', '#127a4a', '#1fb85e', '#5cf08a', '#b4ffc0', '#ecfff0', '#ffffff'];
-const C = fit(MOC_HEX, 7);
+// v5 (Opus): the approved jade ramp of the side-view Thanh Lien (ultimate/_lotus-lib.js FLAMES[0]), not grass 'moc'.
+export const JADE_HEX = ['#031d29', '#07545b', '#0c9b88', '#24d9a1', '#7afbc6', '#caffed', '#ffffff'];
+export const MOC_HEX = JADE_HEX;   // legacy name kept for older tools
+const C = fit(JADE_HEX, 7);
 const END = 2.5, DROP = 0.1, LAND = 0.3, BUD = 0.7, BEATS = [0.98, 1.16], OPEN = 1.2, FULL = 1.48, GATHER = 1.46, ERUPT = 1.72;
 const MELT = 0.14, COLH = 114, POOL_R = 46, SQ = 0.5, GRAV = 150;
 export const AX = 0;
@@ -59,7 +61,7 @@ const layerOf = (floorY) => (floorY > 1e-3 ? 'front' : 'back');   // sin(PI) = 1
 const petalKey = (a) => pk(Math.atan2(Math.round(Math.sin(a) * 1e6), Math.round(Math.abs(Math.cos(a)) * 1e6)));
 function soft(v, x, y) {
   v = clamp(v, 0, 6);
-  const i = Math.floor(v), f = clamp((v - i - 0.5) * 5 + 0.5);
+  const i = Math.floor(v), f = clamp((v - i - 0.5) * 3 + 0.5);
   return C[Math.min(6, f > BAYER[(Math.floor(y) & 3) * 4 + (mx(x) & 3)] ? i + 1 : i)];
 }
 function lotusPetal(p, bx, by, tx, ty, W, t, seed, { dim = 0, melt = 0, face = 'in', side = 1, bud = false } = {}) {
@@ -67,9 +69,10 @@ function lotusPetal(p, bx, by, tx, ty, W, t, seed, { dim = 0, melt = 0, face = '
   if (L < 2 || melt >= 1) return;
   const ux = dx / L, uy = dy / L, nx = -uy * (side || 1), ny = ux * (side || 1);
   // Elliptic shoulders, a fleshy narrow attachment, and a short subacute tip, rather than a spear.
-  const M = 0.57, hw = (u) => W * 0.5 * (u < M
-    ? 0.16 + 0.84 * Math.sqrt(Math.max(0, 1 - ((M - u) / M) ** 2))
-    : Math.pow(Math.max(0, 1 - ((u - M) / (1 - M)) ** 2), 0.85));
+  // v5: plump, rounded shoulders and a blunt tip (style B), not a faceted spear.
+  const M = 0.52, hw = (u) => W * 0.5 * (u < M
+    ? 0.24 + 0.76 * Math.sqrt(Math.max(0, 1 - ((M - u) / M) ** 2))
+    : Math.pow(Math.max(0, 1 - ((u - M) / (1 - M)) ** 2), 0.62));
   const pad = W * 0.65 + 2;
   p.shade(Math.min(bx, tx) - pad, Math.min(by, ty) - pad, Math.max(bx, tx) + pad, Math.max(by, ty) + pad, (x, y, o) => {
     if (side * (x - AX) < 0) return;   // paired shells meet at the axis without draw-order colour bias
@@ -85,18 +88,20 @@ function lotusPetal(p, bx, by, tx, ty, W, t, seed, { dim = 0, melt = 0, face = '
     }
     const long = smooth(0.12, 1, u), belly = Math.sin(Math.PI * u);
     // Broad curved value fields: the root is the light source, the rolled rim is the only pale strip.
-    let shadow = false;
-    let tn = 4.65 - 1.65 * long - 0.90 * as ** 2 - dim;
+    // v5 (Opus): every transition is a smooth field. Translucent glow from the root and the centre line,
+    // edges and tip sink into deep jade; the rolled lip is a soft bright crescent with a soft fold beneath.
+    const shadow = false;
+    let tn = 4.75 - 1.45 * long - 1.05 * as ** 2.2 - dim;
+    tn += 0.55 * Math.exp(-((s / 0.30) ** 2)) * smooth(0.05, 0.5, u) * (1 - long * 0.6);   // inner glow along the midrib
     if (face === 'in') {
-      const lip = 0.78 - 0.30 * belly;
+      const lip = 0.80 - 0.28 * belly;
       const lipPx = (s - lip) * w;
-      tn += 0.35 * Math.exp(-(((s + 0.20) / 0.48) ** 2)) * belly;
-      if (u > 0.25 && u < 0.94 && lipPx > -2.6 && lipPx < -0.3) { tn = 1.85; shadow = lipPx < -1.3; }
-      if (u > 0.28 && u < 0.94 && lipPx >= -0.3 && lipPx < 0.85) tn = 5.5;
+      const on = smooth(0.2, 0.34, u) * (1 - smooth(0.9, 0.98, u));
+      tn += 1.25 * Math.exp(-((lipPx / 1.0) ** 2)) * on;            // lip highlight
+      tn -= 1.05 * Math.exp(-(((lipPx + 1.9) / 1.2) ** 2)) * on;    // cupped hollow under the lip
     } else {
-      tn += 0.95 * Math.exp(-(((s + 0.22) / 0.55) ** 2)) * belly;
-      tn -= 0.35 * smooth(0.42, 1, s) * belly;
-      if (!bud && u > 0.18 && u < 0.88 && Math.abs(s - 0.28) < 0.35 * belly) { tn = 1.85 + 0.75 * belly; shadow = Math.abs(s - 0.28) < 0.16 * belly; }
+      tn += 0.75 * Math.exp(-(((s + 0.22) / 0.55) ** 2)) * belly;     // rounded back catches the core light
+      tn -= 0.85 * smooth(0.35, 1, s) * belly;                        // far flank turns away
       if (bud) {
         tn = 2.0 + 2.45 * (1 - as ** 1.4) + 0.5 * u - dim * 0.4;
         // Two overlapping shells expose their joins, rather than outlining the bud.
@@ -104,7 +109,9 @@ function lotusPetal(p, bx, by, tx, ty, W, t, seed, { dim = 0, melt = 0, face = '
         if (Math.abs(as - seam) * w < 0.8 && u > 0.16 && u < 0.87) tn = 1.8;
       }
     }
-    tn += 0.11 * Math.sin(u * 9 - t * 9 + seed) * belly;
+    tn += 0.14 * Math.sin(u * 9 - t * 9 + seed) * belly;             // slow heat shimmer flowing to the tip
+    // sparse living sparkles inside the bright body (approved style B), mirror-safe
+    if (!bud && tn > 3.6 && hash(mx(x), Math.floor(y), (fr(t) >> 1) + seed) > 0.975) { o.c = C[6]; o.a = 1; return; }
     o.c = shadow && !melt ? C[1] : soft(clamp(tn, 1.1, 5.8) + melt * 2, x, y); o.a = 1;
   });
 }
@@ -169,7 +176,9 @@ export function layout(t) {
       const near = sa > 1e-3, hinge = near ? smooth(BEATS[1], OPEN, t) : 0;
       const o = near ? Math.max(ringOpen, hinge) : ringOpen;
       const th = (-0.06 + (R.th + 0.06) * o) * sq;
-      const L = ([30, 35, 38][ring] * (1 - o) + R.L * o) * rise * (1 - hinge * [0, 0.18, 0.25][ring]);
+      // v5: near shells that fold down get much shorter, the one aimed at the camera most (no flat cross).
+      const frontal = smooth(0.5, 1, sa);
+      const L = ([30, 35, 38][ring] * (1 - o) + R.L * o) * rise * (1 - hinge * ([0.12, 0.32, 0.4][ring] + 0.3 * frontal));
       const [bx, by] = onFloor(a, R.r * (0.7 + 0.3 * rise));
       const hz = Math.sin(th) * L, vx = ca * hz, vy = sa * hz * SQP - Math.cos(th) * L * (1 - 0.78 * hinge);
       // A closed bud converges into an ovoid crown. At bloom, its petals have broad shoulders,
@@ -209,18 +218,19 @@ function pond(p, t, seed) {
   if (t < LAND) return;
   const rx = Math.max(3, POOL_R * out3(inv((t - LAND) / 0.45))), ry = rx * SQ;
   const cool = smooth(ERUPT + 0.25, ERUPT + 0.6, t), erode = smooth(2.15, END, t);
-  const glow = 1.5 * beat(t) + 2 * smooth(GATHER, ERUPT, t) * (t < ERUPT + 0.2 ? 1 : 0) + (t >= ERUPT && t < ERUPT + 0.07 ? 3 : 0);
+  const glow = 1.5 * beat(t) + 1.1 * smooth(GATHER, ERUPT, t) * (t < ERUPT + 0.2 ? 1 : 0) + (t >= ERUPT && t < ERUPT + 0.07 ? 3 : 0);
   p.shade(AX - rx * 1.14 - 1, -ry * 1.14 - 1, AX + rx * 1.14 + 1, ry * 1.14 + 1, (x, y, o) => {
     const dx = x - AX, e = Math.hypot(dx / rx, y / ry);
     if (e > 1.13) return;
-    const n = hash(mx(x), Math.floor(y), seed);
+    const n = hash(mx(x) >> 2, Math.floor(y / 2), seed);   // v5: erosion in 4x2 cells, not salt noise
     if (n < erode * 1.02) { if (e < 1 && n > 0.88 && erode < 0.97) { o.c = C[0]; o.a = 1; } return; }
     if (e > 1) { if (n > 0.4) { o.c = C[0]; o.a = 1; } return; }       // scorched lip of dark rock
     if (e > 0.9) { o.c = cool > 0.5 ? C[1] : e > 0.96 ? C[2] : t >= FULL ? C[2] : C[4]; o.a = 1; return; }
     const ax = mx(x);
     if (cool > 0) {   // cooling: dark crust plates split by glowing veins
       const vein = Math.abs(Math.sin(ax * 0.55 + Math.sin(y * 1.3) * 1.4) * Math.sin(y * 1.05 + Math.sin(ax * 0.8)));
-      if (hash(ax >> 2, Math.floor(y / 2), seed + 1) < cool * 1.1) { o.c = vein < 0.1 ? C[2 + (cool < 0.7 ? 1 : 0)] : C[0]; o.a = 1; return; }
+      // v5: large crust plates (no checkerboard): plate id from a coarse cell, interior one flat dark tone
+      if (hash(Math.floor(ax / 7), Math.floor((y + 40) / 4), seed + 1) < cool * 1.1) { o.c = vein < 0.08 ? C[2 + (cool < 0.7 ? 1 : 0)] : C[1]; o.a = 1; return; }
     }
     const flow = Math.sin(e * 15 - t * 9) * 0.55 + (hash(ax >> 1, Math.floor((y + t * 6) / 2), seed + 2) - 0.5) * 0.8;
     let tn = 2.3 - 1.6 * smooth(OPEN, FULL, t) + 1.7 * (1 - e) ** 0.7 + flow + glow * (1 - 0.65 * smooth(OPEN, FULL, t)) * (1 - e * 0.6);
