@@ -8,7 +8,7 @@ import { createFrame, clearFrame, createFx, composite } from '../../src/core/ind
 import { ROOT, loadEffect, canvas, upscale } from '../lib/fxlib.mjs';
 const [id, outArg, ...ts] = process.argv.slice(2);
 const fx = await loadEffect(id); const [W, H] = fx.meta.size, [OX, OY] = fx.meta.origin;
-const atlas = join(ROOT, '..', 'tienson', 'art', 'daosi', 'daosi.png'), AW = 521;
+const atlas = process.env.DAOSI ?? join(ROOT, '..', 'tienson', 'art', 'daosi', 'daosi.png'), AW = 521;   // DAOSI= when run from a worktree
 const raw = spawnSync('ffmpeg', ['-v', 'error', '-i', atlas, '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'], { maxBuffer: 1 << 28 }).stdout;
 const tgt = (f) => { if (!raw?.length) return; for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) { const s = ((521 + y) * AW + 1 + x) * 4; if (raw[s + 3] < 128) continue; f.color[(OY - 61 + y) * W + OX - 32 + x] = 0xff000000 | (raw[s + 2] << 16) | (raw[s + 1] << 8) | raw[s]; } };
 const BG = new Uint32Array(W * H).fill(0xff666b6b);
