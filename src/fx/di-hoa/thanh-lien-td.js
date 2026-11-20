@@ -290,7 +290,7 @@ function rising(p, t, layer) {
     if (S.front !== (layer === 'front')) continue;
     const d = t - S.t0;
     if (d < 0 || d > 0.55) continue;
-    const y = -20 - S.v * d - 30 * hash(S.x, 35), x = AX + S.x * (1 + d * 2.5) + S.sx * Math.sin(t * 7 + S.ph) * 1.5;
+    const y = -20 - S.v * d - 30 * hash(Math.abs(S.x), 35), x = AX + S.x * (1 + d * 2.5) + S.sx * Math.sin(t * 7 + S.ph) * 1.5;
     if (y < -150) continue;
     p.dot(x, y, C[d < 0.3 ? 6 : 4]); p.dot(x, y + 1, C[3]);
   }
