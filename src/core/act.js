@@ -141,27 +141,26 @@ export class Target {
     }
     this.straw = this.straw.filter((s) => s.age < s.life);
   }
-  draw(C, W, H, X, Y, flip, u = null) {
+  draw(C, W, H, X, Y, flip) {
     const tan = Math.tan(this.theta), sv = this.shiver > 0 ? (Math.floor(this.clock * 30) & 1 ? 1 : -1) : 0, name = this.flashT > 0 ? "flash" : this.skin, sk = name ? SKINS[name] : null;
     const base = X + (flip ? -this.x - 1 : this.x);
     const cut = this.cut * (TH + 3);   // erased rows from the top, with a ragged edge
     for (let r = 0; r < TH; r++) {
       if (r < cut - 3) continue;
-      const lean = (TH - 1 - r) * tan * 0.8, o = u ? Math.round(lean * u[0]) + sv : Math.round(lean) + sv, oy = u ? Math.round(lean * u[1] * 0.5) : 0;
+      const o = Math.round((TH - 1 - r) * tan * 0.8) + sv;
       for (let x = 0; x < TW; x++) {
         const c = DUMMY[r * TW + x];
         if (!c || (r < cut && ((x * 7 + r * 13) % 5) < cut - r + 1)) continue;
-        const px = base + (flip ? -(x - 19 + o) - 1 : x - 19 + o), py = Y - TH + r + oy;
+        const px = base + (flip ? -(x - 19 + o) - 1 : x - 19 + o), py = Y - TH + r;
         if (px >= 0 && py >= 0 && px < W && py < H) C[py * W + px] = sk ? mix(c, sk[0], sk[1]) : c;
       }
     }
   }
-  drawStraw(C, W, H, X, Y, flip, v = null) {
+  drawStraw(C, W, H, X, Y, flip) {
     for (const s of this.straw) {
       const c = STRAW[Math.min(4, Math.floor((s.age / s.life) * 5))], lx = Math.round(s.x), ly = Math.round(s.y) - 1;
       for (let i = 0; i < (s.big ? 2 : 1); i++) {
-        // v = [ux, uy, cos pitch] (u = unit heading on screen): in a top-down view the straw's x runs along the heading on the floor
-        const px = v ? X + Math.round((lx + i) * v[0]) : X + (flip ? -(lx + i) - 1 : lx + i), py = v ? Y + Math.round(ly * v[2] + (lx + i) * v[1]) : Y + ly;
+        const px = X + (flip ? -(lx + i) - 1 : lx + i), py = Y + ly;
         if (px >= 0 && py >= 0 && px < W && py < H) C[py * W + px] = c;
       }
     }
@@ -215,17 +214,7 @@ export function createAct(mod, o = {}) {
   const a = mod.act ?? {}, meta = mod.meta ?? {}, D = meta.duration ?? 1, flip = !!o.flip, seed = o.seed ?? meta.options?.seed ?? 1;
   const fx = createFx(mod, o), track = a.poses ?? [[0, { ...STAND }]], span = actSpan(mod);
   const X = o.x ?? 0, Y = o.y ?? 0;
-  // o.view = { dir, pitch }: a top-down camera. The caster and the targets are seen from above at that heading, and each target
-  // stands d = target.x away along it, on screen (d cos dir, d k sin dir) with k = sin(pitch). Without it, everything is as before.
-  const view = o.view ?? null, vk = view ? Math.sin(view.pitch) : 0, vc = view ? Math.cos(view.dir) : 1, vs = view ? Math.sin(view.dir) : 0;
-  // u = the unit vector of the heading on screen (a screen-length of 1 per unit, whatever the heading)
-  const un = view ? Math.hypot(vc, vk * vs) || 1 : 1, ux = vc / un, uy = vk * vs / un;
-  const aimBehind = !!view && vs < -1e-9;
-  const specs = a.targets ?? (a.target ? [a.target] : []);
-  const targets = specs.map((g, i) => new Target(view ? 0 : g.x ?? 66, seed + 4 + i));
-  // where each target's feet land on screen, relative to the caster's (in view mode)
-  const tPos = specs.map((g) => { const d = g.x ?? 66; return view ? [Math.round(d * ux), Math.round(d * uy)] : [0, 0]; });
-  const viewed = (q) => (view ? { ...q, yaw: (q.yaw ?? 0) + view.dir, pitch: view.pitch } : q);
+  const targets = (a.targets ?? (a.target ? [a.target] : [])).map((g, i) => new Target(g.x ?? 66, seed + 4 + i));
   const hits = (a.hits ?? []).map((h) => ({ ...h })).sort((p, q) => p.t - q.t), dust = (a.dust ?? []).slice();
   const R = new Rng(seed + 9), specks = [];
   // after-images take the effect's own color unless the act names one
@@ -319,36 +308,27 @@ export function createAct(mod, o = {}) {
     draw(frame, { body = true, target: showTarget = true } = {}) {
       const W = frame.w, H = frame.h, q = last ?? poseNow(), active = t >= 0;
       const tgt = showTarget ? targets : [];
-      // in view mode targets sort by screen y: those up the screen (or level) go behind the caster, those below it in front
-      const sel = (near) => (showTarget ? targets.filter((g, i) => !view || (tPos[i][1] > 0) === near) : []);
-      const drawTargets = (near = false) => sel(near).forEach((g) => g.draw(frame.color, W, H, FX + tPos[targets.indexOf(g)][0], FY + tPos[targets.indexOf(g)][1], flip, view ? [ux, uy] : null));
-      const drawStraw = () => tgt.forEach((g) => g.drawStraw(frame.color, W, H, FX + tPos[targets.indexOf(g)][0], FY + tPos[targets.indexOf(g)][1], flip, view ? [ux, uy, cp] : null));
+      const drawTargets = () => tgt.forEach((g) => g.draw(frame.color, W, H, FX, FY, flip));
+      const drawStraw = () => tgt.forEach((g) => g.drawStraw(frame.color, W, H, FX, FY, flip));
       const drawDust = () => {
         for (const k of specks) {
-          const c = k.c || DUST[Math.min(3, Math.floor((k.age / k.life) * 4))], lx = Math.round(k.x), py = FY + (view ? Math.round(k.y * cp + lx * uy) : Math.round(k.y));
+          const c = k.c || DUST[Math.min(3, Math.floor((k.age / k.life) * 4))], lx = Math.round(k.x), py = FY + Math.round(k.y);
           for (let i = 0; i < (k.big ? 2 : 1); i++) {
-            const px = view ? FX + Math.round(lx * ux) + i : flip ? FX - lx - i - 1 : FX + lx + i;
+            const px = flip ? FX - lx - i - 1 : FX + lx + i;
             if (px >= 0 && py >= 0 && px < W && py < H) frame.color[py * W + px] = c;
           }
         }
       };
       const FX = X - (frame.ox | 0), FY = Y - (frame.oy | 0);
-      // how far a pose's shift (x along the facing, y up/down) moves him on screen; in view mode x runs along the heading on the floor
-      const cp = view ? Math.cos(view.pitch) : 1;
-      const offOf = (qq) => {
-        const x = Math.round(qq.x ?? 0), y = Math.round(qq.y ?? 0);
-        return view ? [Math.round(x * ux), Math.round(x * uy + y * cp), Math.round(x * uy)] : [flip ? -x : x, y, 0];
-      };
       if (!body) {
         if (active) fx.draw(frame, "back");
         drawTargets();
-        if (view) drawTargets(true);
         if (active) fx.draw(frame, "front");
         drawStraw();
         return;
       }
-      const ry = Math.round(q.y ?? 0), [ox, oy, fdy] = offOf(q), BX = FX + ox, BY = FY + oy, rxl = flip && !view ? -ox : ox;
-      const r = posed(viewed(q)), mirror = flip;
+      const rx = Math.round(q.x ?? 0), ry = Math.round(q.y ?? 0), BX = FX + (flip ? -rx : rx), BY = FY + ry;
+      const r = posed(q), mirror = flip;
       const paint = (i, color) => {
         const px = mirror ? BX - r.xs[i] - 1 : BX + r.xs[i], py = BY + r.ys[i];
         if (px < 0 || py < 0 || px >= W || py >= H) return;
@@ -359,7 +339,7 @@ export function createAct(mod, o = {}) {
       const drawGhosts = () => {
         for (const g of ghosts) {
           // after-images are light, not paint: they brighten what's behind them and leave nothing muddy
-          const gr = posed(viewed(g.q)), [gox, goy] = offOf(g.q), gx = FX + gox, gy = FY + goy, k = 0.5 * (1 - g.age / GHOST_LIFE);
+          const gr = posed(g.q), gx = FX + (flip ? -Math.round(g.q.x ?? 0) : Math.round(g.q.x ?? 0)), gy = FY + Math.round(g.q.y ?? 0), k = 0.5 * (1 - g.age / GHOST_LIFE);
           const gm = flip, r0 = (gc & 255) * k, g0 = ((gc >>> 8) & 255) * k, b0 = ((gc >>> 16) & 255) * k;
           for (let i = 0; i < gr.n; i++) {
             const px = gm ? gx - gr.xs[i] - 1 : gx + gr.xs[i], py = gy + gr.ys[i];
@@ -370,7 +350,7 @@ export function createAct(mod, o = {}) {
         }
       };
       const shadow = () => {
-        const sy = FY + fdy, cx = FX + ox, hw = 10 + (Math.abs(q.ffx - q.fbx) >> 1) - Math.min(8, Math.abs(ry) >> 1);
+        const sy = FY, cx = FX + (flip ? -rx : rx), hw = 10 + (Math.abs(q.ffx - q.fbx) >> 1) - Math.min(8, Math.abs(ry) >> 1);
         if (sy < 0 || sy >= H) return;
         for (let dy = 0; dy < 2; dy++)
           for (let x = -hw + dy * 2; x <= hw - dy * 2; x++) {
@@ -380,15 +360,13 @@ export function createAct(mod, o = {}) {
           }
       };
       if (!a.onBody) {
-        // the effect doesn't care about the body: back, body, front (aimed at the far side, the front layer goes behind him too)
+        // the effect doesn't care about the body: back, body, front
         if (active) fx.draw(frame, "back");
-        if (aimBehind && active) fx.draw(frame, "front");
         drawTargets();
         shadow();
         drawGhosts();
         for (let i = 0; i < r.n; i++) paint(i, r.color[i]);
-        if (view) drawTargets(true);
-        if (!aimBehind && active) fx.draw(frame, "front");
+        if (active) fx.draw(frame, "front");
         drawStraw();
         drawDust();
         return;
@@ -407,7 +385,7 @@ export function createAct(mod, o = {}) {
       // what's up on the body goes with it; what's on the floor stays on the floor
       const shiftOf = (ly) => {
         const k = clamp((-11 - ly) / 7, 0, 1), f = clamp((-1 - ly) / 6, 0, 1);
-        return [Math.round(lean * k + rxl * f), Math.round(cr * k + oy * f)];
+        return [Math.round(lean * k + rx * f), Math.round(cr * k + ry * f)];
       };
       const rest = (sx, sy) => {
         const c = (flip ? FX - sx - 1 : sx - FX) + 12, r0 = sy - FY + 38;
@@ -415,7 +393,7 @@ export function createAct(mod, o = {}) {
       };
       const C = frame.color, Ls = frame.light;
       const copy = (buf, sx, sy, s) => {
-        const [dx, dy] = shiftOf(sy - FY), px = sx + (flip && !view ? -dx : dx), py = sy + dy;
+        const [dx, dy] = shiftOf(sy - FY), px = sx + (flip ? -dx : dx), py = sy + dy;
         if (px < 0 || py < 0 || px >= W || py >= H) return;
         const i = py * W + px;
         if (buf === Ls) {
@@ -429,7 +407,6 @@ export function createAct(mod, o = {}) {
         }
       };
       drawTargets();
-      if (view) drawTargets(true); // (on-body effects are not laid out for a top-down view yet: targets just go behind)
       shadow();
       for (let sy = 0; sy < H; sy++)
         for (let sx = 0; sx < W; sx++) {
@@ -494,11 +471,11 @@ export function actTiming(mod) {
 }
 
 /** The box an act needs in local space, so nothing gets cut off: { x0, y0, x1, y1 }, sampled over its poses. */
-export function actBounds(mod, view = null) {
+export function actBounds(mod) {
   const a = mod.act, [w, h] = mod.meta.size, [ox, oy] = mod.meta.origin;
   let x0 = -ox, y0 = -oy, x1 = w - ox, y1 = h - oy;
-  const see = (p0) => {
-    const p = view ? { ...p0, yaw: (p0.yaw ?? 0) + view.dir, pitch: view.pitch } : p0, r = posed(p), X = Math.round(p.x ?? 0), Y = Math.round(p.y ?? 0), a = r.x0, b = r.x1;
+  const see = (p) => {
+    const r = posed(p), X = Math.round(p.x ?? 0), Y = Math.round(p.y ?? 0), a = r.x0, b = r.x1;
     x0 = Math.min(x0, a + X - 1); x1 = Math.max(x1, b + X + 1); y0 = Math.min(y0, r.y0 + Y - 1); y1 = Math.max(y1, r.y1 + Y + 1);
   };
   const k = a?.poses;
@@ -508,12 +485,6 @@ export function actBounds(mod, view = null) {
   } else see(STAND);
   for (const g of a?.targets ?? (a?.target ? [a.target] : [])) {
     const tx = g.x ?? 66;
-    if (view) {
-      // the target stands tx away along the heading; its 38 x 52 body hangs from there
-      const vk = Math.sin(view.pitch), vs = Math.sin(view.dir), vc = Math.cos(view.dir), un = Math.hypot(vc, vk * vs) || 1, px = tx * vc / un, py = tx * vk * vs / un;
-      x0 = Math.min(x0, px - 30); x1 = Math.max(x1, px + 36); y0 = Math.min(y0, py - 56); y1 = Math.max(y1, py + 6);
-      continue;
-    }
     x0 = Math.min(x0, tx - 30); x1 = Math.max(x1, tx + 36); y0 = Math.min(y0, -56);
   }
   return { x0, y0, x1, y1 };

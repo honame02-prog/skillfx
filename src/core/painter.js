@@ -9,7 +9,6 @@ import { rasterText, textWidth, FONTS } from "./font.js";
 // 4x4 ordered (Bayer) thresholds: a pixel at alpha a is drawn when a is above its cell's threshold.
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
 const OUT = { c: 0, a: 1, l: 0, k: 0 };
-const FLOOR_SY = 0.16; // the squash effects bake into floor shapes (sim.js)
 const sprites = new WeakMap();
 const call = (v, ...args) => (typeof v === "function" ? v(...args) : v);
 
@@ -19,94 +18,26 @@ export class Painter {
     this.reset();
   }
 
-  /** Re-read the frame and clear placement, fade, light strength and the camera view. */
+  /** Re-read the frame and clear placement, fade and light strength. */
   reset() {
     const f = this.frame;
     this.w = f.w; this.h = f.h; this.ox = f.ox | 0; this.oy = f.oy | 0; this.C = f.color; this.L = f.light;
-    this.tx = 0; this.ty = 0;
-    this._fx = 1; this._cs = 1; this._sn = 0;
-    this.view = null; this.spaceName = "aim";
-    this._rigid();
+    this.tx = 0; this.ty = 0; this.fx = 1; this.cs = 1; this.sn = 0;
     this.fade = 1; this.lightK = 1; this.layer = "front";
-    return this;
-  }
-
-  // ---- the placement is an affine 2x2: screen = (tx, ty) + [a b; c d] * local, with its inverse kept beside it.
-  // The old flip + rotation is the special case a = fx*cs, b = -sn, c = fx*sn, d = cs (fx = +-1), so a placed painter
-  // draws the same pixels as before. fx / cs / sn stay as properties (effects read them to take fast paths): they
-  // describe the rigid case, and read NaN once the matrix is squashed or sheared, which turns every such fast path off.
-  get fx() { return this._fx; }
-  get cs() { return this._cs; }
-  get sn() { return this._sn; }
-  set fx(v) { this._fx = v; this._rigid(); }
-  set cs(v) { this._cs = v; this._rigid(); }
-  set sn(v) { this._sn = v; this._rigid(); }
-  _rigid() {
-    const fx = this._fx, cs = this._cs, sn = this._sn;
-    if (cs !== cs || sn !== sn || fx !== fx) return; // a squashed matrix is not touched by a rigid write
-    this.a = fx * cs; this.b = -sn; this.c = fx * sn; this.d = cs;
-    this.ia = cs * fx; this.ib = sn * fx; this.ic = -sn; this.id = cs;
-  }
-  /** Set the placement matrix directly (local -> screen). A non-rigid matrix hides fx / cs / sn (NaN). */
-  matrix(a, b, c, d) {
-    this.a = a; this.b = b; this.c = c; this.d = d;
-    const det = a * d - b * c, k = det === 0 ? 0 : 1 / det;
-    this.ia = d * k; this.ib = -b * k; this.ic = -c * k; this.id = a * k;
-    if (a === 1 && b === 0 && c === 0 && d === 1) { this._fx = 1; this._cs = 1; this._sn = 0; }
-    else { this._fx = 1; this._cs = NaN; this._sn = NaN; }
     return this;
   }
 
   /** Put the effect's origin at (x, y) in frame space, mirrored if flip, rotated by angle (radians). */
   place(x, y, flip = false, angle = 0) {
-    this.tx = x; this.ty = y; this._fx = flip ? -1 : 1; this._cs = Math.cos(angle); this._sn = Math.sin(angle);
-    this.view = null; this.spaceName = "aim";
-    this._rigid();
+    this.tx = x; this.ty = y; this.fx = flip ? -1 : 1; this.cs = Math.cos(angle); this.sn = Math.sin(angle);
     return this;
-  }
-
-  /**
-   * Choose what local x and y mean on screen. With no `view` this does nothing: the effect stays side-on. With
-   * view = { dir, pitch } (dir: floor heading in radians, 0 = east, pi/2 = towards the viewer; pitch: camera tilt):
-   *   "aim"    local x runs along the heading as a unit vector on screen (cos dir, k sin dir)/|.|, local y down is cos(pitch)
-   *   "up"     no turn; y squashed by cos(pitch)                        (flames, pillars, auras)
-   *   "floor"  undo the old floor squash (y / 0.16), turn by dir on the floor, squash by k = sin(pitch)  (rings, cracks)
-   *   "screen" untouched
-   * The origin (tx, ty) never moves. Returns the painter.
-   */
-  space(name = "aim") {
-    this.spaceName = name;
-    const v = this.view;
-    if (!v) return this;
-    const th = v.dir, k = Math.sin(v.pitch), cP = Math.cos(v.pitch), co = Math.cos(th), si = Math.sin(th);
-    switch (name) {
-      case "aim": { const n = Math.hypot(co, k * si) || 1; return this.matrix(co / n, 0, (k * si) / n, cP); }
-      case "up": return this.matrix(1, 0, 0, cP);
-      case "floor": return this.matrix(co, -si / FLOOR_SY, k * si, (k * co) / FLOOR_SY);
-      case "screen": return this.matrix(1, 0, 0, 1);
-      default: throw new Error(`unknown space "${name}"`);
-    }
-  }
-  /** Give the painter a camera view (null for none) and set the default space, "aim". */
-  setView(view) {
-    this.view = view ?? null;
-    if (this.view) this.space("aim");
-    return this;
-  }
-  /** Multiply a side-view floor squash (0.16, 0.095...) by this to open it up for the view, when drawn in "up" space; 1 with no view. */
-  get floorK() {
-    return this.view ? Math.sin(this.view.pitch) / (FLOOR_SY * Math.cos(this.view.pitch)) : 1;
-  }
-  /** True when the heading points up the screen (N, NE, NW): the aim layer belongs behind the caster. */
-  get behind() {
-    return !!this.view && Math.sin(this.view.dir) < -1e-9;
   }
 
   // ---- transforms: local (effect) space <-> screen (frame) space
-  toX(x, y) { return this.tx + this.a * x + this.b * y; }
-  toY(x, y) { return this.ty + this.c * x + this.d * y; }
-  fromX(sx, sy) { const dx = sx - this.tx, dy = sy - this.ty; return dx * this.ia + dy * this.ib; }
-  fromY(sx, sy) { const dx = sx - this.tx, dy = sy - this.ty; return dx * this.ic + dy * this.id; }
+  toX(x, y) { return this.tx + x * this.fx * this.cs - y * this.sn; }
+  toY(x, y) { return this.ty + x * this.fx * this.sn + y * this.cs; }
+  fromX(sx, sy) { const dx = sx - this.tx, dy = sy - this.ty; return (dx * this.cs + dy * this.sn) * this.fx; }
+  fromY(sx, sy) { const dx = sx - this.tx, dy = sy - this.ty; return -dx * this.sn + dy * this.cs; }
   // the screen pixel of the local pixel cell holding (x, y): mirrors and rotations land on whole cells
   cellX(x, y) { return Math.floor(this.toX(Math.floor(x) + 0.5, Math.floor(y) + 0.5)); }
   cellY(x, y) { return Math.floor(this.toY(Math.floor(x) + 0.5, Math.floor(y) + 0.5)); }
@@ -291,8 +222,7 @@ export class Painter {
   }
   /** Filled rectangle. */
   rect(x, y, w, h, c, a = 1) {
-    // only a pure mirror keeps whole cells whole: any squash or shear must go through the shader to leave no holes
-    if (this.b === 0 && this.c === 0 && (this.a === 1 || this.a === -1) && (this.d === 1 || this.d === -1)) {
+    if (this.sn === 0) {
       const X0 = Math.round(x), Y0 = Math.round(y), X1 = Math.round(x + w), Y1 = Math.round(y + h);
       for (let yy = Y0; yy < Y1; yy++) for (let xx = X0; xx < X1; xx++) this.put(this.cellX(xx, yy), this.cellY(xx, yy), c, a);
       return;
