@@ -1,5 +1,5 @@
 // Review card + GIF for di-hoa/thanh-lien-td on a stone floor with the Dao Si idle (S) as the target.
-// node tools/cards/thanh-lien-td.mjs   -> ../deliver/tienson/07-thanh-lien-td-the-v1.png + 07-thanh-lien-td-v1.gif
+// node tools/cards/thanh-lien-td.mjs   -> ../deliver/tienson/07-thanh-lien-td-the-v2.png + 07-thanh-lien-td-v2.gif
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -73,7 +73,7 @@ T.forEach((t, i) => { const f = at(t); cell(Math.floor(i / COLS), i % COLS, f.fu
 const fl = at(1.80), LR = ROWS - 1;
 cell(LR, 0, fl.floor, 'FLOOR 1.80'); cell(LR, 1, fl.back, 'BACK 1.80'); cell(LR, 2, fl.front, 'FRONT 1.80');
 cell(LR, 3, fl.full, 'GHEP 1.80 (floor,back,nguoi,front)');
-const file = join(OUT, '07-thanh-lien-td-the-v1.png');
+const file = join(OUT, '07-thanh-lien-td-the-v2.png');
 writeFileSync(file, out.png());
 console.log(file, CWID + 'x' + CHT);
 
@@ -82,7 +82,7 @@ const bare = (() => { clearFrame(fr); drawTarget(fr); return composite(fr, new U
 const seq = frames.map((f) => f.full);
 for (let i = 0; i < Math.round(0.4 * FPS); i++) seq.push(bare);
 const buf = Buffer.concat(seq.map((r) => Buffer.from(upscale(r, W, H, Z).buffer)));
-const g = join(OUT, '07-thanh-lien-td-v1.gif');
+const g = join(OUT, '07-thanh-lien-td-v2.gif');
 const res = spawnSync('ffmpeg', ['-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-s', `${W * Z}x${H * Z}`, '-r', String(FPS), '-i', '-',
   '-vf', 'split[a][b];[a]palettegen=max_colors=255:stats_mode=full[p];[b][p]paletteuse=dither=none', '-loop', '0', g], { input: buf, maxBuffer: 1 << 28 });
 if (res.status !== 0) throw new Error(String(res.stderr));

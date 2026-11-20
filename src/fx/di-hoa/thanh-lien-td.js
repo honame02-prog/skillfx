@@ -41,23 +41,31 @@ function beat(t) {
 const layerOf = (floorY) => (floorY > 1e-3 ? 'front' : 'back');   // sin(PI) = 1.2e-16 must not count as front
 
 // ---------------------------------------------------------------- the lotus petal (v3 style B, from thanh-lien.js)
-function lotusPetal(p, bx, by, tx, ty, W, t, seed, { k = 1, dim = 0, side = 1, flame = true, melt = 0 } = {}) {
+// face 'out' = the convex back of the petal (veins, cup crescent); 'in' = the concave inner face, seen from above on
+// open or far-side petals (pale centre, deeper rim). The base pinches to a point: from above the base is in view.
+function lotusPetal(p, bx, by, tx, ty, W, t, seed, { k = 1, dim = 0, side = 1, flame = true, melt = 0, face = 'out' } = {}) {
   const dx = tx - bx, dy = ty - by, L = Math.hypot(dx, dy);
   if (L < 2 || k <= 0 || melt >= 1) return;
-  const ux = dx / L, uy = dy / L, nx = -uy, ny = ux, M = 0.56;
-  const Wn = W * 0.74, hw = (u) => u < M ? Wn * (0.18 + 0.82 * Math.sqrt(1 - ((M - u) / M) ** 2)) : Wn * Math.pow(Math.max(0, 1 - ((u - M) / (1 - M)) ** 2), 1.15);
-  const pad = W + 8;
-  p.shade(Math.min(bx, tx) - pad, Math.min(by, ty) - pad - 8, Math.max(bx, tx) + pad, Math.max(by, ty) + pad, (x, y, o) => {
+  const ux = dx / L, uy = dy / L, nx = -uy, ny = ux, M = 0.58;
+  const Wn = W * 0.5, hw = (u) => u < M ? Wn * Math.sqrt(1 - ((M - u) / M) ** 2) * (0.25 + 0.75 * smooth(0, 0.3, u)) : Wn * Math.pow(Math.max(0, 1 - ((u - M) / (1 - M)) ** 2), 1.15);
+  const pad = W * 0.5 + 3;
+  p.shade(Math.min(bx, tx) - pad, Math.min(by, ty) - pad, Math.max(bx, tx) + pad, Math.max(by, ty) + pad, (x, y, o) => {
     const ex = x - bx, ey = y - by, u = (ex * ux + ey * uy) / L, v = (ex * nx + ey * ny) * side;
-    if (u > 0.97) {   // tip flame tongue
-      if (!flame || melt > 0) return;
-      const fl = (u - 0.97) * L, hgt = 6 + 2.5 * Math.sin(t * 13 + seed), sway = 1.2 * Math.sin(t * 9 + fl * 0.5 + seed);
-      if (fl > hgt || Math.abs(v - sway) > 1.5 * (1 - fl / hgt) + 0.2) return;
-      o.c = fl < hgt * 0.5 ? C[5] : C[4]; o.a = k; return;
-    }
-    if (u < 0) return;
-    const w = hw(u), s = v / Math.max(0.6, w);
+    if (u < 0 || u > 1) return;
+    const w = hw(u), s = v / Math.max(0.5, w);
     if (Math.abs(s) > 1) return;
+    if (face === 'in') {   // concave face: lit centre channel, rim two steps deeper, a midrib line
+      if (melt > 0) {
+        const n = hash(mx(x) >> 1, Math.floor(y / 2), seed) * 0.7 + (Math.abs(s) * 0.5 + Math.abs(u - 0.5)) * 0.6;
+        if (n < melt * 1.3 - 0.05) return;
+        if (n < melt * 1.3 + 0.12) { o.c = C[6]; o.a = k; return; }
+      }
+      if ((1 - Math.abs(s)) * w < 1 && u > 0.04) { o.c = C[clamp(Math.round(2.2 - dim * 0.5), 1, 6)]; o.a = k; return; }
+      let tn = 5.3 - 1.9 * smooth(0.15, 1, u) - 1.6 * Math.abs(s) ** 2 - dim;
+      if (Math.abs(s) < 0.12 && u > 0.12 && u < 0.8) tn -= 0.7;          // the midrib fold
+      tn += 0.15 * Math.sin(u * 6 - t * 4.5 + seed);
+      o.c = tone(tn + melt * 2, x, y); o.a = k; return;
+    }
     if (melt > 0) {   // burns away from the edges in; hole rims flash white
       const n = hash(mx(x) >> 1, Math.floor(y / 2), seed) * 0.7 + (Math.abs(s) * 0.5 + Math.abs(u - 0.5)) * 0.6;
       if (n < melt * 1.3 - 0.05) return;
@@ -75,11 +83,21 @@ function lotusPetal(p, bx, by, tx, ty, W, t, seed, { k = 1, dim = 0, side = 1, f
   });
 }
 
+// style B tip flame: always rises straight up from the tip (fire goes up whatever way the petal points)
+function tipFlame(p, x, y, t, seed, h = 7) {
+  const hgt = h + 2.5 * Math.sin(t * 13 + seed);
+  for (let i = 0; i < hgt; i++) {
+    const f = i / hgt, sway = 1.1 * Math.sin(t * 9 - i * 0.45 + seed) * f;
+    const cx = Math.round(x + sway), yy = y - 1 - i;
+    p.dot(cx, yy, f < 0.25 ? C[5] : f < 0.6 ? C[4] : C[3]);                 // a one-pixel tongue, wider only at its root
+    if (f < 0.3) { p.dot(cx - 1, yy, C[3]); p.dot(cx + 1, yy, C[3]); }
+  }
+}
 // three rings round the feet; angle sets closed under a -> PI - a, no petal on the axis (none hides the face)
 const RINGS = [
-  { n: 8, off: TAU / 16, r: 30, L: 30, W: 14, th: 1.32 },   // outer, lies almost flat
-  { n: 6, off: 0, r: 19, L: 32, W: 13, th: 0.88 },
-  { n: 4, off: TAU / 8, r: 10, L: 30, W: 11, th: 0.42 },    // inner, stands up to the waist
+  { n: 8, off: TAU / 16, r: 24, L: 34, W: 13, th: 1.3 },    // outer, lies almost flat
+  { n: 6, off: 0, r: 16, L: 33, W: 12, th: 0.86 },
+  { n: 4, off: TAU / 8, r: 9, L: 30, W: 10, th: 0.38 },     // inner, stands up to the waist
 ];
 function layout(t) {
   const rise = sm(inv((t - BUD) / (OPEN - BUD - 0.05))), open = sm(inv((t - OPEN) / (FULL - OPEN)));
@@ -91,7 +109,7 @@ function layout(t) {
       const L = R.L * rise * (0.9 + 0.1 * squeeze), W = R.W * (0.55 + 0.45 * rise);
       const [bx, by] = onFloor(a, R.r * (0.6 + 0.4 * rise));
       const hz = Math.sin(th) * L;
-      list.push({ ring, a, bx, by, tx: bx + Math.cos(a) * hz, ty: by + Math.sin(a) * hz * SQ - Math.cos(th) * L, W,
+      list.push({ ring, a, th, bx, by, tx: bx + Math.cos(a) * hz, ty: by + Math.sin(a) * hz * SQ - Math.cos(th) * L, W,
         side: Math.cos(a) >= 0 ? 1 : -1, seed: ring * 13 + (pk(a) % 17) });
     }
   });
@@ -102,7 +120,12 @@ function lotus(p, t, layer) {
   const melt = inv((t - ERUPT) / MELT);
   if (melt >= 1) return;
   const dim = 0.7 - 1.2 * beat(t) - 0.5 * smooth(GATHER, ERUPT, t);   // base 0.7 deeper: the moc ramp is paler than FLAMES[0]
-  for (const P of layout(t)) if (layerOf(P.by) === layer) lotusPetal(p, P.bx, P.by, P.tx, P.ty, P.W, t, P.seed, { dim: dim + (layer === 'back' ? 0.5 : 0), side: P.side, melt });
+  for (const P of layout(t)) {
+    if (layerOf(P.by) !== layer) continue;
+    const face = Math.sin(P.a) < -0.2 || P.th > 0.6 ? 'in' : 'out';   // from above: far petals and open petals show their cup
+    lotusPetal(p, P.bx, P.by, P.tx, P.ty, P.W, t, P.seed, { dim: dim + (layer === 'back' ? 0.4 : 0), side: P.side, melt, face });
+    if (!melt && P.ring < 2 && t > BUD + 0.15) tipFlame(p, P.tx, P.ty, t, P.seed, P.ring ? 7 : 6);
+  }
 }
 
 // ---------------------------------------------------------------- floor: pond, roots, rings, pod, splats
@@ -125,7 +148,7 @@ function pond(p, t, seed) {
     }
     const flow = Math.sin(e * 15 - t * 9) * 0.55 + (hash(ax >> 1, Math.floor((y + t * 6) / 2), seed + 2) - 0.5) * 0.8;
     let tn = 2.3 + 1.7 * (1 - e) ** 0.7 + flow + glow * (1 - e * 0.6);
-    if (hash(ax >> 1, Math.floor(y), seed + 3) > 0.93) tn = 1;          // floating crust specks
+    if (ax > 2 && hash(ax, Math.floor(y / 2), seed + 3) > 0.96) tn = 1;  // floating crust specks (single pixels, none on the axis)
     o.c = tone(tn, x, y); o.a = 1;
   });
 }
@@ -165,9 +188,8 @@ function pod(p, t) {   // the seed pod under the feet, holes glowing
   p.shade(AX - rx, -ry, AX + rx, ry, (x, y, o) => {
     const e = Math.hypot((x - AX) / rx, y / ry);
     if (e > 1) return;
-    o.c = e > 0.8 ? C[2] : C[hot > 0.5 ? 6 : 4]; o.a = 1;
+    o.c = e > 0.75 ? C[2] : C[hot > 0.5 ? 5 : 3]; o.a = 1;
   });
-  for (const [hx, hy] of [[0, 0], [-5, -1], [5, -1], [-3, 2], [3, 2]]) p.dot(AX + hx * g, hy * g, hot > 0.5 ? C[4] : C[1]);
 }
 
 // ---------------------------------------------------------------- the seed falling on the axis
@@ -233,7 +255,7 @@ function crown(p, t, layer) {
   for (const a of [...CROWN].sort((A, B) => Math.sin(A) - Math.sin(B))) {
     if (layerOf(Math.sin(a)) !== layer) continue;
     const th = 0.2 + 1.0 * open, L = 16 * (0.4 + 0.6 * open), [bx, by] = [AX + Math.cos(a) * 3, CR_TOP + Math.sin(a) * 1.5], hz = Math.sin(th) * L;
-    lotusPetal(p, bx, by, bx + Math.cos(a) * hz, by + Math.sin(a) * hz * SQ - Math.cos(th) * L, 8.5, t, 40 + (pk(a) % 11), { side: Math.cos(a) >= 0 ? 1 : -1, melt, dim: layer === 'back' ? 0.4 : -0.3 });
+    lotusPetal(p, bx, by, bx + Math.cos(a) * hz, by + Math.sin(a) * hz * SQ - Math.cos(th) * L, 8.5, t, 40 + (pk(a) % 11), { side: Math.cos(a) >= 0 ? 1 : -1, melt, dim: layer === 'back' ? 0.4 : -0.3, face: open > 0.5 ? 'in' : 'out' });
   }
 }
 
