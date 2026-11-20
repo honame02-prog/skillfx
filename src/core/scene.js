@@ -7,7 +7,7 @@ const SKY = hex("#15131d"), SKY_TOP = hex("#0d0b14"), SKY_LOW = hex("#221d33");
 const FLOOR_EDGE = hex("#4a4263"), FLOOR = hex("#2b2639"), FLOOR_DARK = hex("#211d2d"), MORTAR = hex("#1a1724");
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 
-export const BACKDROPS = ["dark", "ground", "sky", "light", "black"];
+export const BACKDROPS = ["dark", "ground", "sky", "light", "black", "floor"];
 
 /**
  * A backdrop as a Uint32Array of w x h colors. kind: "dark" | "ground" (a stone floor from groundY down)
@@ -17,6 +17,18 @@ export function backdrop(kind, w, h, groundY = h) {
   const out = new Uint32Array(w * h);
   if (kind === "light") return out.fill(hex("#ebe8f0"));
   if (kind === "black") return out.fill(hex("#000000"));
+  if (kind === "floor") {
+    // seen from above: a dark stone floor filling the frame, faint tile lines every 12 px (columns staggered row to row)
+    const TILE = hex("#262233"), LINE = hex("#201c2b");
+    for (let y = 0; y < h; y++) {
+      const row = Math.floor(y / 12), off = row % 2 ? 12 : 0;
+      for (let x = 0; x < w; x++) {
+        const seam = y % 12 === 0 || (x + off) % 24 === 0;
+        out[y * w + x] = seam ? LINE : rand(x, y, 31) > 0.97 ? FLOOR_DARK : TILE;
+      }
+    }
+    return out;
+  }
   for (let y = 0; y < h; y++)
     for (let x = 0; x < w; x++) {
       let c = SKY;

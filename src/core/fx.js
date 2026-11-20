@@ -45,7 +45,7 @@ export function resolveOptions(meta, o = {}) {
 
 /**
  * A live instance of an effect module: { update(dt), draw(frame, layer), stop(), done() }.
- * o: { x, y, flip, angle, seed, palette, light (glow strength), actor, ...the effect's own options }.
+ * o: { x, y, flip, angle, view ({ dir, pitch }, optional: top-down camera), seed, palette, light (glow strength), actor, ...the effect's own options }.
  * draw(frame, "back") draws what goes behind a character, "front" what goes in front, nothing both.
  */
 export function createFx(mod, o = {}) {
@@ -70,6 +70,8 @@ export function createFx(mod, o = {}) {
     draw(frame, layer) {
       const p = painterFor(frame);
       p.place(opts.x ?? 0, opts.y ?? 0, !!opts.flip, opts.angle ?? 0);
+      // a top-down camera view ({ dir, pitch }): the effect is drawn in the "aim" space until it picks another
+      if (opts.view) p.setView(opts.view);
       p.fade = stopAt === Infinity ? 1 : clamp(1 - (t - stopAt) / FADE);
       p.lightK = opts.light ?? 1;
       const tt = meta.loop ? t % D : Math.min(t, D);

@@ -14,15 +14,26 @@ export function chain(cues) {
     const at = (v) => (typeof v === "function" ? v(t) : v);
     const each = (p, layer) => {
       const { frame, tx, ty, fx: sign, cs, sn, fade, lightK } = p;
+      // top-down (p.view): a cue's place goes through the move's current space (aim), and the cue gets the view too
+      const view = p.view, space = p.spaceName, M = [p.a, p.b, p.c, p.d];
       for (const c of list) {
         if (!c.inst || c.over) continue;
-        c.inst.options.x = tx + sign * at(c.x);
-        c.inst.options.y = ty + at(c.y);
-        c.inst.options.flip = sign < 0 !== c.flip;
+        if (view) {
+          const X = at(c.x), Y = at(c.y);
+          c.inst.options.x = tx + M[0] * X + M[1] * Y;
+          c.inst.options.y = ty + M[2] * X + M[3] * Y;
+          c.inst.options.flip = false;
+          c.inst.options.view = view;
+        } else {
+          c.inst.options.x = tx + sign * at(c.x);
+          c.inst.options.y = ty + at(c.y);
+          c.inst.options.flip = sign < 0 !== c.flip;
+        }
         c.inst.draw(frame, layer);
       }
       // each one places the painter for itself: put it back for whoever draws next
-      Object.assign(p, { tx, ty, fx: sign, cs, sn, fade, lightK });
+      if (view) { p.place(tx, ty, false, 0); p.setView(view); p.space(space); Object.assign(p, { fade, lightK }); }
+      else Object.assign(p, { tx, ty, fx: sign, cs, sn, fade, lightK });
     };
     return {
       update(dt) {

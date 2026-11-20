@@ -27,6 +27,7 @@ const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a
 const len = (a) => Math.hypot(a[0], a[1], a[2]);
 const unit = (a) => mul(a, 1 / (len(a) || 1e-6));
 const rotY = (t) => { const c = Math.cos(t), s = Math.sin(t); return [c, 0, s, 0, 1, 0, -s, 0, c]; };
+const rotX = (t) => { const c = Math.cos(t), s = Math.sin(t); return [1, 0, 0, 0, c, -s, 0, s, c]; };
 const rotZ = (t) => { const c = Math.cos(t), s = Math.sin(t); return [c, -s, 0, s, c, 0, 0, 0, 1]; };
 const mm = (A, B) => { const o = new Array(9); for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) o[r * 3 + c] = A[r * 3] * B[c] + A[r * 3 + 1] * B[3 + c] + A[r * 3 + 2] * B[6 + c]; return o; };
 const mv = (M, v) => [M[0] * v[0] + M[1] * v[1] + M[2] * v[2], M[3] * v[0] + M[4] * v[1] + M[5] * v[2], M[6] * v[0] + M[7] * v[1] + M[8] * v[2]];
@@ -142,6 +143,9 @@ const Zb = new Float32Array(BW * BH), Tone = new Float32Array(BW * BH), Part = n
 const touched = [];
 const LIGHT = unit([-0.55, 0.72, 0.5]);
 let clipBody = false, clipWeapon = false, curFrameIndex = 0, curDim = 0, onlyPart = 0;
+// the camera's tilt for the pose being drawn (pose.pitch): the floor is y = 0 before the tilt, so clips take that y back
+let PC = 1, PS = 0;
+const floorY = (wy, z) => wy * PC + z * PS;
 const FRAME_IDS = ["pelvis", "waist", "chest", "head", "neck", "upperN", "foreN", "upperF", "foreF", "thighN", "shinN", "thighF", "shinF", "footN", "footF"];
 function plot(i, z, tone, part, mat, wx, wy, color) {
   if (onlyPart && part !== onlyPart) return;
@@ -161,8 +165,9 @@ function sphere(c, r, part, mat) {
   for (let wy = y0; wy <= y1; wy++)
     for (let wx = x0; wx <= x1; wx++) {
       const dx = wx - c[0], dy = wy - c[1], d2 = dx * dx + dy * dy;
-      if (d2 > r * r || (clipBody && wy < 1.5)) continue;
+      if (d2 > r * r || (clipBody && PS === 0 && wy < 1.5)) continue;
       const dz = Math.sqrt(r * r - d2), n = [dx / r, dy / r, dz / r], i = (OY - wy) * BW + (OX + wx);
+      if (clipBody && PS !== 0 && floorY(wy, c[2] + dz) < 1.5) continue;
       plot(i, c[2] + dz, dot(n, LIGHT), part, mat, wx, wy, 0);
     }
 }
@@ -183,11 +188,12 @@ function ellipsoid(c, R, r, part, mat) {
   void Rt;
   for (let wy = y0; wy <= y1; wy++)
     for (let wx = x0; wx <= x1; wx++) {
-      if (clipBody && wy < 1.5) continue;
+      if (clipBody && PS === 0 && wy < 1.5) continue;
       const dx = wx - c[0], dy = wy - c[1];
       const qa = A[8], qb = 2 * (A[2] * dx + A[5] * dy), qc = A[0] * dx * dx + 2 * A[1] * dx * dy + A[4] * dy * dy - 1, disc = qb * qb - 4 * qa * qc;
       if (disc < 0) continue;
       const dz = (-qb + Math.sqrt(disc)) / (2 * qa);
+      if (clipBody && PS !== 0 && floorY(wy, c[2] + dz) < 1.5) continue;
       const n = unit([A[0] * dx + A[1] * dy + A[2] * dz, A[3] * dx + A[4] * dy + A[5] * dz, A[6] * dx + A[7] * dy + A[8] * dz]);
       plot((OY - wy) * BW + (OX + wx), c[2] + dz, dot(n, LIGHT), part, mat, wx, wy, 0);
     }
@@ -243,7 +249,7 @@ function along(H, axis, side, part) {
   const T = (i, k, c, lift = 0) => {
     const x = H[0] + axis[0] * i + side[0] * k + n[0] * lift, y = H[1] + axis[1] * i + side[1] * k + n[1] * lift, z = H[2] + axis[2] * i + side[2] * k + n[2] * lift;
     const wx = Math.round(x), wy = Math.round(y);
-    if (clipWeapon && wy < 0) return;
+    if (clipWeapon && (PS === 0 ? wy < 0 : Math.round(floorY(y, z)) < 0)) return;
     const idx = (OY - wy) * BW + (OX + wx);
     if (idx < 0 || idx >= BW * BH) return;
     curFrameIndex = -1;
@@ -427,18 +433,22 @@ function finish(S, restFrames) {
   return out;
 }
 
-const turnAll = (S, a) => {
-  // the whole figure turned about the vertical through the feet
-  const R = rotY(-a), P = (v) => mv(R, v);
+const turnAll = (S, a) => spin(S, rotY(-a));
+// the whole figure turned by R about the feet
+function spin(S, R) {
+  const P = (v) => mv(R, v);
   for (const f of Object.values(S.B)) { f.t = P(f.t); f.R = mm(R, f.R); }
   for (const A of [S.armN, S.armF, S.legN, S.legF]) { A.joint = P(A.joint); A.end = P(A.end); }
   S.sN = P(S.sN); S.sF = P(S.sF); S.hipN = P(S.hipN); S.hipF = P(S.hipF);
   S.axis = P(S.axis); S.side = P(S.side);
-};
+}
 let REST_FRAMES = null;
 function render(pose) {
-  const S = solve(pose), q = S.q, whole = (q.yaw ?? 0) + (q.face === -1 ? Math.PI : 0);
+  const S = solve(pose), q = S.q, whole = (q.yaw ?? 0) + (q.face === -1 ? Math.PI : 0), pitch = q.pitch ?? 0;
   if (whole) turnAll(S, whole);
+  // the camera looks down: tip the whole figure about the horizontal through the feet, after it has turned
+  if (pitch) spin(S, rotX(pitch));
+  PC = Math.cos(pitch); PS = pitch ? Math.sin(pitch) : 0;
   const air = (q.y ?? 0) < -0.5;
   clipBody = !air;
   clipWeapon = !air;
@@ -449,9 +459,11 @@ function render(pose) {
     const sb = q.sb ?? Math.PI;
     let ax = [Math.cos(sb), -Math.sin(sb), 0], sd = [-Math.sin(sb), -Math.cos(sb), 0];
     if (whole) { const R = rotY(-whole); ax = mv(R, ax); sd = mv(R, sd); }
+    if (pitch) { const R = rotX(pitch); ax = mv(R, ax); sd = mv(R, sd); }
     S.OW.draw(along(S.armF.end, ax, sd, PART.offWeapon), q, S.armF.end);
   }
   clipWeapon = false;
+  PC = 1; PS = 0;
   return finish(S, REST_FRAMES);
 }
 REST_FRAMES = solve({}).B;
@@ -462,7 +474,7 @@ const keyOf = (p) => {
   for (const k of Object.keys(p).sort()) {
     const v = p[k];
     if (v === undefined || k === "x" || k === "y" || k === "ghost") continue;
-    s += k + (typeof v === "number" ? (k === "sa" || k === "sb" || k === "wl" || k === "yaw" || k === "turn" ? Math.round(v * 20) : Math.round(v)) : v) + ",";
+    s += k + (typeof v === "number" ? (k === "sa" || k === "sb" || k === "wl" || k === "yaw" || k === "turn" ? Math.round(v * 20) : k === "pitch" ? Math.round(v * 100) : Math.round(v)) : v) + ",";
   }
   return s;
 };
@@ -490,6 +502,7 @@ export function posed(pose) {
 export function skeleton(pose) {
   const S = solve(pose), q = S.q, whole = (q.yaw ?? 0) + (q.face === -1 ? Math.PI : 0);
   if (whole) turnAll(S, whole);
+  if (q.pitch) spin(S, rotX(q.pitch));
   const { B, armN, armF, legN, legF, sN, sF, hipN, hipF } = S, at = (f, v) => add(f.t, mv(f.R, v));
   const J = {
     pelvis: B.pelvis.t, waist: B.waist.t, chest: B.chest.t, neck: B.neck.t, head: B.head.t, crown: at(B.head, [0, 3.3, 0]),
