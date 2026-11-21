@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { createFrame, clearFrame, createFx, composite } from '../../src/core/index.js';
 import { ROOT, loadEffect, canvas, upscale } from '../lib/fxlib.mjs';
 
+const VER = process.env.VER || 'v1', WEAVES = (process.env.WEAVES || 'cross,kiss').split(',');
 const Z = 3, ZC = 2, FPS = 30, LBL = 22, GAP = 6;
 const fx = await loadEffect('di-hoa/van-lac-td');
 const [W, H] = fx.meta.size, [OX, OY] = fx.meta.origin;
@@ -87,16 +88,16 @@ function card(weave, frames) {
     out.paste(upscale(c, CROPW, CROPH, ZZ), CROPW * ZZ, CROPH * ZZ, x, y0);
     out.text(`CAN CANH 4x ${t.toFixed(2)}s ${weave}`, x + 2, y0 + CROPH * ZZ + 4, 2);
   });
-  const file = join(OUT, `08-van-lac-td-the-v1-${weave}.png`);
+  const file = join(OUT, `08-van-lac-td-the-${VER}-${weave}.png`);
   writeFileSync(file, out.png());
   console.log(file, CWID + 'x' + CHT);
 }
-for (const weave of ['cross', 'kiss']) {
+for (const weave of WEAVES) {
   const frames = run(weave);
   card(weave, frames);
   if (weave === 'cross') {
     const buf = Buffer.concat(frames.map((f) => Buffer.from(upscale(f.full, W, H, Z).buffer)));
-    const g = join(OUT, '08-van-lac-td-v1.gif');
+    const g = join(OUT, `08-van-lac-td-${VER}.gif`);
     const res = spawnSync('ffmpeg', ['-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-s', `${W * Z}x${H * Z}`, '-r', String(FPS), '-i', '-',
       '-vf', 'split[a][b];[a]palettegen=max_colors=255:stats_mode=full[p];[b][p]paletteuse=dither=none', '-loop', '0', g], { input: buf, maxBuffer: 1 << 28 });
     if (res.status !== 0) throw new Error(String(res.stderr));

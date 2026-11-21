@@ -80,6 +80,21 @@ function runLen(b) {   // longest vertical opaque run (px) in any column
   for (let x = 0; x < W; x++) { let run = 0; for (let y = 0; y < H; y++) { if (A(b, y * W + x) >= 128) { run++; if (run > best) best = run; } else run = 0; } }
   return best;
 }
+function runInfo(b) {   // longest vertical opaque run with position
+  let best = { n: 0, x: 0, y0: 0, y1: 0 };
+  for (let x = 0; x < W; x++) { let run = 0; for (let y = 0; y < H; y++) { if (A(b, y * W + x) >= 128) { run++; if (run > best.n) best = { n: run, x, y0: y - run + 1, y1: y }; } else run = 0; } }
+  return best;
+}
+function renderHeart(weave) {   // same as render() but opts.only = 'heart' (heart-only, all three parts)
+  const inst = ['floor', 'back', 'front'].map((part) => [part, createFx(fx.mod, { x: OX, y: OY, part, weave, only: 'heart' })]);
+  const fr = createFrame(W, H), out = [];
+  for (let i = 0; i < N; i++) {
+    if (i > 0) for (const [, f] of inst) f.update(1 / FPS);
+    clearFrame(fr); for (const [part, f] of inst) f.draw(fr, part === 'front' ? 'front' : 'back');
+    out.push(composite(fr, new Uint8ClampedArray(W * H * 4), null));
+  }
+  return out;
+}
 function gapAxis(frame) {   // smallest horizontal gap across the axis between the serpents (back + front layers only)
   const m = new Uint8Array(W * H);
   for (const k of ['back', 'front']) for (let i = 0; i < W * H; i++) if (A(frame[k], i) >= 128) m[i] = 1;
@@ -152,6 +167,18 @@ for (const weave of ['cross', 'kiss']) {
   let k9 = 0, k9f = 0;
   for (let i = at(2.4); i < N; i++) { const r = runLen(fr[i].all); if (r > k9) { k9 = r; k9f = i; } }
   R.K9 = `longest vertical opaque run ${k9} px (frame ${k9f}, t=${f2(k9f / FPS)})`;
+  {   // K9 by source: full vs heart-only render, window 2.40-3.00; also which layer / how much of the run is heart
+    const hr = renderHeart(weave); let bf = { n: 0 }, bfi = 0, bh = { n: 0 }, bhi = 0;
+    for (let i = at(2.4); i <= at(3.0) && i < N; i++) {
+      const a = runInfo(fr[i].all); if (a.n > bf.n) { bf = a; bfi = i; }
+      const h = runInfo(hr[i]); if (h.n > bh.n) { bh = h; bhi = i; }
+    }
+    const lay = {}, inHeart = { n: 0 };
+    for (const k of ['floor', 'back', 'front']) { let c = 0; for (let y = bf.y0; y <= bf.y1; y++) if (A(fr[bfi][k], y * W + bf.x) >= 128) c++; lay[k] = c; }
+    for (let y = bf.y0; y <= bf.y1; y++) if (A(hr[bfi], y * W + bf.x) >= 128) inHeart.n++;
+    const rel = (x, y) => `(${x - OX},${y - OY})`;
+    R.K9src = `FULL longest ${bf.n} px at x=${bf.x} (${bf.x - OX} from origin), y ${bf.y0}-${bf.y1} (${bf.y0 - OY}..${bf.y1 - OY}), frame ${bfi} t=${f2(bfi / FPS)}; run px per layer floor/back/front ${lay.floor}/${lay.back}/${lay.front}; run px also in heart-only render ${inHeart.n}/${bf.n} | HEART-ONLY longest ${bh.n} px at x=${bh.x} (${bh.x - OX}), y ${bh.y0}-${bh.y1}, frame ${bhi} t=${f2(bhi / FPS)} | verdict: ${inHeart.n >= bf.n * 0.8 ? 'heart/vessels' : inHeart.n === 0 ? 'NOT heart (tongues/soul-serpent)' : 'mixed heart + other'}`;
+  }
   // K10: front layer, option only:'heart', C[3..6] px at each beat peak (+0.03 s) and max radius from the chest
   {
     const h = createFx(fx.mod, { x: OX, y: OY, part: 'front', weave, only: 'heart' }), hf = createFrame(W, H), cnt = [], rad = [];

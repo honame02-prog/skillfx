@@ -22,6 +22,7 @@ import * as di_hoa_tinh_lien_v2 from "./di-hoa/tinh-lien-v2.js";
 import * as di_hoa_tinh_lien_v2_draft from "./di-hoa/tinh-lien-v2-draft.js";
 import * as di_hoa_van_lac from "./di-hoa/van-lac.js";
 import * as di_hoa_van_lac_draft from "./di-hoa/van-lac-draft.js";
+import * as di_hoa_van_lac_td from "./di-hoa/van-lac-td.js";
 import * as moves_arrow_shot from "./moves/arrow-shot.js";
 import * as moves_dash_strike from "./moves/dash-strike.js";
 import * as moves_earth_stomp from "./moves/earth-stomp.js";
@@ -292,6 +293,7 @@ export const effects = {
   "di-hoa/tinh-lien-v2-draft": di_hoa_tinh_lien_v2_draft,
   "di-hoa/van-lac": di_hoa_van_lac,
   "di-hoa/van-lac-draft": di_hoa_van_lac_draft,
+  "di-hoa/van-lac-td": di_hoa_van_lac_td,
   "moves/arrow-shot": moves_arrow_shot,
   "moves/dash-strike": moves_dash_strike,
   "moves/earth-stomp": moves_earth_stomp,
