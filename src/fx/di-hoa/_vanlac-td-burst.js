@@ -19,6 +19,11 @@ export function burst(p, t, part) {
       const d = Math.hypot(x / r, (y - cy) / (r * 0.62)); if (d > 1) return;
       o.c = d < 0.3 ? C[6] : d < 0.6 ? C[4] : C[3];
     });
+    for (let i = 0; i < 8; i++) {   // eight short, single-pixel glints, flattened with the flash
+      const a = (i + 0.5) / 8 * TAU, d = r + 2;
+      p.line(cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.5,
+        cx + Math.cos(a) * (d + 3), cy + Math.sin(a) * (d + 3) * 0.5, RIM);
+    }
   }
   if (part === 'floor' && age < 0.5) {    // glass shock ring on the floor
     const u = out3(age / 0.5), rx = 10 + 90 * u, k = 1 - smooth(0.3, 0.5, age);
@@ -39,29 +44,67 @@ export function burst(p, t, part) {
       p.dot(cx + Math.cos(a) * rx, cy + z * rx * SQ * 0.6, i % 4 ? RIM : C[4]);
     }
   }
-  if ((part === 'front' || part === 'back') && age < 0.6) {   // 16 clear flame tongues flung out in 3D
+  if ((part === 'front' || part === 'back') && age < 0.6) {   // open, hooked glass ribbons; no stippled dissolve
     for (const a of TONGUES) {
       const z = Math.sin(a); if (layerOfZ(z) !== part) continue;
-      const key = pk(a), lift = (hash(key, 1, 4) - 0.35) * 0.9, reach = (40 + 26 * hash(key, 2, 4)) * out3(clamp(age / 0.4));
-      const tail = Math.max(0, reach - 26 * (1 - smooth(0.25, 0.6, age)) - 4), k = 1 - smooth(0.35, 0.6, age);
-      const at = (s) => [cx + Math.cos(a) * s, cy + z * s * SQ - lift * s - 0.5 * 60 * (s / 80) ** 2];
-      const n = Math.max(2, Math.ceil(reach - tail));
+      const key = pk(a), side = Math.sign(Math.cos(a)), dx = Math.cos(a), dy = z * SQ;
+      const lift = (hash(key, 1, 4) - 0.35) * 0.9;
+      const reach = (40 + 26 * hash(key, 2, 4)) * out3(clamp(age / 0.4));
+      const len = (19 + 15 * hash(key, 3, 4)) * smooth(0, 0.09, age);
+      const root = Math.max(0, reach - len), from = smooth(0.27, 0.59, age);
+      if (len < 1 || from > 0.995) continue;
+      // Screen-space normal, mirrored with the radial direction. End bends back like drawFins.
+      const tl = Math.hypot(dx, dy - lift) || 1, nx = -(dy - lift) / tl * side, ny = dx / tl * side;
+      const phase = hash(key, 4, 4) * TAU, freq = 8 + 2 * hash(key, 7, 4);
+      const whip = Math.sin(age * TAU * freq + phase);
+      const at = (u) => {
+        const v = 1 - u;
+        const along = len * (3 * v * v * u * 0.35 + 3 * v * u * u * 1.26 + u * u * u * 0.82);
+        const curl = len * (3 * v * u * u * 0.12 + u * u * u * 0.39) + 2.8 * u ** 3 * whip;
+        const r = root + along;
+        return [cx + dx * r + nx * curl, cy + (dy - lift) * r - 30 * (r / 80) ** 2 + ny * curl];
+      };
+      const leading = [], trailing = [];
+      const n = Math.max(3, Math.ceil(len * (1 - from) * 1.7));
       for (let i = 0; i <= n; i++) {
-        const s = tail + (reach - tail) * (i / n), [x, y] = at(s), w = 1.6 * Math.sin(Math.PI * i / n);
-        if (hash(key, i, fr(t)) > k + 0.2) continue;
-        const nx = -Math.sin(a), ny = Math.cos(a) * 0.4;
-        p.dot(x + nx * w, y + ny * w, RIM); p.dot(x - nx * w, y - ny * w, SHADE);
-        if (i > n - 3) p.dot(x, y, i === n ? C[4] : C[3]);
+        const u = from + (1 - from) * i / n, q = at(u), b = at(Math.max(0, u - 0.012)), e = at(Math.min(1, u + 0.012));
+        const vx = e[0] - b[0], vy = e[1] - b[1], vl = Math.hypot(vx, vy) || 1;
+        const w = (2.2 + 1.1 * hash(key, 8, 4)) * Math.sin(Math.PI * u) * (1 - 0.65 * smooth(0.32, 0.59, age));
+        leading.push([q[0] - vy / vl * w * side, q[1] + vx / vl * w * side]);
+        trailing.push([q[0] + vy / vl * w * side, q[1] - vx / vl * w * side]);
       }
+      p.polyline(trailing, SHADE);
+      const tip = Math.max(1, Math.floor(n * clamp((0.77 - from) / (1 - from))));
+      p.polyline(leading.slice(0, tip + 1), RIM);
+      p.polyline(leading.slice(tip), C[4]);
+      p.polyline(leading.slice(Math.max(tip, n - 2)), C[3]);
     }
   }
-  if (age < 0.6) for (const a of EMBERS) {   // embers: arc out, fall, land with a shadow
-    const key = pk(a), sp = 40 + 50 * hash(key, 5, 6), up = 50 + 40 * hash(key, 6, 6), g = 260;
-    const tt = Math.min(age, 0.55), r = sp * tt, h = 30 + up * tt - 0.5 * g * tt * tt, z = Math.sin(a);
-    const fx = Math.cos(a) * r, fy = z * r * SQ;
-    if (part === 'floor') { if (h < 30) p.dot(fx, fy, C[0]); continue; }
-    if (layerOfZ(z) !== part) continue;
-    if (h <= 0) { if (hash(key, fr(t), 8) < 0.6) p.dot(fx, fy, C[2]); continue; }
+  if (age < 0.6) for (const a of EMBERS) {   // forty curved flights; land before 2.9, then cool on the floor
+    const key = pk(a), side = Math.sign(Math.cos(a)), sp = 48 + 60 * hash(key, 5, 6);
+    const up = 15 + 45 * hash(key, 6, 6), g = 680 + 160 * hash(key, 7, 6);
+    const land = (up + Math.sqrt(up * up + 60 * g)) / g;
+    const flight = (tt) => {
+      const r = sp * tt, bend = side * (0.6 + hash(key, 9, 6)) * tt;
+      const aa = a + bend;
+      return [Math.cos(aa) * r, Math.sin(aa) * r * SQ, Math.max(0, 30 + up * tt - 0.5 * g * tt * tt)];
+    };
+    const [fx, fy, h] = flight(Math.min(age, land));
+    const z = Math.sin(a + side * (0.6 + hash(key, 9, 6)) * Math.min(age, land));
+    if (part === 'floor') {
+      if (age < land) { if (h < 24) p.line(fx - 1, fy, fx + 1, fy, C[0]); }
+      else {
+        const cool = (age - land) / (0.59 - land);
+        if (cool < 1) p.line(fx - 0.7 * (1 - cool), fy, fx + 0.7 * (1 - cool), fy, C[cool < 0.22 ? 3 : cool < 0.58 ? 2 : 1]);
+      }
+      continue;
+    }
+    if (age >= land || layerOfZ(z) !== part) continue;
+    if (hash(key, 10, 6) < 0.4 && age > 0.025) {
+      const [bx, by, bh] = flight(age - 0.025), vx = bx - fx, vy = by - bh - (fy - h), vl = Math.hypot(vx, vy) || 1;
+      const tail = 2 + hash(key, 11, 6);
+      p.line(fx, fy - h, fx + vx / vl * tail, fy - h + vy / vl * tail, C[2]);
+    }
     p.dot(fx, fy - h, age < 0.25 ? C[4] : C[3]);
   }
   if (part === 'front' && age > 0.05) for (let i = 0; i < 8; i++) {   // ash flakes rising (mirror pairs)
@@ -72,10 +115,20 @@ export function burst(p, t, part) {
   }
   if (part === 'front' && age > 0.08) {   // two soul serpents rise from the head in a V and fade
     const k = 1 - smooth(0.30, 0.55, age);   // fades by shrinking from the tail, never by stipple (K12)
-    if (k > 0.08) for (const m of [1, -1]) {
+    if (k > 0.002) for (const m of [1, -1]) {
       const head = (ti) => { const u = clamp((ti - BURN - 0.08) / 0.5); return [m * (4 + 44 * u + 3 * Math.sin(u * 9)), cy - 22 - 46 * u]; };
-      const sp = spine(head, t, 46 * k, BURN + 0.08);
-      drawSerpentTD(p, sp, t, { L: 46, W: 3, heart: 0.3, layer: 'front', seed: 4, dorsal: -m });
+      const L = 46 * k, sp = spine(head, t, L, BURN + 0.08);
+      // Shorten the library's own length too: its taper and fins follow the retreating tail.
+      const w = 3 * Math.min(1, k / 0.5), scale = Math.min(1, k / 0.35);
+      // Once the tail has gone, contract the remaining head around its snout too.
+      // Transform the library's geometry, with opaque marks throughout (no clipping or white stipple).
+      const q = Object.create(p), [hx, hy] = head(t);
+      const X = (x) => hx + (x - hx) * scale, Y = (y) => hy + (y - hy) * scale;
+      q.cellX = (x, y) => p.cellX(X(x), Y(y));
+      q.cellY = (x, y) => p.cellY(X(x), Y(y));
+      q.shade = (x0, y0, x1, y1, fn) => p.shade(X(x0), Y(y0), X(x1), Y(y1),
+        (x, y, o) => fn(hx + (x - hx) / scale, hy + (y - hy) / scale, o));
+      drawSerpentTD(q, sp, t, { L, W: w, heart: 0.3 * k, layer: 'front', seed: 4, dorsal: -m });
     }
   }
   if (part === 'front' && age < END - BURN - 0.05) {   // the last ember of the heart dies last
