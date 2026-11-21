@@ -1,0 +1,8494 @@
+{
+  "version": 2,
+  "fps": 30,
+  "frame_count": 90,
+  "canvas": [
+    240,
+    220
+  ],
+  "foot_pivot": [
+    120,
+    144
+  ],
+  "chest_pivot": [
+    120,
+    112
+  ],
+  "heartbeats_seconds": [
+    1.3,
+    1.67,
+    2.03
+  ],
+  "heartbeat_frames": [
+    39,
+    50,
+    61
+  ],
+  "hit_frame": 72,
+  "empty_frame": 89,
+  "depth_rule": "back iff ground_y < 144; front otherwise; floor is independent",
+  "resampling": "NEAREST; opaque binary alpha; no crossfade",
+  "assets": {
+    "inhale-A": {
+      "path": "src/inhale-A.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        97,
+        44,
+        143,
+        116
+      ],
+      "source_crop": [
+        0,
+        0,
+        314,
+        314
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        46,
+        72
+      ],
+      "sha256": "0711a43a1269c6597b0316435c4e9599ac19d614371f4439a9452b2a21fdc5b3"
+    },
+    "inhale-B": {
+      "path": "src/inhale-B.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        97,
+        44,
+        143,
+        116
+      ],
+      "source_crop": [
+        314,
+        0,
+        627,
+        314
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        46,
+        72
+      ],
+      "sha256": "d8571248731ac9a3e50faaa8567805282aea0b1bb12e17f6a7789d5a759e52b6"
+    },
+    "inhale-C": {
+      "path": "src/inhale-C.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        97,
+        44,
+        143,
+        116
+      ],
+      "source_crop": [
+        627,
+        0,
+        940,
+        314
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        46,
+        72
+      ],
+      "sha256": "08ae9dcec51e0f9e9e98f1983dc3648cbb2e7da3d4a118b074d3157adbb0e948"
+    },
+    "core-small": {
+      "path": "src/core-small.png",
+      "anchor": [
+        120,
+        112
+      ],
+      "bbox": [
+        118,
+        109,
+        123,
+        116
+      ],
+      "source_crop": [
+        940,
+        0,
+        1254,
+        314
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        5,
+        7
+      ],
+      "sha256": "60f4e7cec3c747bec3c0fe893d1f32703692d1ca3bf7a193c9047679ba38ad57"
+    },
+    "pressure-A": {
+      "path": "src/pressure-A.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        103,
+        69,
+        138,
+        116
+      ],
+      "source_crop": [
+        0,
+        314,
+        314,
+        627
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        35,
+        47
+      ],
+      "sha256": "c989c068e2b41dab6530abdf7d2df2472c52cdc3bcfe41389fe462c0c878046c"
+    },
+    "pressure-B": {
+      "path": "src/pressure-B.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        103,
+        69,
+        138,
+        116
+      ],
+      "source_crop": [
+        314,
+        314,
+        627,
+        627
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        35,
+        47
+      ],
+      "sha256": "1e877afdbd6b61f07920d8e7e24bca431d1888863a04fe25f8f14e68997df2f8"
+    },
+    "pressure-C": {
+      "path": "src/pressure-C.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        103,
+        69,
+        138,
+        116
+      ],
+      "source_crop": [
+        627,
+        314,
+        940,
+        627
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        35,
+        47
+      ],
+      "sha256": "b5d7d92b2f9dd9306617188b9429f210458fed7c6014228e30336904f63e6ed3"
+    },
+    "core-medium": {
+      "path": "src/core-medium.png",
+      "anchor": [
+        120,
+        112
+      ],
+      "bbox": [
+        116,
+        107,
+        125,
+        118
+      ],
+      "source_crop": [
+        940,
+        314,
+        1254,
+        627
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        9,
+        12
+      ],
+      "sha256": "3a2fab81c902c01b9818988cdcccc5716c9e619fca60da0077b4a8326c42a353"
+    },
+    "burst-A": {
+      "path": "src/burst-A.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        101,
+        52,
+        139,
+        115
+      ],
+      "source_crop": [
+        0,
+        627,
+        314,
+        940
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        38,
+        65
+      ],
+      "sha256": "af1e8daa187459437d0a4e2f5a3e874b9c11f237e54a55d1a1f3988b81c828c7"
+    },
+    "burst-B": {
+      "path": "src/burst-B.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        101,
+        52,
+        139,
+        116
+      ],
+      "source_crop": [
+        314,
+        627,
+        627,
+        940
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        38,
+        65
+      ],
+      "sha256": "c50e405f7de3ae6f2d265755c893c3cd46b984d9110051891b3078a890cd36d0"
+    },
+    "burst-C": {
+      "path": "src/burst-C.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        101,
+        52,
+        139,
+        116
+      ],
+      "source_crop": [
+        627,
+        627,
+        940,
+        940
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        38,
+        65
+      ],
+      "sha256": "378f7c9ae024f0743eabc338745d6319fc06c94d24e56e1fa9ccba7175108ece"
+    },
+    "core-hit": {
+      "path": "src/core-hit.png",
+      "anchor": [
+        120,
+        112
+      ],
+      "bbox": [
+        112,
+        104,
+        128,
+        121
+      ],
+      "source_crop": [
+        940,
+        627,
+        1254,
+        940
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        16,
+        17
+      ],
+      "sha256": "f9fd00cdf9d5fffebf78835ee45ecf94583847cd2394fe4f7e7b671d7435b94b"
+    },
+    "floor-ring": {
+      "path": "src/floor-ring.png",
+      "anchor": [
+        120,
+        144
+      ],
+      "bbox": [
+        70,
+        119,
+        170,
+        169
+      ],
+      "source_crop": [
+        0,
+        940,
+        314,
+        1254
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        100,
+        50
+      ],
+      "sha256": "b68977a40b886f45f3b2f1f116b3926abe42ca026d1edc90f865b66d0a10bc72"
+    },
+    "floor-wave": {
+      "path": "src/floor-wave.png",
+      "anchor": [
+        120,
+        144
+      ],
+      "bbox": [
+        70,
+        119,
+        170,
+        169
+      ],
+      "source_crop": [
+        314,
+        940,
+        627,
+        1254
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        100,
+        50
+      ],
+      "sha256": "bdba10937e879fdac1d85e42722dd0fd2d9f2d69f57e475c646f1e74b3bf49a7"
+    },
+    "core-dying": {
+      "path": "src/core-dying.png",
+      "anchor": [
+        120,
+        112
+      ],
+      "bbox": [
+        119,
+        112,
+        122,
+        114
+      ],
+      "source_crop": [
+        627,
+        940,
+        940,
+        1254
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        3,
+        5
+      ],
+      "sha256": "202a0d5e336a4744f497f56d51532e741c1418675c87131ca7bfcc9a7bacdd73"
+    },
+    "residue": {
+      "path": "src/residue.png",
+      "anchor": [
+        120,
+        112
+      ],
+      "bbox": [
+        108,
+        99,
+        133,
+        126
+      ],
+      "source_crop": [
+        940,
+        940,
+        1254,
+        1254
+      ],
+      "source": "gen-01.png",
+      "native_size": [
+        25,
+        28
+      ],
+      "sha256": "a163b181db4a6fdba09ffd2a032c9d8ea76e85e831b58c15e88f8b3cc32fac7e"
+    }
+  },
+  "frames": [
+    {
+      "frame": 0,
+      "time": 0.0,
+      "phase": "ember",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 52,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.52,
+            0.52
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 1,
+      "time": 0.033333,
+      "phase": "ember",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 54,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.54,
+            0.54
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 2,
+      "time": 0.066667,
+      "phase": "ember",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 56,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.56,
+            0.56
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 3,
+      "time": 0.1,
+      "phase": "ember",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 58,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.58,
+            0.58
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 4,
+      "time": 0.133333,
+      "phase": "ember",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 60,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.6,
+            0.6
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 5,
+      "time": 0.166667,
+      "phase": "ember",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 62,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.62,
+            0.62
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 6,
+      "time": 0.2,
+      "phase": "ember",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 64,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.64,
+            0.64
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 7,
+      "time": 0.233333,
+      "phase": "ember",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 66,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.66,
+            0.66
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 8,
+      "time": 0.266667,
+      "phase": "ember",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 68,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.68,
+            0.68
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 9,
+      "time": 0.3,
+      "phase": "ember",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 70,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.7,
+            0.7
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 10,
+      "time": 0.333333,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 72,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.72,
+            0.72
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            91.0,
+            127.0
+          ],
+          "rotation": -18.992,
+          "scale": [
+            0.72,
+            0.72
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            150.0,
+            128.0
+          ],
+          "rotation": 18.988,
+          "scale": [
+            0.72,
+            0.72
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            113.0,
+            145
+          ],
+          "rotation": -40.83,
+          "scale": [
+            0.72,
+            0.72
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 11,
+      "time": 0.366667,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 74,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.74,
+            0.74
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            91.364,
+            126.909
+          ],
+          "rotation": -18.686,
+          "scale": [
+            0.7327,
+            0.7327
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            149.636,
+            127.864
+          ],
+          "rotation": 19.679,
+          "scale": [
+            0.7327,
+            0.7327
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            113.182,
+            145
+          ],
+          "rotation": -41.711,
+          "scale": [
+            0.7327,
+            0.7327
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 12,
+      "time": 0.4,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 76,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.76,
+            0.76
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            91.727,
+            126.818
+          ],
+          "rotation": -17.999,
+          "scale": [
+            0.7455,
+            0.7455
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            149.273,
+            127.727
+          ],
+          "rotation": 19.991,
+          "scale": [
+            0.7455,
+            0.7455
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            113.364,
+            145
+          ],
+          "rotation": -42.658,
+          "scale": [
+            0.7455,
+            0.7455
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 13,
+      "time": 0.433333,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 78,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.78,
+            0.78
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            92.091,
+            126.727
+          ],
+          "rotation": -17.086,
+          "scale": [
+            0.7582,
+            0.7582
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            148.909,
+            127.591
+          ],
+          "rotation": 19.853,
+          "scale": [
+            0.7582,
+            0.7582
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            113.545,
+            145
+          ],
+          "rotation": -43.456,
+          "scale": [
+            0.7582,
+            0.7582
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 14,
+      "time": 0.466667,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 80,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.8,
+            0.8
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            92.455,
+            126.636
+          ],
+          "rotation": -16.154,
+          "scale": [
+            0.7709,
+            0.7709
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            148.545,
+            127.455
+          ],
+          "rotation": 19.296,
+          "scale": [
+            0.7709,
+            0.7709
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            113.727,
+            145
+          ],
+          "rotation": -43.925,
+          "scale": [
+            0.7709,
+            0.7709
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 15,
+      "time": 0.5,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            92.818,
+            126.545
+          ],
+          "rotation": -15.413,
+          "scale": [
+            0.7836,
+            0.7836
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            148.182,
+            127.318
+          ],
+          "rotation": 18.446,
+          "scale": [
+            0.7836,
+            0.7836
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            113.909,
+            145
+          ],
+          "rotation": -43.958,
+          "scale": [
+            0.7836,
+            0.7836
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 16,
+      "time": 0.533333,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            93.182,
+            126.455
+          ],
+          "rotation": -15.03,
+          "scale": [
+            0.7964,
+            0.7964
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            147.818,
+            127.182
+          ],
+          "rotation": 17.495,
+          "scale": [
+            0.7964,
+            0.7964
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            114.091,
+            145
+          ],
+          "rotation": -43.55,
+          "scale": [
+            0.7964,
+            0.7964
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 17,
+      "time": 0.566667,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 86,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.86,
+            0.86
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            93.545,
+            126.364
+          ],
+          "rotation": -15.093,
+          "scale": [
+            0.8091,
+            0.8091
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            147.455,
+            127.045
+          ],
+          "rotation": 16.658,
+          "scale": [
+            0.8091,
+            0.8091
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            114.273,
+            145
+          ],
+          "rotation": -42.791,
+          "scale": [
+            0.8091,
+            0.8091
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 18,
+      "time": 0.6,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 88,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.88,
+            0.88
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            93.909,
+            126.273
+          ],
+          "rotation": -15.587,
+          "scale": [
+            0.8218,
+            0.8218
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            147.091,
+            126.909
+          ],
+          "rotation": 16.125,
+          "scale": [
+            0.8218,
+            0.8218
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            114.455,
+            145
+          ],
+          "rotation": -41.853,
+          "scale": [
+            0.8218,
+            0.8218
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 19,
+      "time": 0.633333,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 90,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.9,
+            0.9
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            94.273,
+            126.182
+          ],
+          "rotation": -16.4,
+          "scale": [
+            0.8345,
+            0.8345
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            146.727,
+            126.773
+          ],
+          "rotation": 16.015,
+          "scale": [
+            0.8345,
+            0.8345
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            114.636,
+            145
+          ],
+          "rotation": -40.948,
+          "scale": [
+            0.8345,
+            0.8345
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 20,
+      "time": 0.666667,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 92,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.92,
+            0.92
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            94.636,
+            126.091
+          ],
+          "rotation": -17.349,
+          "scale": [
+            0.8473,
+            0.8473
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            146.364,
+            126.636
+          ],
+          "rotation": 16.354,
+          "scale": [
+            0.8473,
+            0.8473
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            114.818,
+            145
+          ],
+          "rotation": -40.282,
+          "scale": [
+            0.8473,
+            0.8473
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 21,
+      "time": 0.7,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 94,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.94,
+            0.94
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            95.0,
+            126.0
+          ],
+          "rotation": -18.219,
+          "scale": [
+            0.86,
+            0.86
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            146.0,
+            126.5
+          ],
+          "rotation": 17.065,
+          "scale": [
+            0.86,
+            0.86
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            115.0,
+            145
+          ],
+          "rotation": -40.003,
+          "scale": [
+            0.86,
+            0.86
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 22,
+      "time": 0.733333,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 96,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.96,
+            0.96
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            95.364,
+            125.909
+          ],
+          "rotation": -18.813,
+          "scale": [
+            0.8727,
+            0.8727
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            145.636,
+            126.364
+          ],
+          "rotation": 17.987,
+          "scale": [
+            0.8727,
+            0.8727
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            115.182,
+            145
+          ],
+          "rotation": -40.176,
+          "scale": [
+            0.8727,
+            0.8727
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 23,
+      "time": 0.766667,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 98,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.98,
+            0.98
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            95.727,
+            125.818
+          ],
+          "rotation": -18.998,
+          "scale": [
+            0.8855,
+            0.8855
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            145.273,
+            126.227
+          ],
+          "rotation": 18.912,
+          "scale": [
+            0.8855,
+            0.8855
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            115.364,
+            145
+          ],
+          "rotation": -40.761,
+          "scale": [
+            0.8855,
+            0.8855
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 24,
+      "time": 0.8,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 100,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            96.091,
+            125.727
+          ],
+          "rotation": -18.731,
+          "scale": [
+            0.8982,
+            0.8982
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            144.909,
+            126.091
+          ],
+          "rotation": 19.631,
+          "scale": [
+            0.8982,
+            0.8982
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            115.545,
+            145
+          ],
+          "rotation": -41.626,
+          "scale": [
+            0.8982,
+            0.8982
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 25,
+      "time": 0.833333,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 102,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.02,
+            1.02
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            96.455,
+            125.636
+          ],
+          "rotation": -18.073,
+          "scale": [
+            0.9109,
+            0.9109
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            144.545,
+            125.955
+          ],
+          "rotation": 19.981,
+          "scale": [
+            0.9109,
+            0.9109
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            115.727,
+            145
+          ],
+          "rotation": -42.576,
+          "scale": [
+            0.9109,
+            0.9109
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 26,
+      "time": 0.866667,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 104,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.04,
+            1.04
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            96.818,
+            125.545
+          ],
+          "rotation": -17.173,
+          "scale": [
+            0.9236,
+            0.9236
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            144.182,
+            125.818
+          ],
+          "rotation": 19.884,
+          "scale": [
+            0.9236,
+            0.9236
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            115.909,
+            145
+          ],
+          "rotation": -43.395,
+          "scale": [
+            0.9236,
+            0.9236
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 27,
+      "time": 0.9,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 106,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.06,
+            1.06
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            97.182,
+            125.455
+          ],
+          "rotation": -16.233,
+          "scale": [
+            0.9364,
+            0.9364
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            143.818,
+            125.682
+          ],
+          "rotation": 19.36,
+          "scale": [
+            0.9364,
+            0.9364
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            116.091,
+            145
+          ],
+          "rotation": -43.899,
+          "scale": [
+            0.9364,
+            0.9364
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 28,
+      "time": 0.933333,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 108,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.08,
+            1.08
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            97.545,
+            125.364
+          ],
+          "rotation": -15.467,
+          "scale": [
+            0.9491,
+            0.9491
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            143.455,
+            125.545
+          ],
+          "rotation": 18.53,
+          "scale": [
+            0.9491,
+            0.9491
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            116.273,
+            145
+          ],
+          "rotation": -43.974,
+          "scale": [
+            0.9491,
+            0.9491
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 29,
+      "time": 0.966667,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 110,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.1,
+            1.1
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            97.909,
+            125.273
+          ],
+          "rotation": -15.047,
+          "scale": [
+            0.9618,
+            0.9618
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            143.091,
+            125.409
+          ],
+          "rotation": 17.579,
+          "scale": [
+            0.9618,
+            0.9618
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            116.455,
+            145
+          ],
+          "rotation": -43.603,
+          "scale": [
+            0.9618,
+            0.9618
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 30,
+      "time": 1.0,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 112,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.12,
+            1.12
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            98.273,
+            125.182
+          ],
+          "rotation": -15.069,
+          "scale": [
+            0.9745,
+            0.9745
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            142.727,
+            125.273
+          ],
+          "rotation": 16.724,
+          "scale": [
+            0.9745,
+            0.9745
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            116.636,
+            145
+          ],
+          "rotation": -42.869,
+          "scale": [
+            0.9745,
+            0.9745
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 31,
+      "time": 1.033333,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 114,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.14,
+            1.14
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            98.636,
+            125.091
+          ],
+          "rotation": -15.527,
+          "scale": [
+            0.9873,
+            0.9873
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            142.364,
+            125.136
+          ],
+          "rotation": 16.157,
+          "scale": [
+            0.9873,
+            0.9873
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            116.818,
+            145
+          ],
+          "rotation": -41.939,
+          "scale": [
+            0.9873,
+            0.9873
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 32,
+      "time": 1.066667,
+      "phase": "inhale",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 116,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.16,
+            1.16
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "inhale-A",
+          "position": [
+            99,
+            125
+          ],
+          "rotation": -16.318,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "inhale-B",
+          "position": [
+            142,
+            125
+          ],
+          "rotation": 16.007,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "inhale-C",
+          "position": [
+            117,
+            145
+          ],
+          "rotation": -41.023,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-small",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 33,
+      "time": 1.1,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -12.263,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.307,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.327,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 34,
+      "time": 1.133333,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.149,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.99,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.01,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 35,
+      "time": 1.166667,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.775,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 14.901,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.142,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 36,
+      "time": 1.2,
+      "phase": "pressure",
+      "pulse": 0.05,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -14.0,
+          "scale": [
+            0.993,
+            0.993
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 15.835,
+          "scale": [
+            0.993,
+            0.993
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.695,
+          "scale": [
+            0.993,
+            0.993
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.05,
+            1.05
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 37,
+      "time": 1.233333,
+      "phase": "pressure",
+      "pulse": 0.1,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.773,
+          "scale": [
+            0.986,
+            0.986
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.58,
+          "scale": [
+            0.986,
+            0.986
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -37.542,
+          "scale": [
+            0.986,
+            0.986
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.1,
+            1.1
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 38,
+      "time": 1.266667,
+      "phase": "pressure",
+      "pulse": 0.15,
+      "events": [],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.145,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.968,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -38.493,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.15,
+            1.15
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 39,
+      "time": 1.3,
+      "phase": "pressure",
+      "pulse": 0.2,
+      "events": [
+        "heartbeat"
+      ],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -12.258,
+          "scale": [
+            0.972,
+            0.972
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.911,
+          "scale": [
+            0.972,
+            0.972
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -39.332,
+          "scale": [
+            0.972,
+            0.972
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.2,
+            1.2
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 40,
+      "time": 1.333333,
+      "phase": "pressure",
+      "pulse": 0.15,
+      "events": [],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -11.313,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.422,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -39.87,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.15,
+            1.15
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 41,
+      "time": 1.366667,
+      "phase": "pressure",
+      "pulse": 0.1,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -10.524,
+          "scale": [
+            0.986,
+            0.986
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 15.612,
+          "scale": [
+            0.986,
+            0.986
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -39.986,
+          "scale": [
+            0.986,
+            0.986
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.1,
+            1.1
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 42,
+      "time": 1.4,
+      "phase": "pressure",
+      "pulse": 0.05,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -10.067,
+          "scale": [
+            0.993,
+            0.993
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 14.664,
+          "scale": [
+            0.993,
+            0.993
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -39.653,
+          "scale": [
+            0.993,
+            0.993
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.05,
+            1.05
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 43,
+      "time": 1.433333,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -10.048,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.791,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -38.946,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 44,
+      "time": 1.466667,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -10.47,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.192,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -38.025,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 45,
+      "time": 1.5,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -11.237,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.001,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -37.099,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 46,
+      "time": 1.533333,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -12.177,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.262,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.376,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 47,
+      "time": 1.566667,
+      "phase": "pressure",
+      "pulse": 0.075,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.077,
+          "scale": [
+            0.9895,
+            0.9895
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.916,
+          "scale": [
+            0.9895,
+            0.9895
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.021,
+          "scale": [
+            0.9895,
+            0.9895
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.075,
+            1.075
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 48,
+      "time": 1.6,
+      "phase": "pressure",
+      "pulse": 0.15,
+      "events": [],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.734,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 14.815,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.112,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.15,
+            1.15
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 49,
+      "time": 1.633333,
+      "phase": "pressure",
+      "pulse": 0.225,
+      "events": [],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.998,
+          "scale": [
+            0.9685,
+            0.9685
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 15.755,
+          "scale": [
+            0.9685,
+            0.9685
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.63,
+          "scale": [
+            0.9685,
+            0.9685
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.225,
+            1.225
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 50,
+      "time": 1.666667,
+      "phase": "pressure",
+      "pulse": 0.3,
+      "events": [
+        "heartbeat"
+      ],
+      "floor_width": 80,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.8,
+            0.8
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.811,
+          "scale": [
+            0.958,
+            0.958
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.525,
+          "scale": [
+            0.958,
+            0.958
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -37.458,
+          "scale": [
+            0.958,
+            0.958
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.3,
+            1.3
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 51,
+      "time": 1.7,
+      "phase": "pressure",
+      "pulse": 0.225,
+      "events": [],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.215,
+          "scale": [
+            0.9685,
+            0.9685
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.95,
+          "scale": [
+            0.9685,
+            0.9685
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -38.408,
+          "scale": [
+            0.9685,
+            0.9685
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.225,
+            1.225
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 52,
+      "time": 1.733333,
+      "phase": "pressure",
+      "pulse": 0.15,
+      "events": [],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -12.344,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.935,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -39.266,
+          "scale": [
+            0.979,
+            0.979
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.15,
+            1.15
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 53,
+      "time": 1.766667,
+      "phase": "pressure",
+      "pulse": 0.075,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -11.395,
+          "scale": [
+            0.9895,
+            0.9895
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.482,
+          "scale": [
+            0.9895,
+            0.9895
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -39.838,
+          "scale": [
+            0.9895,
+            0.9895
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.075,
+            1.075
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 54,
+      "time": 1.8,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -10.583,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 15.694,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -39.994,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 55,
+      "time": 1.833333,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -10.091,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 14.749,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -39.7,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 56,
+      "time": 1.866667,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -10.031,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.861,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -39.021,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 57,
+      "time": 1.9,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -10.416,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.231,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -38.112,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 58,
+      "time": 1.933333,
+      "phase": "pressure",
+      "pulse": 0.105,
+      "events": [],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -11.158,
+          "scale": [
+            0.9853,
+            0.9853
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.0,
+          "scale": [
+            0.9853,
+            0.9853
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -37.177,
+          "scale": [
+            0.9853,
+            0.9853
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.105,
+            1.105
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 59,
+      "time": 1.966667,
+      "phase": "pressure",
+      "pulse": 0.21,
+      "events": [],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -12.091,
+          "scale": [
+            0.9706,
+            0.9706
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.221,
+          "scale": [
+            0.9706,
+            0.9706
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.428,
+          "scale": [
+            0.9706,
+            0.9706
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.21,
+            1.21
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 60,
+      "time": 2.0,
+      "phase": "pressure",
+      "pulse": 0.315,
+      "events": [],
+      "floor_width": 80,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.8,
+            0.8
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.004,
+          "scale": [
+            0.9559,
+            0.9559
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 13.845,
+          "scale": [
+            0.9559,
+            0.9559
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.035,
+          "scale": [
+            0.9559,
+            0.9559
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.315,
+            1.315
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 61,
+      "time": 2.033333,
+      "phase": "pressure",
+      "pulse": 0.42,
+      "events": [
+        "heartbeat"
+      ],
+      "floor_width": 80,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.8,
+            0.8
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.689,
+          "scale": [
+            0.9412,
+            0.9412
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 14.729,
+          "scale": [
+            0.9412,
+            0.9412
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.085,
+          "scale": [
+            0.9412,
+            0.9412
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.42,
+            1.42
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 62,
+      "time": 2.066667,
+      "phase": "pressure",
+      "pulse": 0.315,
+      "events": [],
+      "floor_width": 80,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.8,
+            0.8
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.993,
+          "scale": [
+            0.9559,
+            0.9559
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 15.675,
+          "scale": [
+            0.9559,
+            0.9559
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -36.569,
+          "scale": [
+            0.9559,
+            0.9559
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.315,
+            1.315
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 63,
+      "time": 2.1,
+      "phase": "pressure",
+      "pulse": 0.21,
+      "events": [],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.846,
+          "scale": [
+            0.9706,
+            0.9706
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.468,
+          "scale": [
+            0.9706,
+            0.9706
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -37.376,
+          "scale": [
+            0.9706,
+            0.9706
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.21,
+            1.21
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 64,
+      "time": 2.133333,
+      "phase": "pressure",
+      "pulse": 0.105,
+      "events": [],
+      "floor_width": 82,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.82,
+            0.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -13.282,
+          "scale": [
+            0.9853,
+            0.9853
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.929,
+          "scale": [
+            0.9853,
+            0.9853
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -38.324,
+          "scale": [
+            0.9853,
+            0.9853
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.105,
+            1.105
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 65,
+      "time": 2.166667,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -12.429,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.955,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -39.198,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 66,
+      "time": 2.2,
+      "phase": "pressure",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 84,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.84,
+            0.84
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "A",
+          "source": "pressure-A",
+          "position": [
+            105,
+            125
+          ],
+          "rotation": -11.478,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "B",
+          "source": "pressure-B",
+          "position": [
+            137,
+            126
+          ],
+          "rotation": 16.538,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 133,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "C",
+          "source": "pressure-C",
+          "position": [
+            119,
+            144
+          ],
+          "rotation": -39.802,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 153,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-medium",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 67,
+      "time": 2.233333,
+      "phase": "burst",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 126,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.26,
+            1.26
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "burst-0",
+          "source": "burst-A",
+          "position": [
+            134.758,
+            132.343
+          ],
+          "rotation": 100.313,
+          "scale": [
+            0.429,
+            0.55
+          ],
+          "ground_y": 145.343,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-1",
+          "source": "burst-B",
+          "position": [
+            128.536,
+            137.167
+          ],
+          "rotation": 145.313,
+          "scale": [
+            0.429,
+            0.55
+          ],
+          "ground_y": 150.167,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-2",
+          "source": "burst-C",
+          "position": [
+            117.315,
+            138.379
+          ],
+          "rotation": 190.313,
+          "scale": [
+            0.429,
+            0.55
+          ],
+          "ground_y": 151.379,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-3",
+          "source": "burst-A",
+          "position": [
+            107.666,
+            135.268
+          ],
+          "rotation": 235.313,
+          "scale": [
+            0.429,
+            0.55
+          ],
+          "ground_y": 148.268,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-4",
+          "source": "burst-B",
+          "position": [
+            105.242,
+            129.657
+          ],
+          "rotation": 280.313,
+          "scale": [
+            0.429,
+            0.55
+          ],
+          "ground_y": 142.657,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-5",
+          "source": "burst-C",
+          "position": [
+            111.464,
+            124.833
+          ],
+          "rotation": 325.313,
+          "scale": [
+            0.429,
+            0.55
+          ],
+          "ground_y": 137.833,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-6",
+          "source": "burst-A",
+          "position": [
+            122.685,
+            123.621
+          ],
+          "rotation": 370.313,
+          "scale": [
+            0.429,
+            0.55
+          ],
+          "ground_y": 136.621,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-7",
+          "source": "burst-B",
+          "position": [
+            132.334,
+            126.732
+          ],
+          "rotation": 415.313,
+          "scale": [
+            0.429,
+            0.55
+          ],
+          "ground_y": 139.732,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "heart",
+          "source": "core-hit",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1,
+            1
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 68,
+      "time": 2.266667,
+      "phase": "burst",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 134,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.34,
+            1.34
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "burst-0",
+          "source": "burst-A",
+          "position": [
+            135.84,
+            132.441
+          ],
+          "rotation": 100.313,
+          "scale": [
+            0.4992,
+            0.64
+          ],
+          "ground_y": 145.441,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-1",
+          "source": "burst-B",
+          "position": [
+            129.162,
+            137.619
+          ],
+          "rotation": 145.313,
+          "scale": [
+            0.4992,
+            0.64
+          ],
+          "ground_y": 150.619,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-2",
+          "source": "burst-C",
+          "position": [
+            117.118,
+            138.92
+          ],
+          "rotation": 190.313,
+          "scale": [
+            0.4992,
+            0.64
+          ],
+          "ground_y": 151.92,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-3",
+          "source": "burst-A",
+          "position": [
+            106.761,
+            135.581
+          ],
+          "rotation": 235.313,
+          "scale": [
+            0.4992,
+            0.64
+          ],
+          "ground_y": 148.581,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-4",
+          "source": "burst-B",
+          "position": [
+            104.16,
+            129.559
+          ],
+          "rotation": 280.313,
+          "scale": [
+            0.4992,
+            0.64
+          ],
+          "ground_y": 142.559,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-5",
+          "source": "burst-C",
+          "position": [
+            110.838,
+            124.381
+          ],
+          "rotation": 325.313,
+          "scale": [
+            0.4992,
+            0.64
+          ],
+          "ground_y": 137.381,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-6",
+          "source": "burst-A",
+          "position": [
+            122.882,
+            123.08
+          ],
+          "rotation": 370.313,
+          "scale": [
+            0.4992,
+            0.64
+          ],
+          "ground_y": 136.08,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-7",
+          "source": "burst-B",
+          "position": [
+            133.239,
+            126.419
+          ],
+          "rotation": 415.313,
+          "scale": [
+            0.4992,
+            0.64
+          ],
+          "ground_y": 139.419,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "heart",
+          "source": "core-hit",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1,
+            1
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 69,
+      "time": 2.3,
+      "phase": "burst",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 142,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.42,
+            1.42
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "burst-0",
+          "source": "burst-A",
+          "position": [
+            136.922,
+            132.54
+          ],
+          "rotation": 100.313,
+          "scale": [
+            0.5694,
+            0.73
+          ],
+          "ground_y": 145.54,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-1",
+          "source": "burst-B",
+          "position": [
+            129.788,
+            138.072
+          ],
+          "rotation": 145.313,
+          "scale": [
+            0.5694,
+            0.73
+          ],
+          "ground_y": 151.072,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-2",
+          "source": "burst-C",
+          "position": [
+            116.921,
+            139.461
+          ],
+          "rotation": 190.313,
+          "scale": [
+            0.5694,
+            0.73
+          ],
+          "ground_y": 152.461,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-3",
+          "source": "burst-A",
+          "position": [
+            105.857,
+            135.894
+          ],
+          "rotation": 235.313,
+          "scale": [
+            0.5694,
+            0.73
+          ],
+          "ground_y": 148.894,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-4",
+          "source": "burst-B",
+          "position": [
+            103.078,
+            129.46
+          ],
+          "rotation": 280.313,
+          "scale": [
+            0.5694,
+            0.73
+          ],
+          "ground_y": 142.46,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-5",
+          "source": "burst-C",
+          "position": [
+            110.212,
+            123.928
+          ],
+          "rotation": 325.313,
+          "scale": [
+            0.5694,
+            0.73
+          ],
+          "ground_y": 136.928,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-6",
+          "source": "burst-A",
+          "position": [
+            123.079,
+            122.539
+          ],
+          "rotation": 370.313,
+          "scale": [
+            0.5694,
+            0.73
+          ],
+          "ground_y": 135.539,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-7",
+          "source": "burst-B",
+          "position": [
+            134.143,
+            126.106
+          ],
+          "rotation": 415.313,
+          "scale": [
+            0.5694,
+            0.73
+          ],
+          "ground_y": 139.106,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "heart",
+          "source": "core-hit",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1,
+            1
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 70,
+      "time": 2.333333,
+      "phase": "burst",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 150,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.5,
+            1.5
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "burst-0",
+          "source": "burst-A",
+          "position": [
+            138.004,
+            132.638
+          ],
+          "rotation": 100.313,
+          "scale": [
+            0.6396,
+            0.82
+          ],
+          "ground_y": 145.638,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-1",
+          "source": "burst-B",
+          "position": [
+            130.414,
+            138.524
+          ],
+          "rotation": 145.313,
+          "scale": [
+            0.6396,
+            0.82
+          ],
+          "ground_y": 151.524,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-2",
+          "source": "burst-C",
+          "position": [
+            116.724,
+            140.002
+          ],
+          "rotation": 190.313,
+          "scale": [
+            0.6396,
+            0.82
+          ],
+          "ground_y": 153.002,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-3",
+          "source": "burst-A",
+          "position": [
+            104.952,
+            136.207
+          ],
+          "rotation": 235.313,
+          "scale": [
+            0.6396,
+            0.82
+          ],
+          "ground_y": 149.207,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-4",
+          "source": "burst-B",
+          "position": [
+            101.996,
+            129.362
+          ],
+          "rotation": 280.313,
+          "scale": [
+            0.6396,
+            0.82
+          ],
+          "ground_y": 142.362,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-5",
+          "source": "burst-C",
+          "position": [
+            109.586,
+            123.476
+          ],
+          "rotation": 325.313,
+          "scale": [
+            0.6396,
+            0.82
+          ],
+          "ground_y": 136.476,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-6",
+          "source": "burst-A",
+          "position": [
+            123.276,
+            121.998
+          ],
+          "rotation": 370.313,
+          "scale": [
+            0.6396,
+            0.82
+          ],
+          "ground_y": 134.998,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-7",
+          "source": "burst-B",
+          "position": [
+            135.048,
+            125.793
+          ],
+          "rotation": 415.313,
+          "scale": [
+            0.6396,
+            0.82
+          ],
+          "ground_y": 138.793,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "heart",
+          "source": "core-hit",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1,
+            1
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 71,
+      "time": 2.366667,
+      "phase": "burst",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 158,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.58,
+            1.58
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "burst-0",
+          "source": "burst-A",
+          "position": [
+            139.087,
+            132.737
+          ],
+          "rotation": 100.313,
+          "scale": [
+            0.7098,
+            0.91
+          ],
+          "ground_y": 145.737,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-1",
+          "source": "burst-B",
+          "position": [
+            131.04,
+            138.976
+          ],
+          "rotation": 145.313,
+          "scale": [
+            0.7098,
+            0.91
+          ],
+          "ground_y": 151.976,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-2",
+          "source": "burst-C",
+          "position": [
+            116.527,
+            140.543
+          ],
+          "rotation": 190.313,
+          "scale": [
+            0.7098,
+            0.91
+          ],
+          "ground_y": 153.543,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-3",
+          "source": "burst-A",
+          "position": [
+            104.048,
+            136.52
+          ],
+          "rotation": 235.313,
+          "scale": [
+            0.7098,
+            0.91
+          ],
+          "ground_y": 149.52,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-4",
+          "source": "burst-B",
+          "position": [
+            100.913,
+            129.263
+          ],
+          "rotation": 280.313,
+          "scale": [
+            0.7098,
+            0.91
+          ],
+          "ground_y": 142.263,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-5",
+          "source": "burst-C",
+          "position": [
+            108.96,
+            123.024
+          ],
+          "rotation": 325.313,
+          "scale": [
+            0.7098,
+            0.91
+          ],
+          "ground_y": 136.024,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-6",
+          "source": "burst-A",
+          "position": [
+            123.473,
+            121.457
+          ],
+          "rotation": 370.313,
+          "scale": [
+            0.7098,
+            0.91
+          ],
+          "ground_y": 134.457,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-7",
+          "source": "burst-B",
+          "position": [
+            135.952,
+            125.48
+          ],
+          "rotation": 415.313,
+          "scale": [
+            0.7098,
+            0.91
+          ],
+          "ground_y": 138.48,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "heart",
+          "source": "core-hit",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1,
+            1
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 72,
+      "time": 2.4,
+      "phase": "burst",
+      "pulse": 0.0,
+      "events": [
+        "hit"
+      ],
+      "floor_width": 166,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.66,
+            1.66
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "burst-0",
+          "source": "burst-A",
+          "position": [
+            140.169,
+            132.835
+          ],
+          "rotation": 100.313,
+          "scale": [
+            0.78,
+            1.0
+          ],
+          "ground_y": 145.835,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-1",
+          "source": "burst-B",
+          "position": [
+            131.666,
+            139.428
+          ],
+          "rotation": 145.313,
+          "scale": [
+            0.78,
+            1.0
+          ],
+          "ground_y": 152.428,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-2",
+          "source": "burst-C",
+          "position": [
+            116.33,
+            141.084
+          ],
+          "rotation": 190.313,
+          "scale": [
+            0.78,
+            1.0
+          ],
+          "ground_y": 154.084,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-3",
+          "source": "burst-A",
+          "position": [
+            103.143,
+            136.833
+          ],
+          "rotation": 235.313,
+          "scale": [
+            0.78,
+            1.0
+          ],
+          "ground_y": 149.833,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-4",
+          "source": "burst-B",
+          "position": [
+            99.831,
+            129.165
+          ],
+          "rotation": 280.313,
+          "scale": [
+            0.78,
+            1.0
+          ],
+          "ground_y": 142.165,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-5",
+          "source": "burst-C",
+          "position": [
+            108.334,
+            122.572
+          ],
+          "rotation": 325.313,
+          "scale": [
+            0.78,
+            1.0
+          ],
+          "ground_y": 135.572,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-6",
+          "source": "burst-A",
+          "position": [
+            123.67,
+            120.916
+          ],
+          "rotation": 370.313,
+          "scale": [
+            0.78,
+            1.0
+          ],
+          "ground_y": 133.916,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-7",
+          "source": "burst-B",
+          "position": [
+            136.857,
+            125.167
+          ],
+          "rotation": 415.313,
+          "scale": [
+            0.78,
+            1.0
+          ],
+          "ground_y": 138.167,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "heart",
+          "source": "core-hit",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1,
+            1
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 73,
+      "time": 2.433333,
+      "phase": "burst",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 174,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.74,
+            1.74
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "burst-0",
+          "source": "burst-A",
+          "position": [
+            141.251,
+            132.934
+          ],
+          "rotation": 100.313,
+          "scale": [
+            0.8502,
+            1.09
+          ],
+          "ground_y": 145.934,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-1",
+          "source": "burst-B",
+          "position": [
+            132.292,
+            139.881
+          ],
+          "rotation": 145.313,
+          "scale": [
+            0.8502,
+            1.09
+          ],
+          "ground_y": 152.881,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-2",
+          "source": "burst-C",
+          "position": [
+            116.133,
+            141.626
+          ],
+          "rotation": 190.313,
+          "scale": [
+            0.8502,
+            1.09
+          ],
+          "ground_y": 154.626,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-3",
+          "source": "burst-A",
+          "position": [
+            102.239,
+            137.146
+          ],
+          "rotation": 235.313,
+          "scale": [
+            0.8502,
+            1.09
+          ],
+          "ground_y": 150.146,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-4",
+          "source": "burst-B",
+          "position": [
+            98.749,
+            129.066
+          ],
+          "rotation": 280.313,
+          "scale": [
+            0.8502,
+            1.09
+          ],
+          "ground_y": 142.066,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-5",
+          "source": "burst-C",
+          "position": [
+            107.708,
+            122.119
+          ],
+          "rotation": 325.313,
+          "scale": [
+            0.8502,
+            1.09
+          ],
+          "ground_y": 135.119,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-6",
+          "source": "burst-A",
+          "position": [
+            123.867,
+            120.374
+          ],
+          "rotation": 370.313,
+          "scale": [
+            0.8502,
+            1.09
+          ],
+          "ground_y": 133.374,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-7",
+          "source": "burst-B",
+          "position": [
+            137.761,
+            124.854
+          ],
+          "rotation": 415.313,
+          "scale": [
+            0.8502,
+            1.09
+          ],
+          "ground_y": 137.854,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "heart",
+          "source": "core-hit",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1,
+            1
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 74,
+      "time": 2.466667,
+      "phase": "burst",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 182,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.82,
+            1.82
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "burst-0",
+          "source": "burst-A",
+          "position": [
+            142.333,
+            133.032
+          ],
+          "rotation": 100.313,
+          "scale": [
+            0.9204,
+            1.18
+          ],
+          "ground_y": 146.032,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-1",
+          "source": "burst-B",
+          "position": [
+            132.918,
+            140.333
+          ],
+          "rotation": 145.313,
+          "scale": [
+            0.9204,
+            1.18
+          ],
+          "ground_y": 153.333,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-2",
+          "source": "burst-C",
+          "position": [
+            115.936,
+            142.167
+          ],
+          "rotation": 190.313,
+          "scale": [
+            0.9204,
+            1.18
+          ],
+          "ground_y": 155.167,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-3",
+          "source": "burst-A",
+          "position": [
+            101.334,
+            137.459
+          ],
+          "rotation": 235.313,
+          "scale": [
+            0.9204,
+            1.18
+          ],
+          "ground_y": 150.459,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-4",
+          "source": "burst-B",
+          "position": [
+            97.667,
+            128.968
+          ],
+          "rotation": 280.313,
+          "scale": [
+            0.9204,
+            1.18
+          ],
+          "ground_y": 141.968,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-5",
+          "source": "burst-C",
+          "position": [
+            107.082,
+            121.667
+          ],
+          "rotation": 325.313,
+          "scale": [
+            0.9204,
+            1.18
+          ],
+          "ground_y": 134.667,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-6",
+          "source": "burst-A",
+          "position": [
+            124.064,
+            119.833
+          ],
+          "rotation": 370.313,
+          "scale": [
+            0.9204,
+            1.18
+          ],
+          "ground_y": 132.833,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-7",
+          "source": "burst-B",
+          "position": [
+            138.666,
+            124.541
+          ],
+          "rotation": 415.313,
+          "scale": [
+            0.9204,
+            1.18
+          ],
+          "ground_y": 137.541,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "heart",
+          "source": "core-hit",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1,
+            1
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 75,
+      "time": 2.5,
+      "phase": "burst",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 190,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.9,
+            1.9
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "burst-0",
+          "source": "burst-A",
+          "position": [
+            143.415,
+            133.13
+          ],
+          "rotation": 100.313,
+          "scale": [
+            0.9906,
+            1.27
+          ],
+          "ground_y": 146.13,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-1",
+          "source": "burst-B",
+          "position": [
+            133.544,
+            140.785
+          ],
+          "rotation": 145.313,
+          "scale": [
+            0.9906,
+            1.27
+          ],
+          "ground_y": 153.785,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-2",
+          "source": "burst-C",
+          "position": [
+            115.739,
+            142.708
+          ],
+          "rotation": 190.313,
+          "scale": [
+            0.9906,
+            1.27
+          ],
+          "ground_y": 155.708,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-3",
+          "source": "burst-A",
+          "position": [
+            100.43,
+            137.772
+          ],
+          "rotation": 235.313,
+          "scale": [
+            0.9906,
+            1.27
+          ],
+          "ground_y": 150.772,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-4",
+          "source": "burst-B",
+          "position": [
+            96.585,
+            128.87
+          ],
+          "rotation": 280.313,
+          "scale": [
+            0.9906,
+            1.27
+          ],
+          "ground_y": 141.87,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-5",
+          "source": "burst-C",
+          "position": [
+            106.456,
+            121.215
+          ],
+          "rotation": 325.313,
+          "scale": [
+            0.9906,
+            1.27
+          ],
+          "ground_y": 134.215,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-6",
+          "source": "burst-A",
+          "position": [
+            124.261,
+            119.292
+          ],
+          "rotation": 370.313,
+          "scale": [
+            0.9906,
+            1.27
+          ],
+          "ground_y": 132.292,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-7",
+          "source": "burst-B",
+          "position": [
+            139.57,
+            124.228
+          ],
+          "rotation": 415.313,
+          "scale": [
+            0.9906,
+            1.27
+          ],
+          "ground_y": 137.228,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            1.0,
+            1.0
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 76,
+      "time": 2.533333,
+      "phase": "burst",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 198,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.98,
+            1.98
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "burst-0",
+          "source": "burst-A",
+          "position": [
+            144.498,
+            133.229
+          ],
+          "rotation": 100.313,
+          "scale": [
+            1.0608,
+            1.36
+          ],
+          "ground_y": 146.229,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-1",
+          "source": "burst-B",
+          "position": [
+            134.17,
+            141.237
+          ],
+          "rotation": 145.313,
+          "scale": [
+            1.0608,
+            1.36
+          ],
+          "ground_y": 154.237,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-2",
+          "source": "burst-C",
+          "position": [
+            115.542,
+            143.249
+          ],
+          "rotation": 190.313,
+          "scale": [
+            1.0608,
+            1.36
+          ],
+          "ground_y": 156.249,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-3",
+          "source": "burst-A",
+          "position": [
+            99.525,
+            138.085
+          ],
+          "rotation": 235.313,
+          "scale": [
+            1.0608,
+            1.36
+          ],
+          "ground_y": 151.085,
+          "layer": "front",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-4",
+          "source": "burst-B",
+          "position": [
+            95.502,
+            128.771
+          ],
+          "rotation": 280.313,
+          "scale": [
+            1.0608,
+            1.36
+          ],
+          "ground_y": 141.771,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-5",
+          "source": "burst-C",
+          "position": [
+            105.83,
+            120.763
+          ],
+          "rotation": 325.313,
+          "scale": [
+            1.0608,
+            1.36
+          ],
+          "ground_y": 133.763,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-6",
+          "source": "burst-A",
+          "position": [
+            124.458,
+            118.751
+          ],
+          "rotation": 370.313,
+          "scale": [
+            1.0608,
+            1.36
+          ],
+          "ground_y": 131.751,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "burst-7",
+          "source": "burst-B",
+          "position": [
+            140.475,
+            123.915
+          ],
+          "rotation": 415.313,
+          "scale": [
+            1.0608,
+            1.36
+          ],
+          "ground_y": 136.915,
+          "layer": "back",
+          "projection_y": 0.5
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.9286,
+            0.9286
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 77,
+      "time": 2.566667,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 176,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.76,
+            1.76
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-0",
+          "source": "residue",
+          "position": [
+            78,
+            145
+          ],
+          "rotation": -45,
+          "scale": [
+            0.8182,
+            0.8182
+          ],
+          "ground_y": 142,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-1",
+          "source": "residue",
+          "position": [
+            162,
+            154
+          ],
+          "rotation": 45,
+          "scale": [
+            0.8182,
+            0.8182
+          ],
+          "ground_y": 154,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.8571,
+            0.8571
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 78,
+      "time": 2.6,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 162,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-wave",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.62,
+            1.62
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-0",
+          "source": "residue",
+          "position": [
+            78,
+            145
+          ],
+          "rotation": -45,
+          "scale": [
+            0.7273,
+            0.7273
+          ],
+          "ground_y": 142,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-1",
+          "source": "residue",
+          "position": [
+            162,
+            154
+          ],
+          "rotation": 45,
+          "scale": [
+            0.7273,
+            0.7273
+          ],
+          "ground_y": 154,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.7857,
+            0.7857
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 79,
+      "time": 2.633333,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 148,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.48,
+            1.48
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-0",
+          "source": "residue",
+          "position": [
+            78,
+            145
+          ],
+          "rotation": -45,
+          "scale": [
+            0.6364,
+            0.6364
+          ],
+          "ground_y": 142,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-1",
+          "source": "residue",
+          "position": [
+            162,
+            154
+          ],
+          "rotation": 45,
+          "scale": [
+            0.6364,
+            0.6364
+          ],
+          "ground_y": 154,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.7143,
+            0.7143
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 80,
+      "time": 2.666667,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 134,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.34,
+            1.34
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-0",
+          "source": "residue",
+          "position": [
+            78,
+            145
+          ],
+          "rotation": -45,
+          "scale": [
+            0.5455,
+            0.5455
+          ],
+          "ground_y": 142,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-1",
+          "source": "residue",
+          "position": [
+            162,
+            154
+          ],
+          "rotation": 45,
+          "scale": [
+            0.5455,
+            0.5455
+          ],
+          "ground_y": 154,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.6429,
+            0.6429
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 81,
+      "time": 2.7,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 120,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.2,
+            1.2
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-0",
+          "source": "residue",
+          "position": [
+            78,
+            145
+          ],
+          "rotation": -45,
+          "scale": [
+            0.4545,
+            0.4545
+          ],
+          "ground_y": 142,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-1",
+          "source": "residue",
+          "position": [
+            162,
+            154
+          ],
+          "rotation": 45,
+          "scale": [
+            0.4545,
+            0.4545
+          ],
+          "ground_y": 154,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.5714,
+            0.5714
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 82,
+      "time": 2.733333,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 106,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            1.06,
+            1.06
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-0",
+          "source": "residue",
+          "position": [
+            78,
+            145
+          ],
+          "rotation": -45,
+          "scale": [
+            0.3636,
+            0.3636
+          ],
+          "ground_y": 142,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-1",
+          "source": "residue",
+          "position": [
+            162,
+            154
+          ],
+          "rotation": 45,
+          "scale": [
+            0.3636,
+            0.3636
+          ],
+          "ground_y": 154,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.5,
+            0.5
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 83,
+      "time": 2.766667,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 92,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.92,
+            0.92
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-0",
+          "source": "residue",
+          "position": [
+            78,
+            145
+          ],
+          "rotation": -45,
+          "scale": [
+            0.2727,
+            0.2727
+          ],
+          "ground_y": 142,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-1",
+          "source": "residue",
+          "position": [
+            162,
+            154
+          ],
+          "rotation": 45,
+          "scale": [
+            0.2727,
+            0.2727
+          ],
+          "ground_y": 154,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.5,
+            0.5
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 84,
+      "time": 2.8,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 78,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.78,
+            0.78
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-0",
+          "source": "residue",
+          "position": [
+            78,
+            145
+          ],
+          "rotation": -45,
+          "scale": [
+            0.1818,
+            0.1818
+          ],
+          "ground_y": 142,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-1",
+          "source": "residue",
+          "position": [
+            162,
+            154
+          ],
+          "rotation": 45,
+          "scale": [
+            0.1818,
+            0.1818
+          ],
+          "ground_y": 154,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.5,
+            0.5
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 85,
+      "time": 2.833333,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 64,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.64,
+            0.64
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-0",
+          "source": "residue",
+          "position": [
+            78,
+            145
+          ],
+          "rotation": -45,
+          "scale": [
+            0.0909,
+            0.0909
+          ],
+          "ground_y": 142,
+          "layer": "back",
+          "projection_y": 1
+        },
+        {
+          "id": "residue-1",
+          "source": "residue",
+          "position": [
+            162,
+            154
+          ],
+          "rotation": 45,
+          "scale": [
+            0.0909,
+            0.0909
+          ],
+          "ground_y": 154,
+          "layer": "front",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.5,
+            0.5
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 86,
+      "time": 2.866667,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 50,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.5,
+            0.5
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.5,
+            0.5
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 87,
+      "time": 2.9,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 36,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.36,
+            0.36
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.5,
+            0.5
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 88,
+      "time": 2.933333,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 22,
+      "parts": [
+        {
+          "id": "ground",
+          "source": "floor-ring",
+          "position": [
+            120,
+            144
+          ],
+          "rotation": 0,
+          "scale": [
+            0.22,
+            0.22
+          ],
+          "ground_y": 144,
+          "layer": "floor",
+          "projection_y": 1
+        },
+        {
+          "id": "heart",
+          "source": "core-dying",
+          "position": [
+            120,
+            112
+          ],
+          "rotation": 0,
+          "scale": [
+            0.5,
+            0.5
+          ],
+          "ground_y": 144,
+          "layer": "front",
+          "projection_y": 1
+        }
+      ]
+    },
+    {
+      "frame": 89,
+      "time": 2.966667,
+      "phase": "decay",
+      "pulse": 0.0,
+      "events": [],
+      "floor_width": 0,
+      "parts": []
+    }
+  ]
+}
