@@ -1,0 +1,2447 @@
+{
+  "method": {
+    "pixel_delta": "any RGBA change on any of three layers / 52800 canvas pixels",
+    "heart_drift": "Euclidean distance of independently rendered heart alpha centroids",
+    "tongues": "nonempty independently rendered flame instances; stable IDs, not connected components",
+    "permitted_transitions": [
+      10,
+      33,
+      67,
+      77,
+      89
+    ]
+  },
+  "summary": {
+    "png_count": 270,
+    "max_heart_drift_px": 1.402,
+    "max_changed_percent": 18.5341,
+    "violations": 0,
+    "empty_89": true,
+    "gif_frames": 90,
+    "gif_duration_ms": 3000
+  },
+  "violations": [],
+  "frames": [
+    {
+      "frame": 0,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        118,
+        109,
+        123,
+        116
+      ],
+      "phase": "ember",
+      "changed_pixels": 0,
+      "changed_percent": 0.0,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0,
+      "tongues": 0,
+      "tongue_ids": [],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 1,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        118,
+        109,
+        123,
+        116
+      ],
+      "phase": "ember",
+      "changed_pixels": 75,
+      "changed_percent": 0.142,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 0,
+      "tongue_ids": [],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 2,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        118,
+        109,
+        123,
+        116
+      ],
+      "phase": "ember",
+      "changed_pixels": 104,
+      "changed_percent": 0.197,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 0,
+      "tongue_ids": [],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 3,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        118,
+        109,
+        123,
+        116
+      ],
+      "phase": "ember",
+      "changed_pixels": 144,
+      "changed_percent": 0.2727,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 0,
+      "tongue_ids": [],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 4,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        118,
+        109,
+        123,
+        116
+      ],
+      "phase": "ember",
+      "changed_pixels": 171,
+      "changed_percent": 0.3239,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 0,
+      "tongue_ids": [],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 5,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        118,
+        109,
+        123,
+        116
+      ],
+      "phase": "ember",
+      "changed_pixels": 200,
+      "changed_percent": 0.3788,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 0,
+      "tongue_ids": [],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 6,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        118,
+        109,
+        123,
+        116
+      ],
+      "phase": "ember",
+      "changed_pixels": 223,
+      "changed_percent": 0.4223,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 0,
+      "tongue_ids": [],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 7,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        118,
+        109,
+        123,
+        116
+      ],
+      "phase": "ember",
+      "changed_pixels": 265,
+      "changed_percent": 0.5019,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 0,
+      "tongue_ids": [],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 8,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        118,
+        109,
+        123,
+        116
+      ],
+      "phase": "ember",
+      "changed_pixels": 283,
+      "changed_percent": 0.536,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 0,
+      "tongue_ids": [],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 9,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        118,
+        109,
+        123,
+        116
+      ],
+      "phase": "ember",
+      "changed_pixels": 342,
+      "changed_percent": 0.6477,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 0,
+      "tongue_ids": [],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 10,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        92,
+        109,
+        148,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 202,
+      "changed_percent": 0.3826,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [
+        "A",
+        "B",
+        "C"
+      ],
+      "deaths": []
+    },
+    {
+      "frame": 11,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        87,
+        106,
+        150,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 343,
+      "changed_percent": 0.6496,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 12,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        84,
+        99,
+        152,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 438,
+      "changed_percent": 0.8295,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 13,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        81,
+        92,
+        154,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 750,
+      "changed_percent": 1.4205,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 14,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        78,
+        85,
+        157,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 931,
+      "changed_percent": 1.7633,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 15,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        75,
+        78,
+        159,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 1342,
+      "changed_percent": 2.5417,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 16,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        72,
+        71,
+        161,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 1569,
+      "changed_percent": 2.9716,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 17,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        69,
+        64,
+        163,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 2114,
+      "changed_percent": 4.0038,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 18,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        65,
+        57,
+        166,
+        147
+      ],
+      "phase": "inhale",
+      "changed_pixels": 2518,
+      "changed_percent": 4.7689,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 19,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        65,
+        57,
+        165,
+        147
+      ],
+      "phase": "inhale",
+      "changed_pixels": 738,
+      "changed_percent": 1.3977,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 20,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        65,
+        57,
+        165,
+        147
+      ],
+      "phase": "inhale",
+      "changed_pixels": 844,
+      "changed_percent": 1.5985,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 21,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        65,
+        57,
+        165,
+        147
+      ],
+      "phase": "inhale",
+      "changed_pixels": 617,
+      "changed_percent": 1.1686,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 22,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        65,
+        57,
+        164,
+        147
+      ],
+      "phase": "inhale",
+      "changed_pixels": 832,
+      "changed_percent": 1.5758,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 23,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        66,
+        57,
+        164,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 409,
+      "changed_percent": 0.7746,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 24,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        66,
+        57,
+        164,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 697,
+      "changed_percent": 1.3201,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 25,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        66,
+        57,
+        164,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 788,
+      "changed_percent": 1.4924,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 26,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        67,
+        57,
+        164,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 470,
+      "changed_percent": 0.8902,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 27,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        67,
+        57,
+        164,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 755,
+      "changed_percent": 1.4299,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 28,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        67,
+        57,
+        164,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 544,
+      "changed_percent": 1.0303,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 29,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        67,
+        56,
+        164,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 204,
+      "changed_percent": 0.3864,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 30,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        68,
+        58,
+        164,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 1074,
+      "changed_percent": 2.0341,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 31,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        69,
+        59,
+        163,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 1460,
+      "changed_percent": 2.7652,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 32,
+      "heart_pixels": 18,
+      "fx_bbox": [
+        70,
+        60,
+        162,
+        146
+      ],
+      "phase": "inhale",
+      "changed_pixels": 1131,
+      "changed_percent": 2.142,
+      "heart_centroid": [
+        119.88888888888889,
+        112.5
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 33,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        63,
+        61,
+        164,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 3039,
+      "changed_percent": 5.7557,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.1539,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 34,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        64,
+        62,
+        163,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 1666,
+      "changed_percent": 3.1553,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 35,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        65,
+        63,
+        162,
+        147
+      ],
+      "phase": "pressure",
+      "changed_pixels": 1599,
+      "changed_percent": 3.0284,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 36,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        66,
+        65,
+        161,
+        147
+      ],
+      "phase": "pressure",
+      "changed_pixels": 1824,
+      "changed_percent": 3.4545,
+      "heart_centroid": [
+        119.88461538461539,
+        111.65384615384616
+      ],
+      "heart_drift_px": 1.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 37,
+      "heart_pixels": 59,
+      "fx_bbox": [
+        68,
+        66,
+        159,
+        147
+      ],
+      "phase": "pressure",
+      "changed_pixels": 1632,
+      "changed_percent": 3.0909,
+      "heart_centroid": [
+        119.98305084745763,
+        112.0
+      ],
+      "heart_drift_px": 0.3599,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 38,
+      "heart_pixels": 73,
+      "fx_bbox": [
+        69,
+        68,
+        158,
+        147
+      ],
+      "phase": "pressure",
+      "changed_pixels": 1692,
+      "changed_percent": 3.2045,
+      "heart_centroid": [
+        120.4931506849315,
+        111.68493150684931
+      ],
+      "heart_drift_px": 0.5996,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 39,
+      "heart_pixels": 78,
+      "fx_bbox": [
+        71,
+        69,
+        157,
+        147
+      ],
+      "phase": "pressure",
+      "changed_pixels": 1309,
+      "changed_percent": 2.4792,
+      "heart_centroid": [
+        119.91025641025641,
+        112.03846153846153
+      ],
+      "heart_drift_px": 0.6817,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 40,
+      "heart_pixels": 73,
+      "fx_bbox": [
+        72,
+        70,
+        156,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 1105,
+      "changed_percent": 2.0928,
+      "heart_centroid": [
+        120.4931506849315,
+        111.68493150684931
+      ],
+      "heart_drift_px": 0.6817,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 41,
+      "heart_pixels": 59,
+      "fx_bbox": [
+        74,
+        71,
+        154,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 1105,
+      "changed_percent": 2.0928,
+      "heart_centroid": [
+        119.98305084745763,
+        112.0
+      ],
+      "heart_drift_px": 0.5996,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 42,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        74,
+        70,
+        154,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 339,
+      "changed_percent": 0.642,
+      "heart_centroid": [
+        119.88461538461539,
+        111.65384615384616
+      ],
+      "heart_drift_px": 0.3599,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 43,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        74,
+        70,
+        154,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 312,
+      "changed_percent": 0.5909,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 1.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 44,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        75,
+        70,
+        154,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 297,
+      "changed_percent": 0.5625,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 45,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        75,
+        70,
+        154,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 315,
+      "changed_percent": 0.5966,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 46,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        75,
+        70,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 485,
+      "changed_percent": 0.9186,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 47,
+      "heart_pixels": 63,
+      "fx_bbox": [
+        75,
+        70,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 434,
+      "changed_percent": 0.822,
+      "heart_centroid": [
+        120.2063492063492,
+        111.93650793650794
+      ],
+      "heart_drift_px": 0.7862,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 48,
+      "heart_pixels": 73,
+      "fx_bbox": [
+        75,
+        71,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 433,
+      "changed_percent": 0.8201,
+      "heart_centroid": [
+        120.4931506849315,
+        111.68493150684931
+      ],
+      "heart_drift_px": 0.3815,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 49,
+      "heart_pixels": 77,
+      "fx_bbox": [
+        75,
+        71,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 371,
+      "changed_percent": 0.7027,
+      "heart_centroid": [
+        120.3896103896104,
+        111.84415584415585
+      ],
+      "heart_drift_px": 0.1899,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 50,
+      "heart_pixels": 84,
+      "fx_bbox": [
+        75,
+        72,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 362,
+      "changed_percent": 0.6856,
+      "heart_centroid": [
+        119.77380952380952,
+        112.36904761904762
+      ],
+      "heart_drift_px": 0.8091,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 51,
+      "heart_pixels": 77,
+      "fx_bbox": [
+        75,
+        71,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 373,
+      "changed_percent": 0.7064,
+      "heart_centroid": [
+        120.3896103896104,
+        111.84415584415585
+      ],
+      "heart_drift_px": 0.8091,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 52,
+      "heart_pixels": 73,
+      "fx_bbox": [
+        74,
+        71,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 435,
+      "changed_percent": 0.8239,
+      "heart_centroid": [
+        120.4931506849315,
+        111.68493150684931
+      ],
+      "heart_drift_px": 0.1899,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 53,
+      "heart_pixels": 63,
+      "fx_bbox": [
+        74,
+        70,
+        156,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 375,
+      "changed_percent": 0.7102,
+      "heart_centroid": [
+        120.2063492063492,
+        111.93650793650794
+      ],
+      "heart_drift_px": 0.3815,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 54,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        73,
+        70,
+        156,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 459,
+      "changed_percent": 0.8693,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.7862,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 55,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        73,
+        70,
+        156,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 291,
+      "changed_percent": 0.5511,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 56,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        73,
+        70,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 254,
+      "changed_percent": 0.4811,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 57,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        73,
+        70,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 194,
+      "changed_percent": 0.3674,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 58,
+      "heart_pixels": 61,
+      "fx_bbox": [
+        74,
+        71,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 459,
+      "changed_percent": 0.8693,
+      "heart_centroid": [
+        120.06557377049181,
+        112.09836065573771
+      ],
+      "heart_drift_px": 0.5842,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 59,
+      "heart_pixels": 78,
+      "fx_bbox": [
+        74,
+        71,
+        154,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 808,
+      "changed_percent": 1.5303,
+      "heart_centroid": [
+        119.91025641025641,
+        112.03846153846153
+      ],
+      "heart_drift_px": 0.1665,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 60,
+      "heart_pixels": 94,
+      "fx_bbox": [
+        75,
+        72,
+        154,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 429,
+      "changed_percent": 0.8125,
+      "heart_centroid": [
+        120.01063829787235,
+        111.90425531914893
+      ],
+      "heart_drift_px": 0.1676,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 61,
+      "heart_pixels": 108,
+      "fx_bbox": [
+        76,
+        73,
+        154,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 532,
+      "changed_percent": 1.0076,
+      "heart_centroid": [
+        120.10185185185185,
+        112.07407407407408
+      ],
+      "heart_drift_px": 0.1928,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 62,
+      "heart_pixels": 94,
+      "fx_bbox": [
+        76,
+        72,
+        154,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 490,
+      "changed_percent": 0.928,
+      "heart_centroid": [
+        120.01063829787235,
+        111.90425531914893
+      ],
+      "heart_drift_px": 0.1928,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 63,
+      "heart_pixels": 78,
+      "fx_bbox": [
+        75,
+        71,
+        154,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 430,
+      "changed_percent": 0.8144,
+      "heart_centroid": [
+        119.91025641025641,
+        112.03846153846153
+      ],
+      "heart_drift_px": 0.1676,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 64,
+      "heart_pixels": 61,
+      "fx_bbox": [
+        75,
+        71,
+        154,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 561,
+      "changed_percent": 1.0625,
+      "heart_centroid": [
+        120.06557377049181,
+        112.09836065573771
+      ],
+      "heart_drift_px": 0.1665,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 65,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        75,
+        70,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 534,
+      "changed_percent": 1.0114,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.5842,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 66,
+      "heart_pixels": 52,
+      "fx_bbox": [
+        75,
+        70,
+        155,
+        146
+      ],
+      "phase": "pressure",
+      "changed_pixels": 258,
+      "changed_percent": 0.4886,
+      "heart_centroid": [
+        119.88461538461539,
+        112.65384615384616
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 3,
+      "tongue_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 67,
+      "heart_pixels": 131,
+      "fx_bbox": [
+        91,
+        81,
+        154,
+        139
+      ],
+      "phase": "burst",
+      "changed_pixels": 2703,
+      "changed_percent": 5.1193,
+      "heart_centroid": [
+        119.89312977099236,
+        111.25190839694656
+      ],
+      "heart_drift_px": 1.402,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "deaths": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "frame": 68,
+      "heart_pixels": 131,
+      "fx_bbox": [
+        83,
+        72,
+        164,
+        147
+      ],
+      "phase": "burst",
+      "changed_pixels": 3005,
+      "changed_percent": 5.6913,
+      "heart_centroid": [
+        119.89312977099236,
+        111.25190839694656
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 69,
+      "heart_pixels": 131,
+      "fx_bbox": [
+        75,
+        63,
+        174,
+        155
+      ],
+      "phase": "burst",
+      "changed_pixels": 4226,
+      "changed_percent": 8.0038,
+      "heart_centroid": [
+        119.89312977099236,
+        111.25190839694656
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 70,
+      "heart_pixels": 131,
+      "fx_bbox": [
+        67,
+        54,
+        184,
+        163
+      ],
+      "phase": "burst",
+      "changed_pixels": 5684,
+      "changed_percent": 10.7652,
+      "heart_centroid": [
+        119.89312977099236,
+        111.25190839694656
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 71,
+      "heart_pixels": 131,
+      "fx_bbox": [
+        59,
+        45,
+        194,
+        171
+      ],
+      "phase": "burst",
+      "changed_pixels": 7314,
+      "changed_percent": 13.8523,
+      "heart_centroid": [
+        119.89312977099236,
+        111.25190839694656
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 72,
+      "heart_pixels": 131,
+      "fx_bbox": [
+        51,
+        36,
+        204,
+        179
+      ],
+      "phase": "burst",
+      "changed_pixels": 8976,
+      "changed_percent": 17.0,
+      "heart_centroid": [
+        119.89312977099236,
+        111.25190839694656
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 73,
+      "heart_pixels": 131,
+      "fx_bbox": [
+        49,
+        34,
+        206,
+        181
+      ],
+      "phase": "burst",
+      "changed_pixels": 5328,
+      "changed_percent": 10.0909,
+      "heart_centroid": [
+        119.89312977099236,
+        111.25190839694656
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 74,
+      "heart_pixels": 131,
+      "fx_bbox": [
+        47,
+        33,
+        208,
+        183
+      ],
+      "phase": "burst",
+      "changed_pixels": 5592,
+      "changed_percent": 10.5909,
+      "heart_centroid": [
+        119.89312977099236,
+        111.25190839694656
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 75,
+      "heart_pixels": 131,
+      "fx_bbox": [
+        45,
+        31,
+        210,
+        184
+      ],
+      "phase": "burst",
+      "changed_pixels": 5746,
+      "changed_percent": 10.8826,
+      "heart_centroid": [
+        119.89312977099236,
+        111.25190839694656
+      ],
+      "heart_drift_px": 0.0,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 76,
+      "heart_pixels": 114,
+      "fx_bbox": [
+        43,
+        29,
+        212,
+        185
+      ],
+      "phase": "burst",
+      "changed_pixels": 5937,
+      "changed_percent": 11.2443,
+      "heart_centroid": [
+        119.85964912280701,
+        111.66666666666667
+      ],
+      "heart_drift_px": 0.4161,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 77,
+      "heart_pixels": 95,
+      "fx_bbox": [
+        48,
+        35,
+        206,
+        180
+      ],
+      "phase": "decay",
+      "changed_pixels": 9786,
+      "changed_percent": 18.5341,
+      "heart_centroid": [
+        119.98947368421052,
+        111.92631578947369
+      ],
+      "heart_drift_px": 0.2903,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 78,
+      "heart_pixels": 77,
+      "fx_bbox": [
+        53,
+        40,
+        200,
+        175
+      ],
+      "phase": "decay",
+      "changed_pixels": 8615,
+      "changed_percent": 16.3163,
+      "heart_centroid": [
+        119.84415584415585,
+        112.25974025974025
+      ],
+      "heart_drift_px": 0.3637,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 79,
+      "heart_pixels": 68,
+      "fx_bbox": [
+        58,
+        46,
+        194,
+        171
+      ],
+      "phase": "decay",
+      "changed_pixels": 7619,
+      "changed_percent": 14.4299,
+      "heart_centroid": [
+        120.05882352941177,
+        111.77941176470588
+      ],
+      "heart_drift_px": 0.5261,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 80,
+      "heart_pixels": 54,
+      "fx_bbox": [
+        63,
+        51,
+        188,
+        166
+      ],
+      "phase": "decay",
+      "changed_pixels": 6639,
+      "changed_percent": 12.5739,
+      "heart_centroid": [
+        120.0925925925926,
+        111.9074074074074
+      ],
+      "heart_drift_px": 0.1324,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 81,
+      "heart_pixels": 39,
+      "fx_bbox": [
+        71,
+        59,
+        179,
+        159
+      ],
+      "phase": "decay",
+      "changed_pixels": 6053,
+      "changed_percent": 11.464,
+      "heart_centroid": [
+        120.05128205128206,
+        111.97435897435898
+      ],
+      "heart_drift_px": 0.0787,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 82,
+      "heart_pixels": 32,
+      "fx_bbox": [
+        78,
+        67,
+        170,
+        152
+      ],
+      "phase": "decay",
+      "changed_pixels": 4714,
+      "changed_percent": 8.928,
+      "heart_centroid": [
+        119.90625,
+        112.21875
+      ],
+      "heart_drift_px": 0.2842,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 83,
+      "heart_pixels": 22,
+      "fx_bbox": [
+        86,
+        76,
+        161,
+        144
+      ],
+      "phase": "decay",
+      "changed_pixels": 3418,
+      "changed_percent": 6.4735,
+      "heart_centroid": [
+        119.86363636363636,
+        111.95454545454545
+      ],
+      "heart_drift_px": 0.2676,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 84,
+      "heart_pixels": 19,
+      "fx_bbox": [
+        94,
+        84,
+        151,
+        137
+      ],
+      "phase": "decay",
+      "changed_pixels": 2384,
+      "changed_percent": 4.5152,
+      "heart_centroid": [
+        120.42105263157895,
+        111.84210526315789
+      ],
+      "heart_drift_px": 0.5686,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 85,
+      "heart_pixels": 11,
+      "fx_bbox": [
+        98,
+        88,
+        146,
+        133
+      ],
+      "phase": "decay",
+      "changed_pixels": 1481,
+      "changed_percent": 2.8049,
+      "heart_centroid": [
+        120.18181818181819,
+        111.9090909090909
+      ],
+      "heart_drift_px": 0.2484,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 86,
+      "heart_pixels": 4,
+      "fx_bbox": [
+        103,
+        93,
+        141,
+        129
+      ],
+      "phase": "decay",
+      "changed_pixels": 1058,
+      "changed_percent": 2.0038,
+      "heart_centroid": [
+        120.0,
+        111.75
+      ],
+      "heart_drift_px": 0.2416,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 87,
+      "heart_pixels": 1,
+      "fx_bbox": [
+        107,
+        98,
+        136,
+        125
+      ],
+      "phase": "decay",
+      "changed_pixels": 689,
+      "changed_percent": 1.3049,
+      "heart_centroid": [
+        120.0,
+        112.0
+      ],
+      "heart_drift_px": 0.25,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 88,
+      "heart_pixels": 0,
+      "fx_bbox": [
+        111,
+        102,
+        131,
+        121
+      ],
+      "phase": "decay",
+      "changed_pixels": 360,
+      "changed_percent": 0.6818,
+      "heart_centroid": null,
+      "heart_drift_px": 0,
+      "tongues": 8,
+      "tongue_ids": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ],
+      "births": [],
+      "deaths": []
+    },
+    {
+      "frame": 89,
+      "heart_pixels": 0,
+      "fx_bbox": null,
+      "phase": "decay",
+      "changed_pixels": 140,
+      "changed_percent": 0.2652,
+      "heart_centroid": null,
+      "heart_drift_px": 0,
+      "tongues": 0,
+      "tongue_ids": [],
+      "births": [],
+      "deaths": [
+        "burst-0",
+        "burst-1",
+        "burst-2",
+        "burst-3",
+        "burst-4",
+        "burst-5",
+        "burst-6",
+        "burst-7"
+      ]
+    }
+  ]
+}

@@ -53,6 +53,27 @@ python exp/VL2/build.py --frames 6,25,50,72,85 --out exp/VL2/test
 PASS build: 5 frames x 3 layers = 15 PNG; 240x220; binary alpha; palette OK; character excluded
 ```
 
+## VL2b — 90 khung, ba lớp và kiểm liên tục
+
+Mục này thay phần mô tả chuyển động/bung của VL2a2. `build.py --all` chỉ đọc nguồn và rig hiện tại, xuất `frames/{floor,back,front}/000..089.png`, GIF, bảng lớp và continuity; không gọi dịch vụ. `motion.py` là bước biên soạn nguồn/chuyển động, chỉ chạy khi muốn tái tạo rig VL2b. `rig-vl2a2.json` giữ nguyên đầu vào trước sửa. Không chạy `prepare.py` sau đó vì nó tái tạo bản A.
+
+**Hai sửa hình:** (1) Thay burst-A/B/C bằng ba vùng cuộn thực từ `VL1/gen-k4.png`, ghi polygon, gốc và tỉ lệ trong rig; loại màu tối ở gốc để không mang áo/da nhân vật vào nguồn. Giữ mép ngà/hồng, lòng rỗng, nở mép 1 px bằng màu kề. Tám gốc cùng ở ngực (120,112), chiếu Y 0,85 thay 0,5, bung nhanh từ khung 67; k4 có bbox lửa 153×143 px, vòng sàn rộng 122 px. Không còn tám mảnh nhỏ rải trên vòng sàn. (2) Gộp 32 pixel trắng thuộc cụm 1–2 px ở sáu nguồn inhale/pressure vào màu mép kề sẵn có; không thêm màu, không dither hay alpha mềm. Lọc alpha cụm <3 px cũng được áp dụng nhưng các nguồn này không có cụm alpha nhỏ cần bỏ. Affine nearest vẫn có thể tạo đầu nét 1 px; không tuyên bố mọi mép đều dày đúng 2–3 px.
+
+**Chuyển động:** lửa hút đi vào trong 9 khung thay vì bật đủ kích thước; đổi nguồn hút/ép đúng mốc 33, nội suy footprint và vị trí. Nhịp ở 39/50/61 (1,3000/1,6667/2,0333 s), diện tích tâm đục tương ứng 78/84/108 px so với 52 px khi không pulse. Tám lưỡi giữ ID tới 88, thu nhỏ liên tục rồi tắt ở 89. Lượt đầu phát hiện năm lưỡi mất ở 88 do affine co dưới pixel; đã nâng kích thước cuối pha, không nới ngoại lệ kiểm. Căn lại vị trí tâm theo centroid alpha thực sau nearest; không chỉ đo pivot ghi trong rig.
+
+**Số đo kiểm toàn bộ:** 270/270 PNG, 240×220, alpha chỉ 0/255, không pixel ngoài bảng; cả ba lớp khung 89 trống; mọi bbox nằm trong canvas. PNG trên đĩa khớp render; hash của đủ 16 nguồn khớp rig. Trôi centroid tâm tối đa **1,4020 px/khung**, 0 đổi số lưỡi ngoài mốc. Chênh RGBA tối đa **18,5341% diện tích canvas**; biến đổi lớn nằm trong pha bung/rã. `continuity.json` ghi đủ 90 khung/89 chuyển tiếp, % chênh, centroid, số lưỡi, sinh/mất theo ID. Số lưỡi là số instance nguồn thực sự render không trống, không phải số connected component vì các cuộn giao nhau tại ngực. Các mốc chuyển pha được phép là 10/33/67/77/89.
+
+**Xem trước:** GIF 720×660 (3× nearest), 90 khung, 883327 byte, lặp vô hạn, tổng 3000 ms. GIF chỉ có đơn vị delay 10 ms nên dùng chu kỳ 30/30/40 ms, trung bình đúng 30 fps; không tuyên bố mỗi khung là 33,333 ms. Bảng `preview-layers.png` có hàng floor/back/front/ghép và đủ tám cột yêu cầu. Nhân vật chỉ ghép trong preview từ `daosi.png` ô `walk_down_right_00`; các PNG lớp chỉ có FX.
+
+**Tự chấm và giới hạn xem:** đã mở đủ bốn hàng bảng lớp và giải mã chính GIF thành ba bảng liên tiếp, rà **90/90 khung** (`gif-review-inhale/pressure/burst.png`). Dáng bung **4/5**: bông cuộn lớn đọc rõ, vượt vòng sàn, cùng tâm ngực; nguồn lặp ba biến thể vẫn có tính đều. Nhịp tim **3/5**: ba đỉnh tăng dần có số đo, nhịp ba đọc rõ hơn nhịp đầu. Liên tục qua dải khung **3/5**: hút vào/rã ra đều; đổi silhouette ở 33 vẫn dứt. **Chưa tự xác nhận độ mượt khi phát GIF thời gian thực**: CUA lỗi khởi tạo hai lần, node_repl báo `invalid sandbox permission path: 'file:///D:' is invalid on 'windows'`. Không đánh đồng xem dải khung với xem phát động. Đây là phần còn thiếu để nghiệm thu đầy đủ tiêu chí xem GIF; không thử sửa hình thêm sau lượt rà cuối.
+
+```text
+python exp/VL2/build.py --all --out exp/VL2/frames
+PASS continuity: 89 transitions; heart drift max 1.4020px; unplanned tongue changes 0
+PASS preview: 90 frames; 720x660; 3000ms; loop=0; GIF 883327 bytes
+PASS build: 90 frames x 3 layers = 270 PNG; 240x220; binary alpha; palette OK; character excluded
+```
+
 Ghi nhận vận hành: lệnh thống kê cuối lỗi quote ở `python -c`, sau đó đọc log gặp UTF-16 do `Tee-Object` PowerShell 5.1. Đã dùng here-string truyền script và chuẩn hoá hai log về UTF-8; không ảnh hưởng kết quả dựng hình. Khi ghi/đọc log tiếp theo chỉ định encoding, tránh nhúng quote nhiều tầng.
 
 

@@ -1,0 +1,3 @@
+PASS continuity: 89 transitions; heart drift max 1.4020px; unplanned tongue changes 0
+PASS preview: 90 frames; 720x660; 3000ms; loop=0; GIF 883327 bytes
+PASS build: 90 frames x 3 layers = 270 PNG; 240x220; binary alpha; palette OK; character excluded

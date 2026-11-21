@@ -86,13 +86,14 @@ def preview(layers):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--all', action='store_true', help='build all frames, previews and continuity audit')
     parser.add_argument('--frames', default='6,25,50,72,85')
     parser.add_argument('--out', type=Path, default=ROOT / 'test')
     args = parser.parse_args()
     out = args.out.resolve()
     if not out.is_relative_to(ROOT):
         parser.error('output must stay inside exp/VL2')
-    frames = [int(f) for f in args.frames.split(',')]
+    frames = list(range(90)) if args.all else [int(f) for f in args.frames.split(',')]
     if any(f < 0 or f > 89 for f in frames):
         parser.error('frame range is 0..89')
     out.mkdir(parents=True, exist_ok=True)
@@ -103,7 +104,14 @@ def main():
             arr = np.array(im)
             assert set(np.unique(arr[:, :, 3])) <= {0, 255}
             assert all(tuple(c) in palette for c in np.unique(arr[arr[:, :, 3] > 0, :3], axis=0))
-            im.save(out / f'{frame:03d}-{layer}.png')
+            if args.all:
+                (out / layer).mkdir(exist_ok=True)
+                im.save(out / layer / f'{frame:03d}.png')
+            else:
+                im.save(out / f'{frame:03d}-{layer}.png')
+    if args.all:
+        from motion import audit_and_preview
+        audit_and_preview(rig, out)
     print(f'PASS build: {len(frames)} frames x 3 layers = {len(frames)*3} PNG; 240x220; binary alpha; palette OK; character excluded')
 
 
