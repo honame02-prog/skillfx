@@ -54,3 +54,35 @@ PASS build: 5 frames x 3 layers = 15 PNG; 240x220; binary alpha; palette OK; cha
 ```
 
 Ghi nhận vận hành: lệnh thống kê cuối lỗi quote ở `python -c`, sau đó đọc log gặp UTF-16 do `Tee-Object` PowerShell 5.1. Đã dùng here-string truyền script và chuẩn hoá hai log về UTF-8; không ảnh hưởng kết quả dựng hình. Khi ghi/đọc log tiếp theo chỉ định encoding, tránh nhúng quote nhiều tầng.
+
+
+## VL2a2 — giữ ngôn ngữ hình VL1
+
+Mục này thay mô tả nguồn và tự chấm VL2a ở trên. Không gọi ImageGen mới (0 vòng sinh); dùng phương án cắt trực tiếp được brief cho phép. `prepare.py` tái lập các mảng từ `VL1/gen-k2.png` và `gen-k3.png`. Polygon chỉ chọn vùng ảnh không người, không vẽ đường lửa. Giữ 4 tâm nhỏ của VL2a.
+
+1. **Bỏ gai/tinh thể:** thay toàn bộ inhale/pressure/burst A/B/C bằng nét cong, lòng rỗng, ngà/hồng của VL1. Chỉ nở alpha 1 px theo 4 hướng, lấy màu mép kề sẵn có; không tô viền xám mới, không dither hay alpha mềm. Cụm mép sáng nhìn ở 1× khoảng 2–3 px; một số đầu cong còn 1 px, chỗ giao nét rộng hơn. Không khẳng định mọi mép đều 2–3 px.
+2. **Sàn nhẹ:** cả hai nguồn floor lấy vòng elip đứt VL1 k3, giữ lòng rỗng, bỏ đĩa đỏ. Sóng k4 có đúng 1 instance `ground`. Nét ngà nguồn 100×50 có trung vị đoạn chạy ngang 2 px; ở k4 phóng 1,66× có chỗ 3–4 px. Không nở thêm sàn. Forward-nearest giữ các cực trị alpha mà inverse-nearest có thể bỏ sót, không nội suy màu.
+3. **Người đọc rõ:** giảm nguồn inhale từ 46×72 xuống khoảng 33–37×61, pressure từ 35×47 xuống 25–31×42–48; đưa lưỡi gần lệch trái, bớt xoay. k2 front che 18/675 pixel người (2,67%); k3 che 86/675 (12,74%, gồm tâm). k4 đúng 8 lưỡi hướng toả, chiếu Y 0,5, cùng họ cong VL1.
+
+### Số đo
+
+`edge≥2×2` là tỷ lệ pixel biên alpha thuộc cụm 2×2 đục, không đo bề dày vuông góc. Dải ngà nguồn có trung vị đoạn chạy ngang 1–2 px, phần hồng kề bên làm cả cụm dày hơn. Không dùng số % này để tuyên bố đồng loạt 2–3 px. `verification.json` lưu số đo bổ sung và cách tính. Footprint sàn đúng 2:1 ở 89/89 khung có sàn; khung 89 trống.
+
+| Mốc | edge≥2×2 | H/W sàn | Pixel người bị front che | Độ phủ alpha trong bbox sàn |
+|---|---:|---:|---:|---:|
+| k1 | 69,23% | 0,5000 | 18/675 | 9,18% |
+| k2 | 90,64% | 0,5000 | 18/675 | 6,40% |
+| k3 | 94,64% | 0,5000 | 86/675 | 7,44% |
+| k4 | 83,57% | 0,5000 | 130/675 | 6,36% |
+| k5 | 0,00% | 0,5000 | 2/675 | 9,18% |
+
+### Tự chấm bằng mắt
+
+Đã mở `comparison-2x.png` (VL1 trên / VL2a2 dưới), bản 1× và bảng lớp. **Cùng ngôn ngữ VL1: có, 4/5**: đường cong cuộn, lòng rỗng, mép ngà/hồng; sàn nhẹ, người rõ. So với VL1, mép dày hơn và k4 chia 8 cuộn rời rõ hơn; nét nối tâm thưa hơn VL1. Đây là tự chấm phần A, chưa phải người dùng nghiệm thu. Affine nearest vẫn tạo bậc pixel ở đường chéo; chưa kiểm hoạt hình liên tục hoặc atlas/game phần B.
+
+Đã kiểm 16/16 nguồn, 90/90 khung, 5/5 keys và 15/15 PNG lớp. `rig.json` ghi crop, nguồn và SHA256; hai ảnh so sánh đã dựng lại. Lệnh thống kê phụ từng lỗi cú pháp import, đã sửa; ghi chú mới từng mất dấu qua pipe PowerShell, đã sửa bằng ghi UTF-8 trực tiếp. Tài nguyên không bị ảnh hưởng.
+
+```text
+python exp/VL2/build.py --frames 6,25,50,72,85 --out exp/VL2/test
+PASS build: 5 frames x 3 layers = 15 PNG; 240x220; binary alpha; palette OK; character excluded
+```

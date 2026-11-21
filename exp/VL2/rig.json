@@ -36,23 +36,44 @@
         116
       ],
       "bbox": [
-        97,
-        44,
-        143,
+        101,
+        53,
+        140,
         116
       ],
-      "source_crop": [
-        0,
-        0,
-        314,
-        314
+      "source": "../VL1/gen-k2.png",
+      "source_polygon": [
+        [
+          96,
+          55
+        ],
+        [
+          260,
+          55
+        ],
+        [
+          260,
+          194
+        ],
+        [
+          214,
+          210
+        ],
+        [
+          214,
+          300
+        ],
+        [
+          96,
+          300
+        ]
       ],
-      "source": "gen-01.png",
       "native_size": [
-        46,
-        72
+        39,
+        63
       ],
-      "sha256": "0711a43a1269c6597b0316435c4e9599ac19d614371f4439a9452b2a21fdc5b3"
+      "rim_growth_pixels": 1,
+      "sha256": "8d1835e79d2f9f420ab57c81798a066efd8a8570c6657db5fe0459b970428e93"
     },
     "inhale-B": {
       "path": "src/inhale-B.png",
@@ -61,23 +82,44 @@
         116
       ],
       "bbox": [
-        97,
-        44,
-        143,
+        103,
+        53,
+        138,
         116
       ],
-      "source_crop": [
-        314,
-        0,
-        627,
-        314
+      "source": "../VL1/gen-k2.png",
+      "source_polygon": [
+        [
+          295,
+          126
+        ],
+        [
+          442,
+          126
+        ],
+        [
+          442,
+          403
+        ],
+        [
+          306,
+          403
+        ],
+        [
+          306,
+          211
+        ],
+        [
+          295,
+          211
+        ]
       ],
-      "source": "gen-01.png",
       "native_size": [
-        46,
-        72
+        35,
+        63
       ],
-      "sha256": "d8571248731ac9a3e50faaa8567805282aea0b1bb12e17f6a7789d5a759e52b6"
+      "rim_growth_pixels": 1,
+      "sha256": "26bba60078b6c8fb54b65457f019a6927e22b222db9bcb7de90173dd7b547932"
     },
     "inhale-C": {
       "path": "src/inhale-C.png",
@@ -86,23 +128,458 @@
         116
       ],
       "bbox": [
-        97,
-        44,
-        143,
+        96,
+        66,
+        144,
         116
       ],
-      "source_crop": [
-        627,
-        0,
-        940,
-        314
+      "source": "../VL1/gen-k2.png",
+      "source_polygon": [
+        [
+          37,
+          207
+        ],
+        [
+          98,
+          207
+        ],
+        [
+          98,
+          294
+        ],
+        [
+          210,
+          307
+        ],
+        [
+          210,
+          411
+        ],
+        [
+          37,
+          411
+        ]
       ],
-      "source": "gen-01.png",
       "native_size": [
-        46,
-        72
+        48,
+        50
       ],
-      "sha256": "08ae9dcec51e0f9e9e98f1983dc3648cbb2e7da3d4a118b074d3157adbb0e948"
+      "rim_growth_pixels": 1,
+      "sha256": "2aeaa99de3e0a6bcfe410faefdf93993a15213a155490e051efa848d9506457a"
+    },
+    "pressure-A": {
+      "path": "src/pressure-A.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        104,
+        66,
+        137,
+        116
+      ],
+      "source": "../VL1/gen-k3.png",
+      "source_polygon": [
+        [
+          129,
+          86
+        ],
+        [
+          241,
+          86
+        ],
+        [
+          241,
+          197
+        ],
+        [
+          217,
+          239
+        ],
+        [
+          217,
+          279
+        ],
+        [
+          129,
+          279
+        ]
+      ],
+      "native_size": [
+        33,
+        50
+      ],
+      "rim_growth_pixels": 1,
+      "sha256": "cfee43cffa6936600a29c5b6942e6ddc2e79577c856d0e3b3468cf11cc3711b4"
+    },
+    "pressure-B": {
+      "path": "src/pressure-B.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        107,
+        73,
+        134,
+        116
+      ],
+      "source": "../VL1/gen-k3.png",
+      "source_polygon": [
+        [
+          295,
+          127
+        ],
+        [
+          378,
+          127
+        ],
+        [
+          378,
+          287
+        ],
+        [
+          311,
+          287
+        ],
+        [
+          311,
+          237
+        ],
+        [
+          295,
+          237
+        ]
+      ],
+      "native_size": [
+        27,
+        43
+      ],
+      "rim_growth_pixels": 1,
+      "sha256": "4c356ef007b020e534f42a747f6156dce2634d3cbd6ee268102c8b7b33172c2e"
+    },
+    "pressure-C": {
+      "path": "src/pressure-C.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        101,
+        86,
+        140,
+        116
+      ],
+      "source": "../VL1/gen-k2.png",
+      "source_polygon": [
+        [
+          40,
+          286
+        ],
+        [
+          208,
+          286
+        ],
+        [
+          208,
+          410
+        ],
+        [
+          40,
+          410
+        ]
+      ],
+      "native_size": [
+        39,
+        30
+      ],
+      "rim_growth_pixels": 1,
+      "sha256": "a0a0619edd046b7e262a03bf47fa16773651936bd582278b97801e0eb3db2d06"
+    },
+    "burst-A": {
+      "path": "src/burst-A.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        104,
+        66,
+        136,
+        116
+      ],
+      "source": "../VL1/gen-k3.png",
+      "source_polygon": [
+        [
+          129,
+          86
+        ],
+        [
+          241,
+          86
+        ],
+        [
+          241,
+          197
+        ],
+        [
+          217,
+          239
+        ],
+        [
+          217,
+          279
+        ],
+        [
+          129,
+          279
+        ]
+      ],
+      "native_size": [
+        32,
+        50
+      ],
+      "rim_growth_pixels": 1,
+      "sha256": "e4e175826855f26419a5785e8aa4e1a160cdae5bca0022f86bc2f72d80fbb113"
+    },
+    "burst-B": {
+      "path": "src/burst-B.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        107,
+        72,
+        134,
+        116
+      ],
+      "source": "../VL1/gen-k3.png",
+      "source_polygon": [
+        [
+          295,
+          127
+        ],
+        [
+          378,
+          127
+        ],
+        [
+          378,
+          287
+        ],
+        [
+          311,
+          287
+        ],
+        [
+          311,
+          237
+        ],
+        [
+          295,
+          237
+        ]
+      ],
+      "native_size": [
+        27,
+        44
+      ],
+      "rim_growth_pixels": 1,
+      "sha256": "74d58f214c810bfacddc7c580d7449f5472c0b4e2dd59d94ddca15124c573ab4"
+    },
+    "burst-C": {
+      "path": "src/burst-C.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        105,
+        65,
+        136,
+        116
+      ],
+      "source": "../VL1/gen-k2.png",
+      "source_polygon": [
+        [
+          96,
+          55
+        ],
+        [
+          260,
+          55
+        ],
+        [
+          260,
+          194
+        ],
+        [
+          214,
+          210
+        ],
+        [
+          214,
+          300
+        ],
+        [
+          96,
+          300
+        ]
+      ],
+      "native_size": [
+        31,
+        51
+      ],
+      "rim_growth_pixels": 1,
+      "sha256": "fe049971a3114d0e00910033313f793454f3757ad7617f32ce3f09bcf8d1ee8b"
+    },
+    "floor-ring": {
+      "path": "src/floor-ring.png",
+      "anchor": [
+        120,
+        144
+      ],
+      "bbox": [
+        70,
+        119,
+        170,
+        169
+      ],
+      "source": "../VL1/gen-k3.png",
+      "source_polygon": [
+        [
+          145,
+          339
+        ],
+        [
+          213,
+          339
+        ],
+        [
+          213,
+          420
+        ],
+        [
+          309,
+          420
+        ],
+        [
+          309,
+          339
+        ],
+        [
+          370,
+          339
+        ],
+        [
+          370,
+          448
+        ],
+        [
+          145,
+          448
+        ]
+      ],
+      "native_size": [
+        100,
+        50
+      ],
+      "rim_growth_pixels": 0,
+      "sha256": "2e2ca7b677d097ab296d67970dda71a47f484bccb11ecc680e21ceea31c36d6d"
+    },
+    "floor-wave": {
+      "path": "src/floor-wave.png",
+      "anchor": [
+        120,
+        144
+      ],
+      "bbox": [
+        70,
+        119,
+        170,
+        169
+      ],
+      "source": "../VL1/gen-k3.png",
+      "source_polygon": [
+        [
+          145,
+          339
+        ],
+        [
+          213,
+          339
+        ],
+        [
+          213,
+          420
+        ],
+        [
+          309,
+          420
+        ],
+        [
+          309,
+          339
+        ],
+        [
+          370,
+          339
+        ],
+        [
+          370,
+          448
+        ],
+        [
+          145,
+          448
+        ]
+      ],
+      "native_size": [
+        100,
+        50
+      ],
+      "rim_growth_pixels": 0,
+      "sha256": "2e2ca7b677d097ab296d67970dda71a47f484bccb11ecc680e21ceea31c36d6d"
+    },
+    "residue": {
+      "path": "src/residue.png",
+      "anchor": [
+        120,
+        116
+      ],
+      "bbox": [
+        109,
+        98,
+        131,
+        116
+      ],
+      "source": "../VL1/gen-k2.png",
+      "source_polygon": [
+        [
+          40,
+          286
+        ],
+        [
+          208,
+          286
+        ],
+        [
+          208,
+          410
+        ],
+        [
+          40,
+          410
+        ]
+      ],
+      "native_size": [
+        22,
+        18
+      ],
+      "rim_growth_pixels": 1,
+      "sha256": "eb2ae8b908cece53a55cc74701711773ed73bef765ecd722076aef063ba4fdd2"
     },
     "core-small": {
       "path": "src/core-small.png",
@@ -129,81 +606,6 @@
       ],
       "sha256": "60f4e7cec3c747bec3c0fe893d1f32703692d1ca3bf7a193c9047679ba38ad57"
     },
-    "pressure-A": {
-      "path": "src/pressure-A.png",
-      "anchor": [
-        120,
-        116
-      ],
-      "bbox": [
-        103,
-        69,
-        138,
-        116
-      ],
-      "source_crop": [
-        0,
-        314,
-        314,
-        627
-      ],
-      "source": "gen-01.png",
-      "native_size": [
-        35,
-        47
-      ],
-      "sha256": "c989c068e2b41dab6530abdf7d2df2472c52cdc3bcfe41389fe462c0c878046c"
-    },
-    "pressure-B": {
-      "path": "src/pressure-B.png",
-      "anchor": [
-        120,
-        116
-      ],
-      "bbox": [
-        103,
-        69,
-        138,
-        116
-      ],
-      "source_crop": [
-        314,
-        314,
-        627,
-        627
-      ],
-      "source": "gen-01.png",
-      "native_size": [
-        35,
-        47
-      ],
-      "sha256": "1e877afdbd6b61f07920d8e7e24bca431d1888863a04fe25f8f14e68997df2f8"
-    },
-    "pressure-C": {
-      "path": "src/pressure-C.png",
-      "anchor": [
-        120,
-        116
-      ],
-      "bbox": [
-        103,
-        69,
-        138,
-        116
-      ],
-      "source_crop": [
-        627,
-        314,
-        940,
-        627
-      ],
-      "source": "gen-01.png",
-      "native_size": [
-        35,
-        47
-      ],
-      "sha256": "b5d7d92b2f9dd9306617188b9429f210458fed7c6014228e30336904f63e6ed3"
-    },
     "core-medium": {
       "path": "src/core-medium.png",
       "anchor": [
@@ -228,81 +630,6 @@
         12
       ],
       "sha256": "3a2fab81c902c01b9818988cdcccc5716c9e619fca60da0077b4a8326c42a353"
-    },
-    "burst-A": {
-      "path": "src/burst-A.png",
-      "anchor": [
-        120,
-        116
-      ],
-      "bbox": [
-        101,
-        52,
-        139,
-        115
-      ],
-      "source_crop": [
-        0,
-        627,
-        314,
-        940
-      ],
-      "source": "gen-01.png",
-      "native_size": [
-        38,
-        65
-      ],
-      "sha256": "af1e8daa187459437d0a4e2f5a3e874b9c11f237e54a55d1a1f3988b81c828c7"
-    },
-    "burst-B": {
-      "path": "src/burst-B.png",
-      "anchor": [
-        120,
-        116
-      ],
-      "bbox": [
-        101,
-        52,
-        139,
-        116
-      ],
-      "source_crop": [
-        314,
-        627,
-        627,
-        940
-      ],
-      "source": "gen-01.png",
-      "native_size": [
-        38,
-        65
-      ],
-      "sha256": "c50e405f7de3ae6f2d265755c893c3cd46b984d9110051891b3078a890cd36d0"
-    },
-    "burst-C": {
-      "path": "src/burst-C.png",
-      "anchor": [
-        120,
-        116
-      ],
-      "bbox": [
-        101,
-        52,
-        139,
-        116
-      ],
-      "source_crop": [
-        627,
-        627,
-        940,
-        940
-      ],
-      "source": "gen-01.png",
-      "native_size": [
-        38,
-        65
-      ],
-      "sha256": "378f7c9ae024f0743eabc338745d6319fc06c94d24e56e1fa9ccba7175108ece"
     },
     "core-hit": {
       "path": "src/core-hit.png",
@@ -329,56 +656,6 @@
       ],
       "sha256": "f9fd00cdf9d5fffebf78835ee45ecf94583847cd2394fe4f7e7b671d7435b94b"
     },
-    "floor-ring": {
-      "path": "src/floor-ring.png",
-      "anchor": [
-        120,
-        144
-      ],
-      "bbox": [
-        70,
-        119,
-        170,
-        169
-      ],
-      "source_crop": [
-        0,
-        940,
-        314,
-        1254
-      ],
-      "source": "gen-01.png",
-      "native_size": [
-        100,
-        50
-      ],
-      "sha256": "b68977a40b886f45f3b2f1f116b3926abe42ca026d1edc90f865b66d0a10bc72"
-    },
-    "floor-wave": {
-      "path": "src/floor-wave.png",
-      "anchor": [
-        120,
-        144
-      ],
-      "bbox": [
-        70,
-        119,
-        170,
-        169
-      ],
-      "source_crop": [
-        314,
-        940,
-        627,
-        1254
-      ],
-      "source": "gen-01.png",
-      "native_size": [
-        100,
-        50
-      ],
-      "sha256": "bdba10937e879fdac1d85e42722dd0fd2d9f2d69f57e475c646f1e74b3bf49a7"
-    },
     "core-dying": {
       "path": "src/core-dying.png",
       "anchor": [
@@ -403,31 +680,6 @@
         5
       ],
       "sha256": "202a0d5e336a4744f497f56d51532e741c1418675c87131ca7bfcc9a7bacdd73"
-    },
-    "residue": {
-      "path": "src/residue.png",
-      "anchor": [
-        120,
-        112
-      ],
-      "bbox": [
-        108,
-        99,
-        133,
-        126
-      ],
-      "source_crop": [
-        940,
-        940,
-        1254,
-        1254
-      ],
-      "source": "gen-01.png",
-      "native_size": [
-        25,
-        28
-      ],
-      "sha256": "a163b181db4a6fdba09ffd2a032c9d8ea76e85e831b58c15e88f8b3cc32fac7e"
     }
   },
   "frames": [
@@ -879,10 +1131,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            91.0,
-            127.0
+            94.0,
+            120
           ],
-          "rotation": -18.992,
+          "rotation": -4.992,
           "scale": [
             0.72,
             0.72
@@ -896,9 +1148,9 @@
           "source": "inhale-B",
           "position": [
             150.0,
-            128.0
+            138
           ],
-          "rotation": 18.988,
+          "rotation": 1.988,
           "scale": [
             0.72,
             0.72
@@ -911,10 +1163,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            113.0,
-            145
+            89.0,
+            146
           ],
-          "rotation": -40.83,
+          "rotation": -3.83,
           "scale": [
             0.72,
             0.72
@@ -969,10 +1221,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            91.364,
-            126.909
+            94.227,
+            120
           ],
-          "rotation": -18.686,
+          "rotation": -4.686,
           "scale": [
             0.7327,
             0.7327
@@ -985,10 +1237,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            149.636,
-            127.864
+            149.818,
+            138
           ],
-          "rotation": 19.679,
+          "rotation": 2.679,
           "scale": [
             0.7327,
             0.7327
@@ -1001,10 +1253,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            113.182,
-            145
+            89.182,
+            146
           ],
-          "rotation": -41.711,
+          "rotation": -4.711,
           "scale": [
             0.7327,
             0.7327
@@ -1059,10 +1311,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            91.727,
-            126.818
+            94.455,
+            120
           ],
-          "rotation": -17.999,
+          "rotation": -3.999,
           "scale": [
             0.7455,
             0.7455
@@ -1075,10 +1327,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            149.273,
-            127.727
+            149.636,
+            138
           ],
-          "rotation": 19.991,
+          "rotation": 2.991,
           "scale": [
             0.7455,
             0.7455
@@ -1091,10 +1343,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            113.364,
-            145
+            89.364,
+            146
           ],
-          "rotation": -42.658,
+          "rotation": -5.658,
           "scale": [
             0.7455,
             0.7455
@@ -1149,10 +1401,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            92.091,
-            126.727
+            94.682,
+            120
           ],
-          "rotation": -17.086,
+          "rotation": -3.086,
           "scale": [
             0.7582,
             0.7582
@@ -1165,10 +1417,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            148.909,
-            127.591
+            149.455,
+            138
           ],
-          "rotation": 19.853,
+          "rotation": 2.853,
           "scale": [
             0.7582,
             0.7582
@@ -1181,10 +1433,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            113.545,
-            145
+            89.545,
+            146
           ],
-          "rotation": -43.456,
+          "rotation": -6.456,
           "scale": [
             0.7582,
             0.7582
@@ -1239,10 +1491,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            92.455,
-            126.636
+            94.909,
+            120
           ],
-          "rotation": -16.154,
+          "rotation": -2.154,
           "scale": [
             0.7709,
             0.7709
@@ -1255,10 +1507,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            148.545,
-            127.455
+            149.273,
+            138
           ],
-          "rotation": 19.296,
+          "rotation": 2.296,
           "scale": [
             0.7709,
             0.7709
@@ -1271,10 +1523,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            113.727,
-            145
+            89.727,
+            146
           ],
-          "rotation": -43.925,
+          "rotation": -6.925,
           "scale": [
             0.7709,
             0.7709
@@ -1329,10 +1581,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            92.818,
-            126.545
+            95.136,
+            120
           ],
-          "rotation": -15.413,
+          "rotation": -1.413,
           "scale": [
             0.7836,
             0.7836
@@ -1345,10 +1597,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            148.182,
-            127.318
+            149.091,
+            138
           ],
-          "rotation": 18.446,
+          "rotation": 1.446,
           "scale": [
             0.7836,
             0.7836
@@ -1361,10 +1613,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            113.909,
-            145
+            89.909,
+            146
           ],
-          "rotation": -43.958,
+          "rotation": -6.958,
           "scale": [
             0.7836,
             0.7836
@@ -1419,10 +1671,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            93.182,
-            126.455
+            95.364,
+            120
           ],
-          "rotation": -15.03,
+          "rotation": -1.03,
           "scale": [
             0.7964,
             0.7964
@@ -1435,10 +1687,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            147.818,
-            127.182
+            148.909,
+            138
           ],
-          "rotation": 17.495,
+          "rotation": 0.495,
           "scale": [
             0.7964,
             0.7964
@@ -1451,10 +1703,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            114.091,
-            145
+            90.091,
+            146
           ],
-          "rotation": -43.55,
+          "rotation": -6.55,
           "scale": [
             0.7964,
             0.7964
@@ -1509,10 +1761,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            93.545,
-            126.364
+            95.591,
+            120
           ],
-          "rotation": -15.093,
+          "rotation": -1.093,
           "scale": [
             0.8091,
             0.8091
@@ -1525,10 +1777,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            147.455,
-            127.045
+            148.727,
+            138
           ],
-          "rotation": 16.658,
+          "rotation": -0.342,
           "scale": [
             0.8091,
             0.8091
@@ -1541,10 +1793,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            114.273,
-            145
+            90.273,
+            146
           ],
-          "rotation": -42.791,
+          "rotation": -5.791,
           "scale": [
             0.8091,
             0.8091
@@ -1599,10 +1851,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            93.909,
-            126.273
+            95.818,
+            120
           ],
-          "rotation": -15.587,
+          "rotation": -1.587,
           "scale": [
             0.8218,
             0.8218
@@ -1615,10 +1867,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            147.091,
-            126.909
+            148.545,
+            138
           ],
-          "rotation": 16.125,
+          "rotation": -0.875,
           "scale": [
             0.8218,
             0.8218
@@ -1631,10 +1883,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            114.455,
-            145
+            90.455,
+            146
           ],
-          "rotation": -41.853,
+          "rotation": -4.853,
           "scale": [
             0.8218,
             0.8218
@@ -1689,10 +1941,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            94.273,
-            126.182
+            96.045,
+            120
           ],
-          "rotation": -16.4,
+          "rotation": -2.4,
           "scale": [
             0.8345,
             0.8345
@@ -1705,10 +1957,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            146.727,
-            126.773
+            148.364,
+            138
           ],
-          "rotation": 16.015,
+          "rotation": -0.985,
           "scale": [
             0.8345,
             0.8345
@@ -1721,10 +1973,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            114.636,
-            145
+            90.636,
+            146
           ],
-          "rotation": -40.948,
+          "rotation": -3.948,
           "scale": [
             0.8345,
             0.8345
@@ -1779,10 +2031,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            94.636,
-            126.091
+            96.273,
+            120
           ],
-          "rotation": -17.349,
+          "rotation": -3.349,
           "scale": [
             0.8473,
             0.8473
@@ -1795,10 +2047,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            146.364,
-            126.636
+            148.182,
+            138
           ],
-          "rotation": 16.354,
+          "rotation": -0.646,
           "scale": [
             0.8473,
             0.8473
@@ -1811,10 +2063,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            114.818,
-            145
+            90.818,
+            146
           ],
-          "rotation": -40.282,
+          "rotation": -3.282,
           "scale": [
             0.8473,
             0.8473
@@ -1869,10 +2121,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            95.0,
-            126.0
+            96.5,
+            120
           ],
-          "rotation": -18.219,
+          "rotation": -4.219,
           "scale": [
             0.86,
             0.86
@@ -1885,10 +2137,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            146.0,
-            126.5
+            148.0,
+            138
           ],
-          "rotation": 17.065,
+          "rotation": 0.065,
           "scale": [
             0.86,
             0.86
@@ -1901,10 +2153,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            115.0,
-            145
+            91.0,
+            146
           ],
-          "rotation": -40.003,
+          "rotation": -3.003,
           "scale": [
             0.86,
             0.86
@@ -1959,10 +2211,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            95.364,
-            125.909
+            96.727,
+            120
           ],
-          "rotation": -18.813,
+          "rotation": -4.813,
           "scale": [
             0.8727,
             0.8727
@@ -1975,10 +2227,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            145.636,
-            126.364
+            147.818,
+            138
           ],
-          "rotation": 17.987,
+          "rotation": 0.987,
           "scale": [
             0.8727,
             0.8727
@@ -1991,10 +2243,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            115.182,
-            145
+            91.182,
+            146
           ],
-          "rotation": -40.176,
+          "rotation": -3.176,
           "scale": [
             0.8727,
             0.8727
@@ -2049,10 +2301,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            95.727,
-            125.818
+            96.955,
+            120
           ],
-          "rotation": -18.998,
+          "rotation": -4.998,
           "scale": [
             0.8855,
             0.8855
@@ -2065,10 +2317,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            145.273,
-            126.227
+            147.636,
+            138
           ],
-          "rotation": 18.912,
+          "rotation": 1.912,
           "scale": [
             0.8855,
             0.8855
@@ -2081,10 +2333,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            115.364,
-            145
+            91.364,
+            146
           ],
-          "rotation": -40.761,
+          "rotation": -3.761,
           "scale": [
             0.8855,
             0.8855
@@ -2139,10 +2391,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            96.091,
-            125.727
+            97.182,
+            120
           ],
-          "rotation": -18.731,
+          "rotation": -4.731,
           "scale": [
             0.8982,
             0.8982
@@ -2155,10 +2407,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            144.909,
-            126.091
+            147.455,
+            138
           ],
-          "rotation": 19.631,
+          "rotation": 2.631,
           "scale": [
             0.8982,
             0.8982
@@ -2171,10 +2423,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            115.545,
-            145
+            91.545,
+            146
           ],
-          "rotation": -41.626,
+          "rotation": -4.626,
           "scale": [
             0.8982,
             0.8982
@@ -2229,10 +2481,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            96.455,
-            125.636
+            97.409,
+            120
           ],
-          "rotation": -18.073,
+          "rotation": -4.073,
           "scale": [
             0.9109,
             0.9109
@@ -2245,10 +2497,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            144.545,
-            125.955
+            147.273,
+            138
           ],
-          "rotation": 19.981,
+          "rotation": 2.981,
           "scale": [
             0.9109,
             0.9109
@@ -2261,10 +2513,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            115.727,
-            145
+            91.727,
+            146
           ],
-          "rotation": -42.576,
+          "rotation": -5.576,
           "scale": [
             0.9109,
             0.9109
@@ -2319,10 +2571,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            96.818,
-            125.545
+            97.636,
+            120
           ],
-          "rotation": -17.173,
+          "rotation": -3.173,
           "scale": [
             0.9236,
             0.9236
@@ -2335,10 +2587,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            144.182,
-            125.818
+            147.091,
+            138
           ],
-          "rotation": 19.884,
+          "rotation": 2.884,
           "scale": [
             0.9236,
             0.9236
@@ -2351,10 +2603,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            115.909,
-            145
+            91.909,
+            146
           ],
-          "rotation": -43.395,
+          "rotation": -6.395,
           "scale": [
             0.9236,
             0.9236
@@ -2409,10 +2661,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            97.182,
-            125.455
+            97.864,
+            120
           ],
-          "rotation": -16.233,
+          "rotation": -2.233,
           "scale": [
             0.9364,
             0.9364
@@ -2425,10 +2677,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            143.818,
-            125.682
+            146.909,
+            138
           ],
-          "rotation": 19.36,
+          "rotation": 2.36,
           "scale": [
             0.9364,
             0.9364
@@ -2441,10 +2693,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            116.091,
-            145
+            92.091,
+            146
           ],
-          "rotation": -43.899,
+          "rotation": -6.899,
           "scale": [
             0.9364,
             0.9364
@@ -2499,10 +2751,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            97.545,
-            125.364
+            98.091,
+            120
           ],
-          "rotation": -15.467,
+          "rotation": -1.467,
           "scale": [
             0.9491,
             0.9491
@@ -2515,10 +2767,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            143.455,
-            125.545
+            146.727,
+            138
           ],
-          "rotation": 18.53,
+          "rotation": 1.53,
           "scale": [
             0.9491,
             0.9491
@@ -2531,10 +2783,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            116.273,
-            145
+            92.273,
+            146
           ],
-          "rotation": -43.974,
+          "rotation": -6.974,
           "scale": [
             0.9491,
             0.9491
@@ -2589,10 +2841,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            97.909,
-            125.273
+            98.318,
+            120
           ],
-          "rotation": -15.047,
+          "rotation": -1.047,
           "scale": [
             0.9618,
             0.9618
@@ -2605,10 +2857,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            143.091,
-            125.409
+            146.545,
+            138
           ],
-          "rotation": 17.579,
+          "rotation": 0.579,
           "scale": [
             0.9618,
             0.9618
@@ -2621,10 +2873,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            116.455,
-            145
+            92.455,
+            146
           ],
-          "rotation": -43.603,
+          "rotation": -6.603,
           "scale": [
             0.9618,
             0.9618
@@ -2679,10 +2931,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            98.273,
-            125.182
+            98.545,
+            120
           ],
-          "rotation": -15.069,
+          "rotation": -1.069,
           "scale": [
             0.9745,
             0.9745
@@ -2695,10 +2947,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            142.727,
-            125.273
+            146.364,
+            138
           ],
-          "rotation": 16.724,
+          "rotation": -0.276,
           "scale": [
             0.9745,
             0.9745
@@ -2711,10 +2963,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            116.636,
-            145
+            92.636,
+            146
           ],
-          "rotation": -42.869,
+          "rotation": -5.869,
           "scale": [
             0.9745,
             0.9745
@@ -2769,10 +3021,10 @@
           "id": "A",
           "source": "inhale-A",
           "position": [
-            98.636,
-            125.091
+            98.773,
+            120
           ],
-          "rotation": -15.527,
+          "rotation": -1.527,
           "scale": [
             0.9873,
             0.9873
@@ -2785,10 +3037,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            142.364,
-            125.136
+            146.182,
+            138
           ],
-          "rotation": 16.157,
+          "rotation": -0.843,
           "scale": [
             0.9873,
             0.9873
@@ -2801,10 +3053,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            116.818,
-            145
+            92.818,
+            146
           ],
-          "rotation": -41.939,
+          "rotation": -4.939,
           "scale": [
             0.9873,
             0.9873
@@ -2860,9 +3112,9 @@
           "source": "inhale-A",
           "position": [
             99,
-            125
+            120
           ],
-          "rotation": -16.318,
+          "rotation": -2.318,
           "scale": [
             1.0,
             1.0
@@ -2875,10 +3127,10 @@
           "id": "B",
           "source": "inhale-B",
           "position": [
-            142,
-            125
+            146,
+            138
           ],
-          "rotation": 16.007,
+          "rotation": -0.993,
           "scale": [
             1.0,
             1.0
@@ -2891,10 +3143,10 @@
           "id": "C",
           "source": "inhale-C",
           "position": [
-            117,
-            145
+            93,
+            146
           ],
-          "rotation": -41.023,
+          "rotation": -4.023,
           "scale": [
             1.0,
             1.0
@@ -2949,10 +3201,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -12.263,
+          "rotation": -3.263,
           "scale": [
             1.0,
             1.0
@@ -2965,10 +3217,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.307,
+          "rotation": 1.307,
           "scale": [
             1.0,
             1.0
@@ -2981,10 +3233,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.327,
+          "rotation": -4.327,
           "scale": [
             1.0,
             1.0
@@ -3039,10 +3291,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.149,
+          "rotation": -4.149,
           "scale": [
             1.0,
             1.0
@@ -3055,10 +3307,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.99,
+          "rotation": 1.99,
           "scale": [
             1.0,
             1.0
@@ -3071,10 +3323,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.01,
+          "rotation": -4.01,
           "scale": [
             1.0,
             1.0
@@ -3129,10 +3381,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.775,
+          "rotation": -4.775,
           "scale": [
             1.0,
             1.0
@@ -3145,10 +3397,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 14.901,
+          "rotation": 2.901,
           "scale": [
             1.0,
             1.0
@@ -3161,10 +3413,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.142,
+          "rotation": -4.142,
           "scale": [
             1.0,
             1.0
@@ -3219,10 +3471,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -14.0,
+          "rotation": -5.0,
           "scale": [
             0.993,
             0.993
@@ -3235,10 +3487,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 15.835,
+          "rotation": 3.835,
           "scale": [
             0.993,
             0.993
@@ -3251,10 +3503,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.695,
+          "rotation": -4.695,
           "scale": [
             0.993,
             0.993
@@ -3309,10 +3561,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.773,
+          "rotation": -4.773,
           "scale": [
             0.986,
             0.986
@@ -3325,10 +3577,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.58,
+          "rotation": 4.58,
           "scale": [
             0.986,
             0.986
@@ -3341,10 +3593,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -37.542,
+          "rotation": -5.542,
           "scale": [
             0.986,
             0.986
@@ -3399,10 +3651,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.145,
+          "rotation": -4.145,
           "scale": [
             0.979,
             0.979
@@ -3415,10 +3667,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.968,
+          "rotation": 4.968,
           "scale": [
             0.979,
             0.979
@@ -3431,10 +3683,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -38.493,
+          "rotation": -6.493,
           "scale": [
             0.979,
             0.979
@@ -3491,10 +3743,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -12.258,
+          "rotation": -3.258,
           "scale": [
             0.972,
             0.972
@@ -3507,10 +3759,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.911,
+          "rotation": 4.911,
           "scale": [
             0.972,
             0.972
@@ -3523,10 +3775,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -39.332,
+          "rotation": -7.332,
           "scale": [
             0.972,
             0.972
@@ -3581,10 +3833,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -11.313,
+          "rotation": -2.313,
           "scale": [
             0.979,
             0.979
@@ -3597,10 +3849,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.422,
+          "rotation": 4.422,
           "scale": [
             0.979,
             0.979
@@ -3613,10 +3865,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -39.87,
+          "rotation": -7.87,
           "scale": [
             0.979,
             0.979
@@ -3671,10 +3923,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -10.524,
+          "rotation": -1.524,
           "scale": [
             0.986,
             0.986
@@ -3687,10 +3939,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 15.612,
+          "rotation": 3.612,
           "scale": [
             0.986,
             0.986
@@ -3703,10 +3955,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -39.986,
+          "rotation": -7.986,
           "scale": [
             0.986,
             0.986
@@ -3761,10 +4013,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -10.067,
+          "rotation": -1.067,
           "scale": [
             0.993,
             0.993
@@ -3777,10 +4029,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 14.664,
+          "rotation": 2.664,
           "scale": [
             0.993,
             0.993
@@ -3793,10 +4045,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -39.653,
+          "rotation": -7.653,
           "scale": [
             0.993,
             0.993
@@ -3851,10 +4103,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -10.048,
+          "rotation": -1.048,
           "scale": [
             1.0,
             1.0
@@ -3867,10 +4119,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.791,
+          "rotation": 1.791,
           "scale": [
             1.0,
             1.0
@@ -3883,10 +4135,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -38.946,
+          "rotation": -6.946,
           "scale": [
             1.0,
             1.0
@@ -3941,10 +4193,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -10.47,
+          "rotation": -1.47,
           "scale": [
             1.0,
             1.0
@@ -3957,10 +4209,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.192,
+          "rotation": 1.192,
           "scale": [
             1.0,
             1.0
@@ -3973,10 +4225,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -38.025,
+          "rotation": -6.025,
           "scale": [
             1.0,
             1.0
@@ -4031,10 +4283,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -11.237,
+          "rotation": -2.237,
           "scale": [
             1.0,
             1.0
@@ -4047,10 +4299,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.001,
+          "rotation": 1.001,
           "scale": [
             1.0,
             1.0
@@ -4063,10 +4315,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -37.099,
+          "rotation": -5.099,
           "scale": [
             1.0,
             1.0
@@ -4121,10 +4373,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -12.177,
+          "rotation": -3.177,
           "scale": [
             1.0,
             1.0
@@ -4137,10 +4389,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.262,
+          "rotation": 1.262,
           "scale": [
             1.0,
             1.0
@@ -4153,10 +4405,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.376,
+          "rotation": -4.376,
           "scale": [
             1.0,
             1.0
@@ -4211,10 +4463,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.077,
+          "rotation": -4.077,
           "scale": [
             0.9895,
             0.9895
@@ -4227,10 +4479,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.916,
+          "rotation": 1.916,
           "scale": [
             0.9895,
             0.9895
@@ -4243,10 +4495,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.021,
+          "rotation": -4.021,
           "scale": [
             0.9895,
             0.9895
@@ -4301,10 +4553,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.734,
+          "rotation": -4.734,
           "scale": [
             0.979,
             0.979
@@ -4317,10 +4569,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 14.815,
+          "rotation": 2.815,
           "scale": [
             0.979,
             0.979
@@ -4333,10 +4585,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.112,
+          "rotation": -4.112,
           "scale": [
             0.979,
             0.979
@@ -4391,10 +4643,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.998,
+          "rotation": -4.998,
           "scale": [
             0.9685,
             0.9685
@@ -4407,10 +4659,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 15.755,
+          "rotation": 3.755,
           "scale": [
             0.9685,
             0.9685
@@ -4423,10 +4675,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.63,
+          "rotation": -4.63,
           "scale": [
             0.9685,
             0.9685
@@ -4483,10 +4735,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.811,
+          "rotation": -4.811,
           "scale": [
             0.958,
             0.958
@@ -4499,10 +4751,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.525,
+          "rotation": 4.525,
           "scale": [
             0.958,
             0.958
@@ -4515,10 +4767,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -37.458,
+          "rotation": -5.458,
           "scale": [
             0.958,
             0.958
@@ -4573,10 +4825,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.215,
+          "rotation": -4.215,
           "scale": [
             0.9685,
             0.9685
@@ -4589,10 +4841,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.95,
+          "rotation": 4.95,
           "scale": [
             0.9685,
             0.9685
@@ -4605,10 +4857,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -38.408,
+          "rotation": -6.408,
           "scale": [
             0.9685,
             0.9685
@@ -4663,10 +4915,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -12.344,
+          "rotation": -3.344,
           "scale": [
             0.979,
             0.979
@@ -4679,10 +4931,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.935,
+          "rotation": 4.935,
           "scale": [
             0.979,
             0.979
@@ -4695,10 +4947,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -39.266,
+          "rotation": -7.266,
           "scale": [
             0.979,
             0.979
@@ -4753,10 +5005,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -11.395,
+          "rotation": -2.395,
           "scale": [
             0.9895,
             0.9895
@@ -4769,10 +5021,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.482,
+          "rotation": 4.482,
           "scale": [
             0.9895,
             0.9895
@@ -4785,10 +5037,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -39.838,
+          "rotation": -7.838,
           "scale": [
             0.9895,
             0.9895
@@ -4843,10 +5095,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -10.583,
+          "rotation": -1.583,
           "scale": [
             1.0,
             1.0
@@ -4859,10 +5111,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 15.694,
+          "rotation": 3.694,
           "scale": [
             1.0,
             1.0
@@ -4875,10 +5127,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -39.994,
+          "rotation": -7.994,
           "scale": [
             1.0,
             1.0
@@ -4933,10 +5185,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -10.091,
+          "rotation": -1.091,
           "scale": [
             1.0,
             1.0
@@ -4949,10 +5201,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 14.749,
+          "rotation": 2.749,
           "scale": [
             1.0,
             1.0
@@ -4965,10 +5217,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -39.7,
+          "rotation": -7.7,
           "scale": [
             1.0,
             1.0
@@ -5023,10 +5275,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -10.031,
+          "rotation": -1.031,
           "scale": [
             1.0,
             1.0
@@ -5039,10 +5291,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.861,
+          "rotation": 1.861,
           "scale": [
             1.0,
             1.0
@@ -5055,10 +5307,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -39.021,
+          "rotation": -7.021,
           "scale": [
             1.0,
             1.0
@@ -5113,10 +5365,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -10.416,
+          "rotation": -1.416,
           "scale": [
             1.0,
             1.0
@@ -5129,10 +5381,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.231,
+          "rotation": 1.231,
           "scale": [
             1.0,
             1.0
@@ -5145,10 +5397,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -38.112,
+          "rotation": -6.112,
           "scale": [
             1.0,
             1.0
@@ -5203,10 +5455,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -11.158,
+          "rotation": -2.158,
           "scale": [
             0.9853,
             0.9853
@@ -5219,10 +5471,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.0,
+          "rotation": 1.0,
           "scale": [
             0.9853,
             0.9853
@@ -5235,10 +5487,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -37.177,
+          "rotation": -5.177,
           "scale": [
             0.9853,
             0.9853
@@ -5293,10 +5545,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -12.091,
+          "rotation": -3.091,
           "scale": [
             0.9706,
             0.9706
@@ -5309,10 +5561,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.221,
+          "rotation": 1.221,
           "scale": [
             0.9706,
             0.9706
@@ -5325,10 +5577,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.428,
+          "rotation": -4.428,
           "scale": [
             0.9706,
             0.9706
@@ -5383,10 +5635,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.004,
+          "rotation": -4.004,
           "scale": [
             0.9559,
             0.9559
@@ -5399,10 +5651,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 13.845,
+          "rotation": 1.845,
           "scale": [
             0.9559,
             0.9559
@@ -5415,10 +5667,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.035,
+          "rotation": -4.035,
           "scale": [
             0.9559,
             0.9559
@@ -5475,10 +5727,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.689,
+          "rotation": -4.689,
           "scale": [
             0.9412,
             0.9412
@@ -5491,10 +5743,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 14.729,
+          "rotation": 2.729,
           "scale": [
             0.9412,
             0.9412
@@ -5507,10 +5759,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.085,
+          "rotation": -4.085,
           "scale": [
             0.9412,
             0.9412
@@ -5565,10 +5817,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.993,
+          "rotation": -4.993,
           "scale": [
             0.9559,
             0.9559
@@ -5581,10 +5833,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 15.675,
+          "rotation": 3.675,
           "scale": [
             0.9559,
             0.9559
@@ -5597,10 +5849,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -36.569,
+          "rotation": -4.569,
           "scale": [
             0.9559,
             0.9559
@@ -5655,10 +5907,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.846,
+          "rotation": -4.846,
           "scale": [
             0.9706,
             0.9706
@@ -5671,10 +5923,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.468,
+          "rotation": 4.468,
           "scale": [
             0.9706,
             0.9706
@@ -5687,10 +5939,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -37.376,
+          "rotation": -5.376,
           "scale": [
             0.9706,
             0.9706
@@ -5745,10 +5997,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -13.282,
+          "rotation": -4.282,
           "scale": [
             0.9853,
             0.9853
@@ -5761,10 +6013,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.929,
+          "rotation": 4.929,
           "scale": [
             0.9853,
             0.9853
@@ -5777,10 +6029,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -38.324,
+          "rotation": -6.324,
           "scale": [
             0.9853,
             0.9853
@@ -5835,10 +6087,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -12.429,
+          "rotation": -3.429,
           "scale": [
             1.0,
             1.0
@@ -5851,10 +6103,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.955,
+          "rotation": 4.955,
           "scale": [
             1.0,
             1.0
@@ -5867,10 +6119,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -39.198,
+          "rotation": -7.198,
           "scale": [
             1.0,
             1.0
@@ -5925,10 +6177,10 @@
           "id": "A",
           "source": "pressure-A",
           "position": [
-            105,
-            125
+            106,
+            120
           ],
-          "rotation": -11.478,
+          "rotation": -2.478,
           "scale": [
             1.0,
             1.0
@@ -5941,10 +6193,10 @@
           "id": "B",
           "source": "pressure-B",
           "position": [
-            137,
-            126
+            140,
+            123
           ],
-          "rotation": 16.538,
+          "rotation": 4.538,
           "scale": [
             1.0,
             1.0
@@ -5957,10 +6209,10 @@
           "id": "C",
           "source": "pressure-C",
           "position": [
-            119,
-            144
+            96,
+            146
           ],
-          "rotation": -39.802,
+          "rotation": -7.802,
           "scale": [
             1.0,
             1.0
@@ -6015,15 +6267,15 @@
           "id": "burst-0",
           "source": "burst-A",
           "position": [
-            134.758,
-            132.343
+            140.661,
+            132.88
           ],
           "rotation": 100.313,
           "scale": [
-            0.429,
+            0.495,
             0.55
           ],
-          "ground_y": 145.343,
+          "ground_y": 145.88,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6031,15 +6283,15 @@
           "id": "burst-1",
           "source": "burst-B",
           "position": [
-            128.536,
-            137.167
+            131.951,
+            139.634
           ],
           "rotation": 145.313,
           "scale": [
-            0.429,
+            0.495,
             0.55
           ],
-          "ground_y": 150.167,
+          "ground_y": 152.634,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6047,15 +6299,15 @@
           "id": "burst-2",
           "source": "burst-C",
           "position": [
-            117.315,
-            138.379
+            116.24,
+            141.33
           ],
           "rotation": 190.313,
           "scale": [
-            0.429,
+            0.495,
             0.55
           ],
-          "ground_y": 151.379,
+          "ground_y": 154.33,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6063,15 +6315,15 @@
           "id": "burst-3",
           "source": "burst-A",
           "position": [
-            107.666,
-            135.268
+            102.732,
+            136.975
           ],
           "rotation": 235.313,
           "scale": [
-            0.429,
+            0.495,
             0.55
           ],
-          "ground_y": 148.268,
+          "ground_y": 149.975,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6079,15 +6331,15 @@
           "id": "burst-4",
           "source": "burst-B",
           "position": [
-            105.242,
-            129.657
+            99.339,
+            129.12
           ],
           "rotation": 280.313,
           "scale": [
-            0.429,
+            0.495,
             0.55
           ],
-          "ground_y": 142.657,
+          "ground_y": 142.12,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6095,15 +6347,15 @@
           "id": "burst-5",
           "source": "burst-C",
           "position": [
-            111.464,
-            124.833
+            108.049,
+            122.366
           ],
           "rotation": 325.313,
           "scale": [
-            0.429,
+            0.495,
             0.55
           ],
-          "ground_y": 137.833,
+          "ground_y": 135.366,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6111,15 +6363,15 @@
           "id": "burst-6",
           "source": "burst-A",
           "position": [
-            122.685,
-            123.621
+            123.76,
+            120.67
           ],
           "rotation": 370.313,
           "scale": [
-            0.429,
+            0.495,
             0.55
           ],
-          "ground_y": 136.621,
+          "ground_y": 133.67,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6127,15 +6379,15 @@
           "id": "burst-7",
           "source": "burst-B",
           "position": [
-            132.334,
-            126.732
+            137.268,
+            125.025
           ],
           "rotation": 415.313,
           "scale": [
-            0.429,
+            0.495,
             0.55
           ],
-          "ground_y": 139.732,
+          "ground_y": 138.025,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6185,15 +6437,15 @@
           "id": "burst-0",
           "source": "burst-A",
           "position": [
-            135.84,
-            132.441
+            142.136,
+            133.014
           ],
           "rotation": 100.313,
           "scale": [
-            0.4992,
+            0.576,
             0.64
           ],
-          "ground_y": 145.441,
+          "ground_y": 146.014,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6201,15 +6453,15 @@
           "id": "burst-1",
           "source": "burst-B",
           "position": [
-            129.162,
-            137.619
+            132.805,
+            140.251
           ],
           "rotation": 145.313,
           "scale": [
-            0.4992,
+            0.576,
             0.64
           ],
-          "ground_y": 150.619,
+          "ground_y": 153.251,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6217,15 +6469,15 @@
           "id": "burst-2",
           "source": "burst-C",
           "position": [
-            117.118,
-            138.92
+            115.972,
+            142.068
           ],
           "rotation": 190.313,
           "scale": [
-            0.4992,
+            0.576,
             0.64
           ],
-          "ground_y": 151.92,
+          "ground_y": 155.068,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6233,15 +6485,15 @@
           "id": "burst-3",
           "source": "burst-A",
           "position": [
-            106.761,
-            135.581
+            101.499,
+            137.402
           ],
           "rotation": 235.313,
           "scale": [
-            0.4992,
+            0.576,
             0.64
           ],
-          "ground_y": 148.581,
+          "ground_y": 150.402,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6249,15 +6501,15 @@
           "id": "burst-4",
           "source": "burst-B",
           "position": [
-            104.16,
-            129.559
+            97.864,
+            128.986
           ],
           "rotation": 280.313,
           "scale": [
-            0.4992,
+            0.576,
             0.64
           ],
-          "ground_y": 142.559,
+          "ground_y": 141.986,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6265,15 +6517,15 @@
           "id": "burst-5",
           "source": "burst-C",
           "position": [
-            110.838,
-            124.381
+            107.195,
+            121.749
           ],
           "rotation": 325.313,
           "scale": [
-            0.4992,
+            0.576,
             0.64
           ],
-          "ground_y": 137.381,
+          "ground_y": 134.749,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6281,15 +6533,15 @@
           "id": "burst-6",
           "source": "burst-A",
           "position": [
-            122.882,
-            123.08
+            124.028,
+            119.932
           ],
           "rotation": 370.313,
           "scale": [
-            0.4992,
+            0.576,
             0.64
           ],
-          "ground_y": 136.08,
+          "ground_y": 132.932,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6297,15 +6549,15 @@
           "id": "burst-7",
           "source": "burst-B",
           "position": [
-            133.239,
-            126.419
+            138.501,
+            124.598
           ],
           "rotation": 415.313,
           "scale": [
-            0.4992,
+            0.576,
             0.64
           ],
-          "ground_y": 139.419,
+          "ground_y": 137.598,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6355,15 +6607,15 @@
           "id": "burst-0",
           "source": "burst-A",
           "position": [
-            136.922,
-            132.54
+            143.612,
+            133.148
           ],
           "rotation": 100.313,
           "scale": [
-            0.5694,
+            0.657,
             0.73
           ],
-          "ground_y": 145.54,
+          "ground_y": 146.148,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6371,15 +6623,15 @@
           "id": "burst-1",
           "source": "burst-B",
           "position": [
-            129.788,
-            138.072
+            133.658,
+            140.867
           ],
           "rotation": 145.313,
           "scale": [
-            0.5694,
+            0.657,
             0.73
           ],
-          "ground_y": 151.072,
+          "ground_y": 153.867,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6387,15 +6639,15 @@
           "id": "burst-2",
           "source": "burst-C",
           "position": [
-            116.921,
-            139.461
+            115.703,
+            142.806
           ],
           "rotation": 190.313,
           "scale": [
-            0.5694,
+            0.657,
             0.73
           ],
-          "ground_y": 152.461,
+          "ground_y": 155.806,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6403,15 +6655,15 @@
           "id": "burst-3",
           "source": "burst-A",
           "position": [
-            105.857,
-            135.894
+            100.265,
+            137.829
           ],
           "rotation": 235.313,
           "scale": [
-            0.5694,
+            0.657,
             0.73
           ],
-          "ground_y": 148.894,
+          "ground_y": 150.829,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6419,15 +6671,15 @@
           "id": "burst-4",
           "source": "burst-B",
           "position": [
-            103.078,
-            129.46
+            96.388,
+            128.852
           ],
           "rotation": 280.313,
           "scale": [
-            0.5694,
+            0.657,
             0.73
           ],
-          "ground_y": 142.46,
+          "ground_y": 141.852,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6435,15 +6687,15 @@
           "id": "burst-5",
           "source": "burst-C",
           "position": [
-            110.212,
-            123.928
+            106.342,
+            121.133
           ],
           "rotation": 325.313,
           "scale": [
-            0.5694,
+            0.657,
             0.73
           ],
-          "ground_y": 136.928,
+          "ground_y": 134.133,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6451,15 +6703,15 @@
           "id": "burst-6",
           "source": "burst-A",
           "position": [
-            123.079,
-            122.539
+            124.297,
+            119.194
           ],
           "rotation": 370.313,
           "scale": [
-            0.5694,
+            0.657,
             0.73
           ],
-          "ground_y": 135.539,
+          "ground_y": 132.194,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6467,15 +6719,15 @@
           "id": "burst-7",
           "source": "burst-B",
           "position": [
-            134.143,
-            126.106
+            139.735,
+            124.171
           ],
           "rotation": 415.313,
           "scale": [
-            0.5694,
+            0.657,
             0.73
           ],
-          "ground_y": 139.106,
+          "ground_y": 137.171,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6525,15 +6777,15 @@
           "id": "burst-0",
           "source": "burst-A",
           "position": [
-            138.004,
-            132.638
+            145.088,
+            133.283
           ],
           "rotation": 100.313,
           "scale": [
-            0.6396,
+            0.738,
             0.82
           ],
-          "ground_y": 145.638,
+          "ground_y": 146.283,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6541,15 +6793,15 @@
           "id": "burst-1",
           "source": "burst-B",
           "position": [
-            130.414,
-            138.524
+            134.512,
+            141.484
           ],
           "rotation": 145.313,
           "scale": [
-            0.6396,
+            0.738,
             0.82
           ],
-          "ground_y": 151.524,
+          "ground_y": 154.484,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6557,15 +6809,15 @@
           "id": "burst-2",
           "source": "burst-C",
           "position": [
-            116.724,
-            140.002
+            115.435,
+            143.544
           ],
           "rotation": 190.313,
           "scale": [
-            0.6396,
+            0.738,
             0.82
           ],
-          "ground_y": 153.002,
+          "ground_y": 156.544,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6573,15 +6825,15 @@
           "id": "burst-3",
           "source": "burst-A",
           "position": [
-            104.952,
-            136.207
+            99.032,
+            138.256
           ],
           "rotation": 235.313,
           "scale": [
-            0.6396,
+            0.738,
             0.82
           ],
-          "ground_y": 149.207,
+          "ground_y": 151.256,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6589,15 +6841,15 @@
           "id": "burst-4",
           "source": "burst-B",
           "position": [
-            101.996,
-            129.362
+            94.912,
+            128.717
           ],
           "rotation": 280.313,
           "scale": [
-            0.6396,
+            0.738,
             0.82
           ],
-          "ground_y": 142.362,
+          "ground_y": 141.717,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6605,15 +6857,15 @@
           "id": "burst-5",
           "source": "burst-C",
           "position": [
-            109.586,
-            123.476
+            105.488,
+            120.516
           ],
           "rotation": 325.313,
           "scale": [
-            0.6396,
+            0.738,
             0.82
           ],
-          "ground_y": 136.476,
+          "ground_y": 133.516,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6621,15 +6873,15 @@
           "id": "burst-6",
           "source": "burst-A",
           "position": [
-            123.276,
-            121.998
+            124.565,
+            118.456
           ],
           "rotation": 370.313,
           "scale": [
-            0.6396,
+            0.738,
             0.82
           ],
-          "ground_y": 134.998,
+          "ground_y": 131.456,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6637,15 +6889,15 @@
           "id": "burst-7",
           "source": "burst-B",
           "position": [
-            135.048,
-            125.793
+            140.968,
+            123.744
           ],
           "rotation": 415.313,
           "scale": [
-            0.6396,
+            0.738,
             0.82
           ],
-          "ground_y": 138.793,
+          "ground_y": 136.744,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6695,15 +6947,15 @@
           "id": "burst-0",
           "source": "burst-A",
           "position": [
-            139.087,
-            132.737
+            146.564,
+            133.417
           ],
           "rotation": 100.313,
           "scale": [
-            0.7098,
+            0.819,
             0.91
           ],
-          "ground_y": 145.737,
+          "ground_y": 146.417,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6711,15 +6963,15 @@
           "id": "burst-1",
           "source": "burst-B",
           "position": [
-            131.04,
-            138.976
+            135.365,
+            142.101
           ],
           "rotation": 145.313,
           "scale": [
-            0.7098,
+            0.819,
             0.91
           ],
-          "ground_y": 151.976,
+          "ground_y": 155.101,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6727,15 +6979,15 @@
           "id": "burst-2",
           "source": "burst-C",
           "position": [
-            116.527,
-            140.543
+            115.166,
+            144.282
           ],
           "rotation": 190.313,
           "scale": [
-            0.7098,
+            0.819,
             0.91
           ],
-          "ground_y": 153.543,
+          "ground_y": 157.282,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6743,15 +6995,15 @@
           "id": "burst-3",
           "source": "burst-A",
           "position": [
-            104.048,
-            136.52
+            97.799,
+            138.683
           ],
           "rotation": 235.313,
           "scale": [
-            0.7098,
+            0.819,
             0.91
           ],
-          "ground_y": 149.52,
+          "ground_y": 151.683,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6759,15 +7011,15 @@
           "id": "burst-4",
           "source": "burst-B",
           "position": [
-            100.913,
-            129.263
+            93.436,
+            128.583
           ],
           "rotation": 280.313,
           "scale": [
-            0.7098,
+            0.819,
             0.91
           ],
-          "ground_y": 142.263,
+          "ground_y": 141.583,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6775,15 +7027,15 @@
           "id": "burst-5",
           "source": "burst-C",
           "position": [
-            108.96,
-            123.024
+            104.635,
+            119.899
           ],
           "rotation": 325.313,
           "scale": [
-            0.7098,
+            0.819,
             0.91
           ],
-          "ground_y": 136.024,
+          "ground_y": 132.899,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6791,15 +7043,15 @@
           "id": "burst-6",
           "source": "burst-A",
           "position": [
-            123.473,
-            121.457
+            124.834,
+            117.718
           ],
           "rotation": 370.313,
           "scale": [
-            0.7098,
+            0.819,
             0.91
           ],
-          "ground_y": 134.457,
+          "ground_y": 130.718,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6807,15 +7059,15 @@
           "id": "burst-7",
           "source": "burst-B",
           "position": [
-            135.952,
-            125.48
+            142.201,
+            123.317
           ],
           "rotation": 415.313,
           "scale": [
-            0.7098,
+            0.819,
             0.91
           ],
-          "ground_y": 138.48,
+          "ground_y": 136.317,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6867,15 +7119,15 @@
           "id": "burst-0",
           "source": "burst-A",
           "position": [
-            140.169,
-            132.835
+            148.04,
+            133.551
           ],
           "rotation": 100.313,
           "scale": [
-            0.78,
+            0.9,
             1.0
           ],
-          "ground_y": 145.835,
+          "ground_y": 146.551,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6883,15 +7135,15 @@
           "id": "burst-1",
           "source": "burst-B",
           "position": [
-            131.666,
-            139.428
+            136.219,
+            142.717
           ],
           "rotation": 145.313,
           "scale": [
-            0.78,
+            0.9,
             1.0
           ],
-          "ground_y": 152.428,
+          "ground_y": 155.717,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6899,15 +7151,15 @@
           "id": "burst-2",
           "source": "burst-C",
           "position": [
-            116.33,
-            141.084
+            114.898,
+            145.02
           ],
           "rotation": 190.313,
           "scale": [
-            0.78,
+            0.9,
             1.0
           ],
-          "ground_y": 154.084,
+          "ground_y": 158.02,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6915,15 +7167,15 @@
           "id": "burst-3",
           "source": "burst-A",
           "position": [
-            103.143,
-            136.833
+            96.565,
+            139.11
           ],
           "rotation": 235.313,
           "scale": [
-            0.78,
+            0.9,
             1.0
           ],
-          "ground_y": 149.833,
+          "ground_y": 152.11,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -6931,15 +7183,15 @@
           "id": "burst-4",
           "source": "burst-B",
           "position": [
-            99.831,
-            129.165
+            91.96,
+            128.449
           ],
           "rotation": 280.313,
           "scale": [
-            0.78,
+            0.9,
             1.0
           ],
-          "ground_y": 142.165,
+          "ground_y": 141.449,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6947,15 +7199,15 @@
           "id": "burst-5",
           "source": "burst-C",
           "position": [
-            108.334,
-            122.572
+            103.781,
+            119.283
           ],
           "rotation": 325.313,
           "scale": [
-            0.78,
+            0.9,
             1.0
           ],
-          "ground_y": 135.572,
+          "ground_y": 132.283,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6963,15 +7215,15 @@
           "id": "burst-6",
           "source": "burst-A",
           "position": [
-            123.67,
-            120.916
+            125.102,
+            116.98
           ],
           "rotation": 370.313,
           "scale": [
-            0.78,
+            0.9,
             1.0
           ],
-          "ground_y": 133.916,
+          "ground_y": 129.98,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -6979,15 +7231,15 @@
           "id": "burst-7",
           "source": "burst-B",
           "position": [
-            136.857,
-            125.167
+            143.435,
+            122.89
           ],
           "rotation": 415.313,
           "scale": [
-            0.78,
+            0.9,
             1.0
           ],
-          "ground_y": 138.167,
+          "ground_y": 135.89,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7037,15 +7289,15 @@
           "id": "burst-0",
           "source": "burst-A",
           "position": [
-            141.251,
-            132.934
+            149.515,
+            133.685
           ],
           "rotation": 100.313,
           "scale": [
-            0.8502,
+            0.981,
             1.09
           ],
-          "ground_y": 145.934,
+          "ground_y": 146.685,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7053,15 +7305,15 @@
           "id": "burst-1",
           "source": "burst-B",
           "position": [
-            132.292,
-            139.881
+            137.073,
+            143.334
           ],
           "rotation": 145.313,
           "scale": [
-            0.8502,
+            0.981,
             1.09
           ],
-          "ground_y": 152.881,
+          "ground_y": 156.334,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7069,15 +7321,15 @@
           "id": "burst-2",
           "source": "burst-C",
           "position": [
-            116.133,
-            141.626
+            114.629,
+            145.758
           ],
           "rotation": 190.313,
           "scale": [
-            0.8502,
+            0.981,
             1.09
           ],
-          "ground_y": 154.626,
+          "ground_y": 158.758,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7085,15 +7337,15 @@
           "id": "burst-3",
           "source": "burst-A",
           "position": [
-            102.239,
-            137.146
+            95.332,
+            139.536
           ],
           "rotation": 235.313,
           "scale": [
-            0.8502,
+            0.981,
             1.09
           ],
-          "ground_y": 150.146,
+          "ground_y": 152.536,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7101,15 +7353,15 @@
           "id": "burst-4",
           "source": "burst-B",
           "position": [
-            98.749,
-            129.066
+            90.485,
+            128.315
           ],
           "rotation": 280.313,
           "scale": [
-            0.8502,
+            0.981,
             1.09
           ],
-          "ground_y": 142.066,
+          "ground_y": 141.315,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7117,15 +7369,15 @@
           "id": "burst-5",
           "source": "burst-C",
           "position": [
-            107.708,
-            122.119
+            102.927,
+            118.666
           ],
           "rotation": 325.313,
           "scale": [
-            0.8502,
+            0.981,
             1.09
           ],
-          "ground_y": 135.119,
+          "ground_y": 131.666,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7133,15 +7385,15 @@
           "id": "burst-6",
           "source": "burst-A",
           "position": [
-            123.867,
-            120.374
+            125.371,
+            116.242
           ],
           "rotation": 370.313,
           "scale": [
-            0.8502,
+            0.981,
             1.09
           ],
-          "ground_y": 133.374,
+          "ground_y": 129.242,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7149,15 +7401,15 @@
           "id": "burst-7",
           "source": "burst-B",
           "position": [
-            137.761,
-            124.854
+            144.668,
+            122.464
           ],
           "rotation": 415.313,
           "scale": [
-            0.8502,
+            0.981,
             1.09
           ],
-          "ground_y": 137.854,
+          "ground_y": 135.464,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7207,15 +7459,15 @@
           "id": "burst-0",
           "source": "burst-A",
           "position": [
-            142.333,
-            133.032
+            150.991,
+            133.82
           ],
           "rotation": 100.313,
           "scale": [
-            0.9204,
+            1.062,
             1.18
           ],
-          "ground_y": 146.032,
+          "ground_y": 146.82,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7223,15 +7475,15 @@
           "id": "burst-1",
           "source": "burst-B",
           "position": [
-            132.918,
-            140.333
+            137.926,
+            143.951
           ],
           "rotation": 145.313,
           "scale": [
-            0.9204,
+            1.062,
             1.18
           ],
-          "ground_y": 153.333,
+          "ground_y": 156.951,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7239,15 +7491,15 @@
           "id": "burst-2",
           "source": "burst-C",
           "position": [
-            115.936,
-            142.167
+            114.361,
+            146.496
           ],
           "rotation": 190.313,
           "scale": [
-            0.9204,
+            1.062,
             1.18
           ],
-          "ground_y": 155.167,
+          "ground_y": 159.496,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7255,15 +7507,15 @@
           "id": "burst-3",
           "source": "burst-A",
           "position": [
-            101.334,
-            137.459
+            94.098,
+            139.963
           ],
           "rotation": 235.313,
           "scale": [
-            0.9204,
+            1.062,
             1.18
           ],
-          "ground_y": 150.459,
+          "ground_y": 152.963,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7271,15 +7523,15 @@
           "id": "burst-4",
           "source": "burst-B",
           "position": [
-            97.667,
-            128.968
+            89.009,
+            128.18
           ],
           "rotation": 280.313,
           "scale": [
-            0.9204,
+            1.062,
             1.18
           ],
-          "ground_y": 141.968,
+          "ground_y": 141.18,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7287,15 +7539,15 @@
           "id": "burst-5",
           "source": "burst-C",
           "position": [
-            107.082,
-            121.667
+            102.074,
+            118.049
           ],
           "rotation": 325.313,
           "scale": [
-            0.9204,
+            1.062,
             1.18
           ],
-          "ground_y": 134.667,
+          "ground_y": 131.049,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7303,15 +7555,15 @@
           "id": "burst-6",
           "source": "burst-A",
           "position": [
-            124.064,
-            119.833
+            125.639,
+            115.504
           ],
           "rotation": 370.313,
           "scale": [
-            0.9204,
+            1.062,
             1.18
           ],
-          "ground_y": 132.833,
+          "ground_y": 128.504,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7319,15 +7571,15 @@
           "id": "burst-7",
           "source": "burst-B",
           "position": [
-            138.666,
-            124.541
+            145.902,
+            122.037
           ],
           "rotation": 415.313,
           "scale": [
-            0.9204,
+            1.062,
             1.18
           ],
-          "ground_y": 137.541,
+          "ground_y": 135.037,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7377,15 +7629,15 @@
           "id": "burst-0",
           "source": "burst-A",
           "position": [
-            143.415,
-            133.13
+            152.467,
+            133.954
           ],
           "rotation": 100.313,
           "scale": [
-            0.9906,
+            1.143,
             1.27
           ],
-          "ground_y": 146.13,
+          "ground_y": 146.954,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7393,15 +7645,15 @@
           "id": "burst-1",
           "source": "burst-B",
           "position": [
-            133.544,
-            140.785
+            138.78,
+            144.568
           ],
           "rotation": 145.313,
           "scale": [
-            0.9906,
+            1.143,
             1.27
           ],
-          "ground_y": 153.785,
+          "ground_y": 157.568,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7409,15 +7661,15 @@
           "id": "burst-2",
           "source": "burst-C",
           "position": [
-            115.739,
-            142.708
+            114.092,
+            147.233
           ],
           "rotation": 190.313,
           "scale": [
-            0.9906,
+            1.143,
             1.27
           ],
-          "ground_y": 155.708,
+          "ground_y": 160.233,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7425,15 +7677,15 @@
           "id": "burst-3",
           "source": "burst-A",
           "position": [
-            100.43,
-            137.772
+            92.865,
+            140.39
           ],
           "rotation": 235.313,
           "scale": [
-            0.9906,
+            1.143,
             1.27
           ],
-          "ground_y": 150.772,
+          "ground_y": 153.39,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7441,15 +7693,15 @@
           "id": "burst-4",
           "source": "burst-B",
           "position": [
-            96.585,
-            128.87
+            87.533,
+            128.046
           ],
           "rotation": 280.313,
           "scale": [
-            0.9906,
+            1.143,
             1.27
           ],
-          "ground_y": 141.87,
+          "ground_y": 141.046,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7457,15 +7709,15 @@
           "id": "burst-5",
           "source": "burst-C",
           "position": [
-            106.456,
-            121.215
+            101.22,
+            117.432
           ],
           "rotation": 325.313,
           "scale": [
-            0.9906,
+            1.143,
             1.27
           ],
-          "ground_y": 134.215,
+          "ground_y": 130.432,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7473,15 +7725,15 @@
           "id": "burst-6",
           "source": "burst-A",
           "position": [
-            124.261,
-            119.292
+            125.908,
+            114.767
           ],
           "rotation": 370.313,
           "scale": [
-            0.9906,
+            1.143,
             1.27
           ],
-          "ground_y": 132.292,
+          "ground_y": 127.767,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7489,15 +7741,15 @@
           "id": "burst-7",
           "source": "burst-B",
           "position": [
-            139.57,
-            124.228
+            147.135,
+            121.61
           ],
           "rotation": 415.313,
           "scale": [
-            0.9906,
+            1.143,
             1.27
           ],
-          "ground_y": 137.228,
+          "ground_y": 134.61,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7547,15 +7799,15 @@
           "id": "burst-0",
           "source": "burst-A",
           "position": [
-            144.498,
-            133.229
+            153.943,
+            134.088
           ],
           "rotation": 100.313,
           "scale": [
-            1.0608,
+            1.224,
             1.36
           ],
-          "ground_y": 146.229,
+          "ground_y": 147.088,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7563,15 +7815,15 @@
           "id": "burst-1",
           "source": "burst-B",
           "position": [
-            134.17,
-            141.237
+            139.634,
+            145.184
           ],
           "rotation": 145.313,
           "scale": [
-            1.0608,
+            1.224,
             1.36
           ],
-          "ground_y": 154.237,
+          "ground_y": 158.184,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7579,15 +7831,15 @@
           "id": "burst-2",
           "source": "burst-C",
           "position": [
-            115.542,
-            143.249
+            113.823,
+            147.971
           ],
           "rotation": 190.313,
           "scale": [
-            1.0608,
+            1.224,
             1.36
           ],
-          "ground_y": 156.249,
+          "ground_y": 160.971,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7595,15 +7847,15 @@
           "id": "burst-3",
           "source": "burst-A",
           "position": [
-            99.525,
-            138.085
+            91.631,
+            140.817
           ],
           "rotation": 235.313,
           "scale": [
-            1.0608,
+            1.224,
             1.36
           ],
-          "ground_y": 151.085,
+          "ground_y": 153.817,
           "layer": "front",
           "projection_y": 0.5
         },
@@ -7611,15 +7863,15 @@
           "id": "burst-4",
           "source": "burst-B",
           "position": [
-            95.502,
-            128.771
+            86.057,
+            127.912
           ],
           "rotation": 280.313,
           "scale": [
-            1.0608,
+            1.224,
             1.36
           ],
-          "ground_y": 141.771,
+          "ground_y": 140.912,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7627,15 +7879,15 @@
           "id": "burst-5",
           "source": "burst-C",
           "position": [
-            105.83,
-            120.763
+            100.366,
+            116.816
           ],
           "rotation": 325.313,
           "scale": [
-            1.0608,
+            1.224,
             1.36
           ],
-          "ground_y": 133.763,
+          "ground_y": 129.816,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7643,15 +7895,15 @@
           "id": "burst-6",
           "source": "burst-A",
           "position": [
-            124.458,
-            118.751
+            126.177,
+            114.029
           ],
           "rotation": 370.313,
           "scale": [
-            1.0608,
+            1.224,
             1.36
           ],
-          "ground_y": 131.751,
+          "ground_y": 127.029,
           "layer": "back",
           "projection_y": 0.5
         },
@@ -7659,15 +7911,15 @@
           "id": "burst-7",
           "source": "burst-B",
           "position": [
-            140.475,
-            123.915
+            148.369,
+            121.183
           ],
           "rotation": 415.313,
           "scale": [
-            1.0608,
+            1.224,
             1.36
           ],
-          "ground_y": 136.915,
+          "ground_y": 134.183,
           "layer": "back",
           "projection_y": 0.5
         },

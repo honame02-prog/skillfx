@@ -57,39 +57,73 @@ def quantize(im, palette):
     return Image.fromarray(arr)
 
 
+def cut_vl1(key, polygon, size, floor=False):
+    """Select existing artwork only; polygon is a crop mask, never a drawn flame."""
+    im = Image.open(ROOT.parent / f'VL1/gen-k{key}.png').convert('RGBA')
+    arr = np.array(im)
+    rgb = arr[:, :, :3].astype(np.int16)
+    green = (rgb[:, :, 1] > 80) & (rgb[:, :, 1] > rgb[:, :, 0]+20) & (rgb[:, :, 1] > rgb[:, :, 2]+20)
+    mask = Image.new('1', im.size)
+    ImageDraw.Draw(mask).polygon(polygon, fill=1)
+    keep = ~green & np.array(mask, dtype=bool)
+    # Floor crops additionally exclude the dark character and its costume.
+    if floor:
+        keep &= (rgb[:, :, 0] > 175) & (rgb[:, :, 2] > 95)
+    arr[:, :, 3] = np.where(keep, 255, 0)
+    arr[~keep] = 0
+    im = Image.fromarray(arr)
+    im = im.crop(im.getbbox()).resize(size, Image.Resampling.NEAREST)
+    palette = json.loads((ROOT.parent/'VL1/palette.json').read_text(encoding='utf-8'))['quantization_rgb']
+    im = quantize(im, palette)
+    # One-pixel morphological growth using an existing adjacent rim colour.
+    # No grey/white replacement, no new silhouette design, no alpha blending.
+    arr = np.array(im)
+    arr = np.pad(arr, ((2,2),(2,2),(0,0)))
+    original = arr.copy()
+    shifts = () if floor else ((-1,0),(1,0),(0,-1),(0,1))
+    for dy,dx in shifts:
+        adjacent = np.roll(original, (dy,dx), axis=(0,1))
+        grow = (arr[:,:,3] == 0) & (adjacent[:,:,3] > 0)
+        arr[grow] = adjacent[grow]
+    im = Image.fromarray(arr)
+    return im.crop(im.getbbox())
+
+
 def sources():
-    master = Image.open(ROOT / 'gen-01.png').convert('RGBA')
-    palette = json.loads((ROOT.parent / 'VL1/palette.json').read_text(encoding='utf-8'))['quantization_rgb']
+    # All primary flame shapes are crops of the APPROVED VL1 generation.
+    specs = {
+        'inhale-A': (2, [(96,55),(260,55),(260,194),(214,210),(214,300),(96,300)], (37,61)),
+        'inhale-B': (2, [(295,126),(442,126),(442,403),(306,403),(306,211),(295,211)], (33,61)),
+        'inhale-C': (2, [(37,207),(98,207),(98,294),(210,307),(210,411),(37,411)], (46,48)),
+        'pressure-A': (3, [(129,86),(241,86),(241,197),(217,239),(217,279),(129,279)], (31,48)),
+        'pressure-B': (3, [(295,127),(378,127),(378,287),(311,287),(311,237),(295,237)], (25,42)),
+        'pressure-C': (2, [(40,286),(208,286),(208,410),(40,410)], (37,28)),
+        'burst-A': (3, [(129,86),(241,86),(241,197),(217,239),(217,279),(129,279)], (30,48)),
+        'burst-B': (3, [(295,127),(378,127),(378,287),(311,287),(311,237),(295,237)], (25,43)),
+        'burst-C': (2, [(96,55),(260,55),(260,194),(214,210),(214,300),(96,300)], (29,49)),
+        'floor-ring': (3, [(145,339),(213,339),(213,420),(309,420),(309,339),(370,339),(370,448),(145,448)], (100,50)),
+        'floor-wave': (3, [(145,339),(213,339),(213,420),(309,420),(309,339),(370,339),(370,448),(145,448)], (100,50)),
+        'residue': (2, [(40,286),(208,286),(208,410),(40,410)], (20,16)),
+    }
     assets = {}
-    for row in range(4):
-        for col in range(4):
-            crop = tuple(round(v) for v in (col*master.width/4, row*master.height/4, (col+1)*master.width/4, (row+1)*master.height/4))
-            im = clean_component(master.crop(crop))
-            if row < 3 and col < 3:
-                name = f'{("inhale", "pressure", "burst")[row]}-{"ABC"[col]}'
-                size = ((46, 72), (35, 47), (38, 65))[row]
-                anchor = (120, 116)
-                offset = (120-size[0]//2, 116-size[1])
-            elif col == 3 and row < 3:
-                name = ('core-small', 'core-medium', 'core-hit')[row]
-                size = ((5, 7), (9, 12), (16, 17))[row]
-                anchor = (120, 112)
-                offset = (120-size[0]//2, 112-size[1]//2)
-            else:
-                name = ('floor-ring', 'floor-wave', 'core-dying', 'residue')[col]
-                size = ((100, 50), (100, 50), (3, 5), (25, 28))[col]
-                anchor = (120, 144) if col < 2 else (120, 112)
-                offset = (anchor[0]-size[0]//2, anchor[1]-size[1]//2)
-            im = quantize(im.resize(size, Image.Resampling.NEAREST), palette)
-            # Normalize tight bounds for the floor: exact 2:1 pixel footprint.
-            if name.startswith('floor-'):
-                im = im.crop(im.getbbox()).resize(size, Image.Resampling.NEAREST)
-            canvas = Image.new('RGBA', SIZE)
-            canvas.alpha_composite(im, offset)
-            canvas.save(ROOT / 'src' / f'{name}.png')
-            assets[name] = {'path': f'src/{name}.png', 'anchor': anchor, 'bbox': canvas.getbbox(),
-                            'source_crop': crop, 'source': 'gen-01.png', 'native_size': size,
-                            'sha256': hashlib.sha256((ROOT / 'src' / f'{name}.png').read_bytes()).hexdigest()}
+    for name, (key, polygon, size) in specs.items():
+        is_floor = name.startswith('floor-')
+        im = cut_vl1(key, polygon, size, is_floor)
+        if is_floor:
+            im = im.resize(size, Image.Resampling.NEAREST)
+        anchor = (120,144) if is_floor else (120,116)
+        offset = (120-im.width//2,144-im.height//2) if is_floor else (120-im.width//2,116-im.height)
+        canvas = Image.new('RGBA',SIZE)
+        canvas.alpha_composite(im,offset)
+        canvas.save(ROOT/'src'/f'{name}.png')
+        assets[name] = {'path':f'src/{name}.png','anchor':anchor,'bbox':canvas.getbbox(),
+                        'source':f'../VL1/gen-k{key}.png','source_polygon':polygon,
+                        'native_size':im.size,'rim_growth_pixels':0 if is_floor else 1,
+                        'sha256':hashlib.sha256((ROOT/'src'/f'{name}.png').read_bytes()).hexdigest()}
+    # Tiny opaque hearts are retained; no character was present in the VL2 atlas.
+    previous = json.loads((ROOT/'rig.json').read_text(encoding='utf-8'))['assets']
+    for name in ('core-small','core-medium','core-hit','core-dying'):
+        assets[name] = previous[name]
     return assets
 
 
@@ -125,9 +159,9 @@ def make_rig(assets):
                 u = min(1, (f-10)/22)
                 shrink = 1 - .14*pulse
                 if f < 33:
-                    positions = [(91+8*u, 127-2*u, -17), (150-8*u, 128-3*u, 18), (113+4*u, 145, -42)]
+                    positions = [(94+5*u, 120, -3), (150-4*u, 138, 1), (89+4*u, 146, -5)]
                 else:
-                    positions = [(105,125,-12),(137,126,15),(119,144,-38)]
+                    positions = [(106,120,-3),(140,123,3),(96,146,-6)]
                 for i, (x,y,r) in enumerate(positions):
                     source = f'{phase}-{"ABC"[i]}'
                     s = (.72+.28*u) * shrink
@@ -137,12 +171,12 @@ def make_rig(assets):
                 growth = .55 + .09*(f-67)
                 for i in range(8):
                     angle = i*math.tau/8 + .18
-                    radius = 15 + 1.1*(f-67)
+                    radius = 21 + 1.5*(f-67)
                     x = 120 + radius*math.cos(angle)
                     gy = 144 + .5*radius*math.sin(angle)
                     y = gy - 13
                     parts.append(part(f'burst-{i}',f'burst-{"ABC"[i%3]}', x,y,
-                                      (.78*growth, growth), 90+math.degrees(angle),
+                                      (.90*growth, growth), 90+math.degrees(angle),
                                       ground_y=gy, projection_y=.5))
             if 77 <= f <= 85:
                 for i in range(2):

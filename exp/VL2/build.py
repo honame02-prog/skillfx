@@ -29,7 +29,17 @@ def render(frame, rig=None):
             # Tight source crop -> exact integer footprint; no endpoint lost to affine rounding.
             width = round(asset['native_size'][0] * item['scale'][0])
             height = round(asset['native_size'][1] * item['scale'][1])
-            floor = src.crop(src.getbbox()).resize((width, height), Image.Resampling.NEAREST)
+            tight = src.crop(src.getbbox())
+            floor = tight.resize((width, height), Image.Resampling.NEAREST)
+            # Forward nearest assignment preserves sparse broken-ring extrema
+            # that inverse sampling can skip; all colours remain source colours.
+            original = np.array(tight)
+            pixels = np.array(floor)
+            yy, xx = np.where(original[:, :, 3] > 0)
+            tx = np.rint(xx * (width-1) / max(1,tight.width-1)).astype(int)
+            ty = np.rint(yy * (height-1) / max(1,tight.height-1)).astype(int)
+            pixels[ty,tx] = original[yy,xx]
+            floor = Image.fromarray(pixels)
             px, py = item['position']
             layers['floor'].alpha_composite(floor, (round(px)-width//2, round(py)-height//2))
             continue
