@@ -6,7 +6,9 @@ import { END, SEAL, EMERGE, COIL, DIVE, BEATS, BURN, SQ, SPOT, SEAL_RX, fr } fro
 
 // Four cells straddle the axis; ten lie on either side. Mirrored sites give 14
 // visible cells per half without forcing an artificial straight crack at x=0.
-const SITES = [[0, -32], [0, -12], [0, 10], [0, 31], [12, -29], [26, -23],
+// Offset the inner rear cell toward the centre and its rear neighbours inward:
+// their seams leave a dark gap below the heart's trailing vessels.
+const SITES = [[0, -32], [0, -8], [0, 10], [0, 31], [11, -29], [26, -23],
   [34, -9], [32, 8], [23, 25], [11, 30], [12, 13], [22, 5], [20, -12], [10, -5]];
 const FULL = [...SITES, ...SITES.filter(([x]) => x > 0).map(([x, y]) => [-x, y])];
 const CELLS = new Map();
