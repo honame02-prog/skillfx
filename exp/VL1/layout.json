@@ -1,0 +1,13 @@
+{
+  "source": "gen-04-concept.png",
+  "chroma": true,
+  "keys": [
+    {"crop": [0, 0, 512, 512], "target_top": 200, "target_bottom": 414, "foot": [256, 414]},
+    {"crop": [512, 0, 1024, 512], "target_top": 199, "target_bottom": 414, "foot": [256, 414]},
+    {"crop": [1024, 0, 1536, 512], "target_top": 199, "target_bottom": 414, "foot": [256, 414]},
+    {"crop": [0, 512, 512, 1024], "target_top": 168, "target_bottom": 387, "foot": [256, 387]},
+    {"crop": [512, 512, 1024, 1024], "target_top": 168, "target_bottom": 387, "foot": [256, 387]}
+  ],
+  "detail_crop": [1024, 512, 1536, 1024],
+  "measurement_note": "Source top of bun to bottom of forward boot; measured by visual check and dark-pixel crosscheck. Not automatic semantic detection."
+}

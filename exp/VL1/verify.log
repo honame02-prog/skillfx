@@ -1,0 +1,1 @@
+PASS VL1: keys=5/5 size=240x220 target=57px alpha=0/255 outside_palette=0 nonbinary_alpha=0 png_decoded=23 sheet=3x; visual review documented in NOTES.md

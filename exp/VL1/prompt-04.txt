@@ -1,0 +1,12 @@
+Final production correction to this exact green-background six-panel sheet. Preserve all hollow flame contours, palette, consistent character scale, chest source and five story moments. Keep the sixth macro close-up.
+
+THE FLOOR ELLIPSES ARE STILL TOO EDGE-ON. Redraw them significantly ROUNDER, much deeper vertically. Their vertical diameter must be EXACTLY one HALF horizontal diameter, 0.50, not the current 0.3. The target is a 30-degree elevated TOP-DOWN camera, not a side-view effect. In each 512x512 cell, floor ellipse centre should be at (256,365). Desired outer bounding rectangles in cell-local coordinates:
+top-left ring x144 to368, y309 to421, width224 height112;
+top-middle ring x112 to400, y293 to437, width288 height144;
+top-right ring x144 to368, y309 to421, width224 height112;
+bottom-left explosion's low ground ring x40 to472, y257 to473, width432 height216;
+bottom-middle residual ring x112 to400, y293 to437, width288 height144.
+Do not render these coordinates or any text. These are invisible construction guidelines, not drawn boxes. Use broken organic elliptical contours, some hidden behind the target, front arc clearly below boots. Keep FULL 2:1 ellipses within cells. The explosion's actual fire tongues also form this rounder projected ground ring, all fan OUTWARD from chest but low to ground, back tongues noticeably foreshortened and hidden behind victim. No vertical pillar. All visible fire in each cell must have 25px margins from cell edges.
+
+Camera emphasis: turn victim about 25 degrees toward the viewer's RIGHT so face points lower-right and we see the top of hair bun and both shoulder upper planes, not a frontal portrait. Same stance and scale all five cells. Keep the victim standing centrally with arms at sides, no caster.
+Background stays FLAT PURE CHROMA GREEN #00ff00 everywhere, including hollow flame interiors, NO mist or shadow, no green spill. No texture, gradients or bloom. Pixel-art clean edges. No text, numbers, labels, grid lines or watermarks.

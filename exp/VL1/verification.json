@@ -1,0 +1,290 @@
+{
+  "png": [
+    {
+      "file": "detail-cutout.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "e90c82900eb26cbe141e929c3bffa625a3bfe486fbc92b28b9a337b5fe57b833",
+      "bytes": 239281
+    },
+    {
+      "file": "gen-01-concept.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "526b7362518713be98b7fe2c7058df392a41eadddc38de2864d33612660e0cae",
+      "bytes": 1749261
+    },
+    {
+      "file": "gen-02-concept.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "1e9af5863a8c12ce03cef39c85930cf46107ab5f5c05bfd2242d31bee764393d",
+      "bytes": 1954960
+    },
+    {
+      "file": "gen-03-concept.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "2ac7520032a54bc9466a4c9e8e6487304bc50a8894d0d0a324a0089e87553786",
+      "bytes": 1633896
+    },
+    {
+      "file": "gen-04-concept.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "b6bb92d620b58580bdb05d4dc90b4b8b0c4551c76d6dada865f95ddef6aa5009",
+      "bytes": 1681482
+    },
+    {
+      "file": "gen-detail.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "6c2ff9c608cf5ef2f0ef99d52831e7fd0176c028b5daab1336b032287580b4f0",
+      "bytes": 362208
+    },
+    {
+      "file": "gen-k1.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "df0134287f7551fe16ac1a301ecfc9a2a4f1f869fc1befc053bdb9dda5862e81",
+      "bytes": 234080
+    },
+    {
+      "file": "gen-k2.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "9518a17424c51f2e685a4451c537efa78168e6a57c36244df4bddaf6556f9c44",
+      "bytes": 306595
+    },
+    {
+      "file": "gen-k3.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "c27715783a153a8ba92a36932fcbef6b45cf6611ae7a73bf0384e22f816d484d",
+      "bytes": 258667
+    },
+    {
+      "file": "gen-k4.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "33704c859f501ef1316d1e26f55d2967e07e7a0c3ac849589a599e174ea91194",
+      "bytes": 335483
+    },
+    {
+      "file": "gen-k5.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "2c7112b0ab63ca0b77d72cede7e8e4131db46ef5506afa5a31f206905c5e9b10",
+      "bytes": 226376
+    },
+    {
+      "file": "keys\\k1.png",
+      "size": [
+        240,
+        220
+      ],
+      "sha256": "8751736fd2709a569f5b451597c1e1307eb87f7d5a3168f67c13a776539a84b8",
+      "bytes": 2731
+    },
+    {
+      "file": "keys\\k2.png",
+      "size": [
+        240,
+        220
+      ],
+      "sha256": "1370bd6c32a88a83d1666cb2c0fd0028b6564ff2e6fffb69fec8d3e869108e75",
+      "bytes": 4610
+    },
+    {
+      "file": "keys\\k3.png",
+      "size": [
+        240,
+        220
+      ],
+      "sha256": "3f4752443b0486632ffae9d6c7757fccc236e349c504a4dfdf41ee226291a331",
+      "bytes": 3365
+    },
+    {
+      "file": "keys\\k4.png",
+      "size": [
+        240,
+        220
+      ],
+      "sha256": "1e31e78a9a82cee9b83e5c035bafa3b621f798ba860920e4d4cee86fca889b36",
+      "bytes": 4901
+    },
+    {
+      "file": "keys\\k5.png",
+      "size": [
+        240,
+        220
+      ],
+      "sha256": "8594ccbf52195f2c2ddeb697f89af382851a4fb7d7ec3b02cb0bd39ddd87d1cf",
+      "bytes": 2461
+    },
+    {
+      "file": "native.png",
+      "size": [
+        1200,
+        248
+      ],
+      "sha256": "4a167c45d06982a90caa675b927c12f7290bfa84c773b42184783bd846532245",
+      "bytes": 19175
+    },
+    {
+      "file": "original-small\\k1.png",
+      "size": [
+        240,
+        220
+      ],
+      "sha256": "8f158c9a3e535696bac86f09116b54eb1236a54bab936b0046b966a68d416794",
+      "bytes": 5750
+    },
+    {
+      "file": "original-small\\k2.png",
+      "size": [
+        240,
+        220
+      ],
+      "sha256": "33f3431439c0f778b5dc9eccc8a3803e0902757257c73affd35b995ec133c223",
+      "bytes": 10388
+    },
+    {
+      "file": "original-small\\k3.png",
+      "size": [
+        240,
+        220
+      ],
+      "sha256": "5eb271e49da4a9d503dcaa07a4c025c0d4ac02846e5be61998a6804e88eafafd",
+      "bytes": 7176
+    },
+    {
+      "file": "original-small\\k4.png",
+      "size": [
+        240,
+        220
+      ],
+      "sha256": "b9df6b09e19424b8fbbc9fd9d827e1ab7d7e6e298fd2e9c6c319eb6c71f4bd95",
+      "bytes": 12260
+    },
+    {
+      "file": "original-small\\k5.png",
+      "size": [
+        240,
+        220
+      ],
+      "sha256": "1ea18cb826ffaa6712aaf824cb93379f0f368f0de0ae92df1a04399e8827e827",
+      "bytes": 5167
+    },
+    {
+      "file": "sheet.png",
+      "size": [
+        1476,
+        3536
+      ],
+      "sha256": "9524fd98f0bcb44fbc8555033305cbc3bce4572ab2b356240f9c952ab5e38c6c",
+      "bytes": 130779
+    }
+  ],
+  "keys": [
+    {
+      "file": "keys/k1.png",
+      "visible_colours": 10,
+      "opaque_pixels": 1212,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        89,
+        66,
+        156,
+        152
+      ]
+    },
+    {
+      "file": "keys/k2.png",
+      "visible_colours": 10,
+      "opaque_pixels": 2143,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        63,
+        52,
+        166,
+        154
+      ]
+    },
+    {
+      "file": "keys/k3.png",
+      "visible_colours": 10,
+      "opaque_pixels": 1520,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        88,
+        60,
+        151,
+        152
+      ]
+    },
+    {
+      "file": "keys/k4.png",
+      "visible_colours": 10,
+      "opaque_pixels": 2627,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        60,
+        79,
+        183,
+        157
+      ]
+    },
+    {
+      "file": "keys/k5.png",
+      "visible_colours": 10,
+      "opaque_pixels": 1111,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        83,
+        87,
+        157,
+        155
+      ]
+    }
+  ],
+  "outside_palette": 0,
+  "nonbinary_alpha": 0
+}
